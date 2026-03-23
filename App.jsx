@@ -3402,6 +3402,11 @@ function StudentLogin({ accounts, onLogin }) {
 // ─── TEACHER: STUDENT ACCOUNTS ────────────────────────────────────────────────
 
 function TeacherStudentAccounts({ accounts = [], setAccounts }) {
+  console.log("TeacherStudentAccounts rendering, accounts:", accounts, typeof accounts);
+
+  // Extra safety — if accounts isn't an array for any reason, force it
+  const safeAccounts = Array.isArray(accounts) ? accounts : [];
+
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({ name: "", username: "", password: "" });
@@ -3415,21 +3420,21 @@ function TeacherStudentAccounts({ accounts = [], setAccounts }) {
 
   const openEdit = (acct) => {
     setEditingId(acct.id);
-    setForm({ name: acct.name, username: acct.username, password: acct.password });
+    setForm({ name: acct.name || "", username: acct.username || "", password: acct.password || "" });
     setShowForm(true);
   };
 
   const save = () => {
     if (!form.name.trim() || !form.username.trim() || !form.password.trim()) return;
     if (editingId) {
-      setAccounts(prev => prev.map(a => a.id === editingId ? { ...a, ...form } : a));
+      setAccounts(prev => (Array.isArray(prev) ? prev : []).map(a => a.id === editingId ? { ...a, ...form } : a));
     } else {
-      setAccounts(prev => [...prev, { id: "sa" + Date.now(), ...form, profileAnswers: {}, points: 0, completed: [] }]);
+      setAccounts(prev => [...(Array.isArray(prev) ? prev : []), { id: "sa" + Date.now(), ...form, profileAnswers: {}, points: 0, completed: [] }]);
     }
     setShowForm(false);
   };
 
-  const del = (id) => setAccounts(prev => prev.filter(a => a.id !== id));
+  const del = (id) => setAccounts(prev => (Array.isArray(prev) ? prev : []).filter(a => a.id !== id));
 
   const toggleShowPw = (id) => setShowPasswords(p => ({ ...p, [id]: !p[id] }));
 
@@ -3441,33 +3446,33 @@ function TeacherStudentAccounts({ accounts = [], setAccounts }) {
         <div className="flex-between">
           <div>
             <h1 className="page-title">🔑 Student Accounts</h1>
-            <p className="page-sub">{accounts.length} student account{accounts.length !== 1 ? "s" : ""} · Students log in from the Student role selector</p>
+            <p className="page-sub">{safeAccounts.length} student account{safeAccounts.length !== 1 ? "s" : ""} · Students log in from the Student role selector</p>
           </div>
           <button className="btn btn-primary" onClick={openNew}>+ Add Account</button>
         </div>
       </div>
 
       <div className="page-content">
-        {accounts.length === 0 ? (
+        {safeAccounts.length === 0 ? (
           <EmptyState icon="🔑" title="No accounts yet" sub="Add student accounts so students can log in without the onboarding questionnaire." />
         ) : (
           <div style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: "var(--r-lg)", overflow: "hidden" }}>
-            {accounts.map((acct, i) => (
-              <div key={acct.id} style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 20px", borderBottom: i < accounts.length - 1 ? "1px solid var(--border)" : "none" }}>
+            {safeAccounts.map((acct, i) => (
+              <div key={acct.id || i} style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 20px", borderBottom: i < safeAccounts.length - 1 ? "1px solid var(--border)" : "none" }}>
                 <div style={{ width: 40, height: 40, borderRadius: "50%", background: avatarColors[i % avatarColors.length], display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 17, color: "#0c0c16", flexShrink: 0 }}>
-                  {acct.name?.[0] || "?"}
+                  {(acct.name || "?")?.[0] || "?"}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 600, fontSize: 14, color: "var(--cream)", marginBottom: 4 }}>{acct.name}</div>
+                  <div style={{ fontWeight: 600, fontSize: 14, color: "var(--cream)", marginBottom: 4 }}>{acct.name || "Unnamed"}</div>
                   <div className="flex gap-12 flex-wrap" style={{ fontSize: 12, color: "var(--muted)" }}>
-                    <span>@{acct.username}</span>
+                    <span>@{acct.username || "no username"}</span>
                     <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      {showPasswords[acct.id] ? acct.password : "••••••••"}
+                      {showPasswords[acct.id] ? (acct.password || "") : "••••••••"}
                       <button onClick={() => toggleShowPw(acct.id)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 11, color: "var(--muted)", padding: 0 }}>
                         {showPasswords[acct.id] ? "hide" : "show"}
                       </button>
                     </span>
-                    {acct.points > 0 && <span className="pts-badge">{acct.points} pts</span>}
+                    {(acct.points || 0) > 0 && <span className="pts-badge">{acct.points} pts</span>}
                     {(acct.completed || []).length > 0 && <span style={{ color: "var(--sage)" }}>✓ {acct.completed.length} completed</span>}
                   </div>
                 </div>
