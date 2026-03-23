@@ -1097,11 +1097,6 @@ function SingleBlockEditor({ block, onChange, onRemove, onMoveUp, onMoveDown, is
           <div className="form-row"><label className="label">Caption</label><input className="input" value={block.caption || ""} onChange={e => upd("caption", e.target.value)} placeholder="Image caption or attribution" /></div>
         </>
       );
-        <>
-          <div className="form-row"><label className="label">Context / Topic for AI</label><textarea className="input textarea" style={{ minHeight: 60 }} value={block.context || ""} onChange={e => upd("context", e.target.value)} placeholder="What should the AI tutor help with? e.g. 'Help the student understand photosynthesis using the Socratic method'" /></div>
-          <div className="form-row"><label className="label">Button Label</label><input className="input" value={block.buttonLabel || "Open Tutor"} onChange={e => upd("buttonLabel", e.target.value)} placeholder="Button label" /></div>
-        </>
-      );
       case "upload": return (
         <>
           <div className="form-row"><label className="label">Submission Instructions</label><textarea className="input textarea" style={{ minHeight: 60 }} value={block.instructions || ""} onChange={e => upd("instructions", e.target.value)} placeholder="What should the student submit? How will they know it's done?" /></div>
