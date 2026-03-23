@@ -4880,6 +4880,8 @@ function TeacherApp({ content, setContent, studentAccounts, setStudentAccounts, 
 }
 
 // ─── STUDENT: ONBOARDING ──────────────────────────────────────────────────────
+
+function Onboarding({ onComplete }) {
   const [step, setStep] = useState(0);
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
