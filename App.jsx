@@ -8575,7 +8575,7 @@ function buildDefaultPlatformDoc() {
       dailyDrops: DAILY_DROPS_DEFAULT, checkIns: CHECK_INS_DEFAULT,
       profileQuestions: PROFILE_QUESTIONS_DEFAULT, habitDefs: [], taskDefs: [],
     },
-    studentAccounts: DEFAULT_STUDENT_ACCOUNTS
+    studentAccounts: DEFAULT_STUDENT_ACCOUNTS,
     teacherPassword: "forge2026",
     messages: {},
   };
