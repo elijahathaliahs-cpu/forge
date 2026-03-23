@@ -4708,6 +4708,27 @@ function StudentMessagesPage({ messages, setMessages, studentId }) {
   );
 }
 
+// ─── ERROR BOUNDARY ───────────────────────────────────────────────────────────
+
+class ErrorBoundary extends React.Component {
+  constructor(props) { super(props); this.state = { error: null }; }
+  static getDerivedStateFromError(error) { return { error }; }
+  render() {
+    if (this.state.error) return (
+      <div style={{ padding: 40, maxWidth: 700 }}>
+        <div style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, color: "var(--clay)", marginBottom: 12 }}>
+          Something went wrong
+        </div>
+        <div style={{ background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: "var(--r)", padding: 16, fontFamily: "monospace", fontSize: 12, color: "var(--cream-dim)", lineHeight: 1.7, whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
+          {this.state.error?.message || String(this.state.error)}
+        </div>
+        <button className="btn btn-ghost" style={{ marginTop: 16 }} onClick={() => this.setState({ error: null })}>Try again</button>
+      </div>
+    );
+    return this.props.children;
+  }
+}
+
 // ─── TEACHER APP ──────────────────────────────────────────────────────────────
 
 function TeacherApp({ content, setContent, studentAccounts, setStudentAccounts, approvals, setApprovals, apiKey, setApiKey, messages, setMessages, onSwitchRole }) {
@@ -4853,14 +4874,12 @@ function TeacherApp({ content, setContent, studentAccounts, setStudentAccounts, 
           <button className="btn btn-ghost btn-sm" style={{ width: "100%" }} onClick={onSwitchRole}>Switch to Student →</button>
         </div>
       </nav>
-      <main className="main">{renderView()}</main>
+      <main className="main"><ErrorBoundary>{renderView()}</ErrorBoundary></main>
     </div>
   );
 }
 
 // ─── STUDENT: ONBOARDING ──────────────────────────────────────────────────────
-
-function Onboarding({ onComplete }) {
   const [step, setStep] = useState(0);
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
