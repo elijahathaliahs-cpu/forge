@@ -4794,11 +4794,16 @@ function TeacherTaskManager({ taskDefs, setTaskDefs, studentAccounts }) {
       assignedTo: form.assignedTo || "all",
       points: form.points ?? 2,
     };
-    setTaskDefs(prev => editingId ? prev.map(x => x.id === editingId ? item : x) : [...prev, item]);
+    setTaskDefs(prev => {
+      const safePrev = Array.isArray(prev) ? prev : [];
+      return editingId ? safePrev.map(x => x.id === editingId ? item : x) : [...safePrev, item];
+    });
     setShowForm(false);
+    setEditingId(null);
+    setForm(blank());
   };
 
-  const del = (id) => setTaskDefs(prev => prev.filter(t => t.id !== id));
+  const del = (id) => setTaskDefs(prev => (Array.isArray(prev) ? prev : []).filter(t => t.id !== id));
   const toggleDay = (d) => setForm(p => ({
     ...p, scheduleDays: (p.scheduleDays || []).includes(d)
       ? (p.scheduleDays || []).filter(x => x !== d)
@@ -4834,7 +4839,7 @@ function TeacherTaskManager({ taskDefs, setTaskDefs, studentAccounts }) {
             action={<button className="btn btn-primary btn-sm" onClick={openNew}>+ Add First Task</button>} />
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {taskDefs.map(t => (
+            {(Array.isArray(taskDefs) ? taskDefs : []).map(t => (
               <div key={t.id} style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: "var(--r-lg)", padding: "14px 18px", display: "flex", alignItems: "center", gap: 14 }}>
                 <span style={{ fontSize: 22, flexShrink: 0 }}>{t.icon}</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
