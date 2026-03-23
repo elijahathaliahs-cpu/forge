@@ -6054,6 +6054,8 @@ function WeeklyPlanner({ content, completed, weekPlan, setWeekPlan, dailyPlan, s
       </Modal>
     </div>
   );
+}
+
 // ─── STUDENT: SKILL EXPLORER ──────────────────────────────────────────────────
 
 function SkillExplorer({ student, completed, content, onComplete, onUncomplete, onSubmitApproval, boards, saveToBoard, submissions, setSubmission }) {
