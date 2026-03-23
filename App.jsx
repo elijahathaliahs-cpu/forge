@@ -4847,6 +4847,7 @@ function TeacherApp({ content, setContent, studentAccounts, setStudentAccounts, 
       case "categories": return <TeacherCategories areas={content.areas} setAreas={setContentKey("areas")} skills={content.skills} />;
       case "habits": return <TeacherHabitsManager habitDefs={content.habitDefs || []} setHabitDefs={setContentKey("habitDefs")} studentAccounts={studentAccounts} />;
       case "messages": return <TeacherMessaging messages={messages} setMessages={setMessages} studentAccounts={studentAccounts} content={content} />;
+      case "accounts": return <TeacherStudentAccounts accounts={studentAccounts} setAccounts={setStudentAccounts} />;
       case "profileqs": return <ProfileQuestionsManager questions={content.profileQuestions || []} setQuestions={setContentKey("profileQuestions")} content={content} />;
       case "students": return <TeacherStudents students={studentAccounts} content={content} />;
       case "approvals": return <TeacherApprovals approvals={approvals} setApprovals={setApprovals} />;
