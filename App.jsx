@@ -5779,6 +5779,7 @@ function WeeklyPlanner({ content, completed, weekPlan, setWeekPlan, dailyPlan, s
   const [picking, setPicking] = useState(null);
   const [search, setSearch] = useState("");
   const [viewItem, setViewItem] = useState(null);
+  const [openPickerAreas, setOpenPickerAreas] = useState({});
 
   const RHYTHM = [
     { key: "skills",    label: "Skill",          icon: "◈",  color: "var(--amber)",    pool: content.skills },
@@ -5930,6 +5931,54 @@ function WeeklyPlanner({ content, completed, weekPlan, setWeekPlan, dailyPlan, s
       </div>
 
       <div className="page-content">
+
+        {/* Weekly Rhythm Guide */}
+        <div className="card mb-20" style={{ background: "var(--bg3)", borderColor: "rgba(0,212,255,0.2)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+            <span style={{ fontSize: 18 }}>🗓</span>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, color: "var(--cream)" }}>Your Weekly Rhythm</div>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+            <div style={{ padding: "12px 14px", background: "var(--bg2)", borderRadius: "var(--r)", border: "1px solid var(--border)" }}>
+              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--amber)", marginBottom: 8 }}>Every Week</div>
+              <div style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.8 }}>
+                <div>◈ <strong style={{ color: "var(--cream)" }}>10 skills</strong> — spread across Mon, Tue, Wed, Fri</div>
+                <div style={{ fontSize: 11, color: "var(--muted)", marginLeft: 16, marginBottom: 4 }}>~2–3 skills per day · focus on 4–5 subjects</div>
+              </div>
+            </div>
+            <div style={{ padding: "12px 14px", background: "var(--bg2)", borderRadius: "var(--r)", border: "1px solid var(--border)" }}>
+              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--lavender)", marginBottom: 8 }}>Every Month (2×)</div>
+              <div style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.9 }}>
+                <div>🎯 Project · ⚡ Sandbox Gig</div>
+                <div>🌊 Ripple Mission · 📖 Teen's Guide</div>
+                <div>💡 Light Room</div>
+              </div>
+            </div>
+          </div>
+          <div style={{ padding: "12px 14px", background: "rgba(0,212,255,0.05)", borderRadius: "var(--r)", border: "1px solid rgba(0,212,255,0.15)" }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--amber)", marginBottom: 8 }}>Example Week</div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 8 }}>
+              {[
+                { day: "Mon", items: ["Math skill", "Writing skill", "History skill"] },
+                { day: "Tue", items: ["Science skill", "Coding skill", "Art skill"] },
+                { day: "Wed", items: ["Math skill", "Logic skill", "Reading skill"] },
+                { day: "Thu", items: ["Co-op", "(optional work)"], note: true },
+                { day: "Fri", items: ["Writing skill", "Project", "Ripple Mission"] },
+              ].map(({ day, items, note }) => (
+                <div key={day} style={{ padding: "8px 10px", background: "var(--bg2)", borderRadius: "var(--r)", border: note ? "1px solid rgba(176,96,255,0.3)" : "1px solid var(--border)" }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: note ? "var(--lavender)" : "var(--amber)", marginBottom: 6 }}>{day}</div>
+                  {items.map((item, i) => (
+                    <div key={i} style={{ fontSize: 11, color: note ? "var(--muted)" : "var(--cream-dim)", lineHeight: 1.7, fontStyle: note ? "italic" : "normal" }}>{item}</div>
+                  ))}
+                </div>
+              ))}
+            </div>
+            <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 10, fontStyle: "italic" }}>
+              Thursday is your co-op day — you can still add work if co-op is out, but it's kept light by default.
+            </div>
+          </div>
+        </div>
+
         {/* Day tabs */}
         <div style={{ display: "flex", gap: 6, marginBottom: 20 }}>
           {DAYS.map(day => {
@@ -5937,19 +5986,19 @@ function WeeklyPlanner({ content, completed, weekPlan, setWeekPlan, dailyPlan, s
             const done = items.filter(e => completed.includes(e.id)).length;
             const isToday = day === todayKey;
             const isActive = activeDay === day;
+            const isCoOp = day === "Thu";
             return (
               <button key={day} onClick={() => setActiveDay(day)} style={{
                 flex: 1, padding: "12px 8px", borderRadius: "var(--r-lg)",
-                border: `2px solid ${isActive ? "var(--amber)" : isToday ? "rgba(0,212,255,0.3)" : "var(--border)"}`,
-                background: isActive ? "var(--amber-dim)" : isToday ? "rgba(0,212,255,0.05)" : "var(--bg2)",
-                cursor: "pointer", fontFamily: "var(--font-body)", transition: "all 0.15s",
-                textAlign: "center",
+                border: `2px solid ${isActive ? (isCoOp ? "var(--lavender)" : "var(--amber)") : isCoOp ? "rgba(176,96,255,0.3)" : isToday ? "rgba(0,212,255,0.3)" : "var(--border)"}`,
+                background: isActive ? (isCoOp ? "rgba(176,96,255,0.1)" : "var(--amber-dim)") : isCoOp ? "rgba(176,96,255,0.04)" : isToday ? "rgba(0,212,255,0.05)" : "var(--bg2)",
+                cursor: "pointer", fontFamily: "var(--font-body)", transition: "all 0.15s", textAlign: "center",
               }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: isActive ? "var(--amber)" : isToday ? "var(--amber)" : "var(--cream)", marginBottom: 4 }}>
-                  {day}{isToday && " ·"}
+                <div style={{ fontSize: 12, fontWeight: 700, color: isActive ? (isCoOp ? "var(--lavender)" : "var(--amber)") : isCoOp ? "var(--lavender)" : isToday ? "var(--amber)" : "var(--cream)", marginBottom: 2 }}>
+                  {day}
                 </div>
-                <div style={{ fontSize: 10, color: isActive ? "var(--amber)" : "var(--muted)" }}>
-                  {items.length === 0 ? "empty" : `${done}/${items.length}`}
+                <div style={{ fontSize: 9, color: isCoOp ? "var(--lavender)" : "var(--muted)", fontStyle: isCoOp ? "italic" : "normal" }}>
+                  {isCoOp ? "co-op" : items.length === 0 ? "empty" : `${done}/${items.length}`}
                 </div>
               </button>
             );
@@ -6026,30 +6075,76 @@ function WeeklyPlanner({ content, completed, weekPlan, setWeekPlan, dailyPlan, s
           <input placeholder={`Search ${pickingRhythm?.label?.toLowerCase() || ""}…`} value={search} onChange={e => setSearch(e.target.value)} autoFocus />
         </div>
         <div style={{ maxHeight: 480, overflowY: "auto" }}>
-          {pickingRhythm && (search.trim() ? searchFiltered : pickingRhythm.pool).map(item => {
-            const alreadyAdded = (dailyPlan[activeDay] || []).some(e => e.id === item.id);
-            const isDone = completed.includes(item.id);
-            return (
-              <div key={item.id} onClick={() => !alreadyAdded && addToDay(picking, item)}
-                style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 14px", borderRadius: "var(--r)", background: alreadyAdded ? "var(--sage-dim)" : "var(--bg3)", border: `1px solid ${alreadyAdded ? "rgba(0,229,168,0.35)" : "var(--border)"}`, marginBottom: 6, cursor: alreadyAdded ? "default" : "pointer", transition: "all 0.15s", opacity: isDone ? 0.6 : 1 }}
-                onMouseEnter={e => { if (!alreadyAdded) e.currentTarget.style.borderColor = pickingRhythm.color; }}
-                onMouseLeave={e => { if (!alreadyAdded) e.currentTarget.style.borderColor = "var(--border)"; }}>
-                <span style={{ fontSize: 18, flexShrink: 0 }}>{item.icon || pickingRhythm.icon}</span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: alreadyAdded ? "var(--sage)" : "var(--cream)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {item.name || item.title}
+          {pickingRhythm && (() => {
+            const pool = search.trim() ? searchFiltered : pickingRhythm.pool;
+            // For skills, group by area accordion
+            if (picking === "skills" && !search.trim()) {
+              const areas = content.areas || [];
+              const byArea = {};
+              pool.forEach(item => {
+                const areaId = item.area || "other";
+                if (!byArea[areaId]) byArea[areaId] = [];
+                byArea[areaId].push(item);
+              });
+              return areas.filter(a => byArea[a.id]?.length > 0).map(area => {
+                const areaItems = byArea[area.id] || [];
+                const addedCount = areaItems.filter(item => (dailyPlan[activeDay] || []).some(e => e.id === item.id)).length;
+                const isOpen = openPickerAreas[area.id] !== false;
+                return (
+                  <div key={area.id} style={{ marginBottom: 8 }}>
+                    <div onClick={() => setOpenPickerAreas(p => ({ ...p, [area.id]: !isOpen }))}
+                      style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderRadius: "var(--r)", background: "var(--bg3)", border: "1px solid var(--border)", cursor: "pointer", marginBottom: isOpen ? 6 : 0 }}>
+                      <span style={{ fontSize: 16 }}>{area.icon || "◈"}</span>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--cream)" }}>{area.name}</div>
+                        <div style={{ fontSize: 11, color: "var(--muted)" }}>{areaItems.length} skills{addedCount > 0 ? ` · ${addedCount} added` : ""}</div>
+                      </div>
+                      <span style={{ color: "var(--muted)", fontSize: 11 }}>{isOpen ? "▲" : "▼"}</span>
+                    </div>
+                    {isOpen && areaItems.map(item => {
+                      const alreadyAdded = (dailyPlan[activeDay] || []).some(e => e.id === item.id);
+                      const isDone = completed.includes(item.id);
+                      return (
+                        <div key={item.id} onClick={() => !alreadyAdded && addToDay(picking, item)}
+                          style={{ display: "flex", alignItems: "center", gap: 12, padding: "9px 14px 9px 42px", borderRadius: "var(--r)", background: alreadyAdded ? "var(--sage-dim)" : "var(--bg2)", border: `1px solid ${alreadyAdded ? "rgba(0,229,168,0.35)" : "var(--border)"}`, marginBottom: 4, cursor: alreadyAdded ? "default" : "pointer", opacity: isDone ? 0.6 : 1, transition: "all 0.15s" }}
+                          onMouseEnter={e => { if (!alreadyAdded) e.currentTarget.style.borderColor = "var(--amber)"; }}
+                          onMouseLeave={e => { if (!alreadyAdded) e.currentTarget.style.borderColor = alreadyAdded ? "rgba(0,229,168,0.35)" : "var(--border)"; }}>
+                          <span style={{ fontSize: 16, flexShrink: 0 }}>{item.icon || "◈"}</span>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: 13, fontWeight: 500, color: alreadyAdded ? "var(--sage)" : "var(--cream)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.name}</div>
+                            {item.pts > 0 && <div style={{ fontSize: 10, color: "var(--muted)" }}>{item.pts} pts{isDone ? " · ✓ done" : ""}</div>}
+                          </div>
+                          {alreadyAdded
+                            ? <span style={{ fontSize: 11, color: "var(--sage)", fontWeight: 600, flexShrink: 0 }}>✓ Added</span>
+                            : <span style={{ fontSize: 12, color: "var(--amber)", flexShrink: 0 }}>+ Add</span>}
+                        </div>
+                      );
+                    })}
                   </div>
-                  <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 1 }}>
-                    {isDone ? "✓ Already completed" : item.pts ? `${item.pts} pts` : ""}
+                );
+              });
+            }
+            // All other types — flat list
+            return pool.map(item => {
+              const alreadyAdded = (dailyPlan[activeDay] || []).some(e => e.id === item.id);
+              const isDone = completed.includes(item.id);
+              return (
+                <div key={item.id} onClick={() => !alreadyAdded && addToDay(picking, item)}
+                  style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 14px", borderRadius: "var(--r)", background: alreadyAdded ? "var(--sage-dim)" : "var(--bg3)", border: `1px solid ${alreadyAdded ? "rgba(0,229,168,0.35)" : "var(--border)"}`, marginBottom: 6, cursor: alreadyAdded ? "default" : "pointer", transition: "all 0.15s", opacity: isDone ? 0.6 : 1 }}
+                  onMouseEnter={e => { if (!alreadyAdded) e.currentTarget.style.borderColor = pickingRhythm.color; }}
+                  onMouseLeave={e => { if (!alreadyAdded) e.currentTarget.style.borderColor = "var(--border)"; }}>
+                  <span style={{ fontSize: 18, flexShrink: 0 }}>{item.icon || pickingRhythm.icon}</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: alreadyAdded ? "var(--sage)" : "var(--cream)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.name || item.title}</div>
+                    <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 1 }}>{isDone ? "✓ Already completed" : item.pts ? `${item.pts} pts` : ""}</div>
                   </div>
+                  {alreadyAdded
+                    ? <span style={{ fontSize: 11, color: "var(--sage)", fontWeight: 600, flexShrink: 0 }}>✓ Added</span>
+                    : <span style={{ fontSize: 12, color: pickingRhythm.color, flexShrink: 0 }}>+ Add</span>}
                 </div>
-                {alreadyAdded
-                  ? <span style={{ fontSize: 11, color: "var(--sage)", fontWeight: 600, flexShrink: 0 }}>✓ Added</span>
-                  : <span style={{ fontSize: 12, color: pickingRhythm.color, flexShrink: 0 }}>+ Add</span>
-                }
-              </div>
-            );
-          })}
+              );
+            });
+          })()}
         </div>
       </Modal>
     </div>
