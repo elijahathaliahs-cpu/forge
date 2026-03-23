@@ -2345,51 +2345,86 @@ function TeacherDropCalendar({ drops, setDrops, students }) {
                         {editDrop.careerSpotlights?.length > 0 && <span className="tag tag-lavender" style={{ fontSize: 10 }}>{editDrop.careerSpotlights.length} added</span>}
                       </div>
                       {(editDrop.careerSpotlights?.length || 0) < 3 && (
-                        <button className="btn btn-ghost btn-xs" onClick={() => updateBlock("careerSpotlights", [...(editDrop.careerSpotlights||[]), { id: "cs" + Date.now(), targetStudent: "all", name: "", role: "", bio: "", insight: "" }])}>
+                        <button className="btn btn-ghost btn-xs" onClick={() => updateBlock("careerSpotlights", [...(editDrop.careerSpotlights||[]), { id: "cs" + Date.now(), targetStudent: "all", careerTitle: "", careerField: "", careerDesc: "", careerSkills: "", careerAwesome: "", careerTryIt: "", name: "", role: "", bio: "", insight: "" }])}>
                           + Add Spotlight
                         </button>
                       )}
                     </div>
-                    {(editDrop.careerSpotlights || []).map((cs, ci) => (
-                      <div key={cs.id} style={{ background: "var(--bg3)", borderRadius: "var(--r)", padding: 12, marginBottom: 10, border: "1px solid var(--border)" }}>
-                        <div className="flex-between mb-8">
-                          <span style={{ fontSize: 12, fontWeight: 700, color: "var(--lavender)", textTransform: "uppercase", letterSpacing: 1 }}>Spotlight {ci + 1}</span>
-                          <button className="btn btn-clay btn-xs" onClick={() => updateBlock("careerSpotlights", editDrop.careerSpotlights.filter((_, i) => i !== ci))}>Remove</button>
-                        </div>
-                        <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-                          <div>
+                    {(editDrop.careerSpotlights || []).map((cs, ci) => {
+                      const upd = (field, val) => { const u = [...editDrop.careerSpotlights]; u[ci] = { ...cs, [field]: val }; updateBlock("careerSpotlights", u); };
+                      return (
+                        <div key={cs.id} style={{ background: "var(--bg3)", borderRadius: "var(--r)", padding: 14, marginBottom: 10, border: "1px solid var(--border)" }}>
+                          <div className="flex-between mb-12">
+                            <span style={{ fontSize: 12, fontWeight: 700, color: "var(--lavender)", textTransform: "uppercase", letterSpacing: 1 }}>Spotlight {ci + 1}</span>
+                            <button className="btn btn-clay btn-xs" onClick={() => updateBlock("careerSpotlights", editDrop.careerSpotlights.filter((_, i) => i !== ci))}>Remove</button>
+                          </div>
+
+                          {/* Show To */}
+                          <div style={{ marginBottom: 10 }}>
                             <label className="label">Show To</label>
-                            <select className="input" value={cs.targetStudent || "all"} onChange={e => {
-                              const updated = [...editDrop.careerSpotlights];
-                              updated[ci] = { ...cs, targetStudent: e.target.value };
-                              updateBlock("careerSpotlights", updated);
-                            }}>
+                            <select className="input" value={cs.targetStudent || "all"} onChange={e => upd("targetStudent", e.target.value)}>
                               {studentOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                             </select>
                           </div>
-                          <div className="grid-2" style={{ gap: 8 }}>
-                            <div>
-                              <label className="label">Person's Name</label>
-                              <input className="input" value={cs.name || ""} onChange={e => { const u = [...editDrop.careerSpotlights]; u[ci] = { ...cs, name: e.target.value }; updateBlock("careerSpotlights", u); }} placeholder="e.g. Ira Glass" />
+
+                          {/* CAREER SECTION */}
+                          <div style={{ padding: "10px 12px", background: "var(--bg2)", borderRadius: "var(--r)", marginBottom: 10, border: "1px solid rgba(176,96,255,0.25)" }}>
+                            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--lavender)", marginBottom: 10 }}>The Career</div>
+                            <div className="grid-2" style={{ gap: 8, marginBottom: 8 }}>
+                              <div>
+                                <label className="label">Career Title</label>
+                                <input className="input" value={cs.careerTitle || ""} onChange={e => upd("careerTitle", e.target.value)} placeholder="e.g. Ethical Hacker" />
+                              </div>
+                              <div>
+                                <label className="label">Career Field</label>
+                                <input className="input" value={cs.careerField || ""} onChange={e => upd("careerField", e.target.value)} placeholder="e.g. Cybersecurity" />
+                              </div>
+                            </div>
+                            <div style={{ marginBottom: 8 }}>
+                              <label className="label">What Is It?</label>
+                              <textarea className="input textarea" style={{ minHeight: 52 }} value={cs.careerDesc || ""} onChange={e => upd("careerDesc", e.target.value)} placeholder="2-3 sentences explaining what this career actually is in plain language" />
+                            </div>
+                            <div style={{ marginBottom: 8 }}>
+                              <label className="label">Skills It Takes (one per line)</label>
+                              <textarea className="input textarea" style={{ minHeight: 52 }} value={cs.careerSkills || ""} onChange={e => upd("careerSkills", e.target.value)} placeholder={"Problem-solving\nCoding and logic\nCreativity\nEthics and responsibility"} />
+                            </div>
+                            <div style={{ marginBottom: 8 }}>
+                              <label className="label">Why It's Awesome</label>
+                              <textarea className="input textarea" style={{ minHeight: 44 }} value={cs.careerAwesome || ""} onChange={e => upd("careerAwesome", e.target.value)} placeholder="What makes this career genuinely exciting or meaningful?" />
                             </div>
                             <div>
-                              <label className="label">Role / Title</label>
-                              <input className="input" value={cs.role || ""} onChange={e => { const u = [...editDrop.careerSpotlights]; u[ci] = { ...cs, role: e.target.value }; updateBlock("careerSpotlights", u); }} placeholder="e.g. Radio Producer" />
+                              <label className="label">Want to Try It?</label>
+                              <textarea className="input textarea" style={{ minHeight: 44 }} value={cs.careerTryIt || ""} onChange={e => upd("careerTryIt", e.target.value)} placeholder="A free resource, project, or first step they can take right now" />
                             </div>
                           </div>
-                          <div>
-                            <label className="label">Brief Bio</label>
-                            <textarea className="input textarea" style={{ minHeight: 52 }} value={cs.bio || ""} onChange={e => { const u = [...editDrop.careerSpotlights]; u[ci] = { ...cs, bio: e.target.value }; updateBlock("careerSpotlights", u); }} placeholder="2-3 sentences about who they are and how they got there" />
-                          </div>
-                          <div>
-                            <label className="label">Key Insight / Quote</label>
-                            <textarea className="input textarea" style={{ minHeight: 52 }} value={cs.insight || ""} onChange={e => { const u = [...editDrop.careerSpotlights]; u[ci] = { ...cs, insight: e.target.value }; updateBlock("careerSpotlights", u); }} placeholder="A quote or key insight worth sitting with" />
+
+                          {/* PERSON SECTION */}
+                          <div style={{ padding: "10px 12px", background: "var(--bg2)", borderRadius: "var(--r)", border: "1px solid rgba(176,96,255,0.25)" }}>
+                            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--lavender)", marginBottom: 10 }}>Real Person In This Field</div>
+                            <div className="grid-2" style={{ gap: 8, marginBottom: 8 }}>
+                              <div>
+                                <label className="label">Name</label>
+                                <input className="input" value={cs.name || ""} onChange={e => upd("name", e.target.value)} placeholder="e.g. Ira Glass" />
+                              </div>
+                              <div>
+                                <label className="label">Role / Title</label>
+                                <input className="input" value={cs.role || ""} onChange={e => upd("role", e.target.value)} placeholder="e.g. Radio Producer" />
+                              </div>
+                            </div>
+                            <div style={{ marginBottom: 8 }}>
+                              <label className="label">Brief Bio</label>
+                              <textarea className="input textarea" style={{ minHeight: 52 }} value={cs.bio || ""} onChange={e => upd("bio", e.target.value)} placeholder="2-3 sentences about who they are and how they got there" />
+                            </div>
+                            <div>
+                              <label className="label">Key Insight / Quote</label>
+                              <textarea className="input textarea" style={{ minHeight: 52 }} value={cs.insight || ""} onChange={e => upd("insight", e.target.value)} placeholder="A quote or key insight worth sitting with" />
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                     {!editDrop.careerSpotlights?.length && (
-                      <p style={{ fontSize: 12, color: "var(--muted)", fontStyle: "italic" }}>Add up to 3 spotlights. You can personalize each one for a specific student.</p>
+                      <p style={{ fontSize: 12, color: "var(--muted)", fontStyle: "italic" }}>Add up to 3 spotlights. Each one includes a career overview plus a real person in that field.</p>
                     )}
                   </div>
 
@@ -4713,6 +4748,421 @@ function StudentMessagesPage({ messages, setMessages, studentId }) {
   );
 }
 
+// ─── TEACHER: TASK MANAGER ────────────────────────────────────────────────────
+
+const TASK_WEEK_DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+function isTaskScheduledOn(task, dateStr) {
+  const day = new Date(dateStr + "T12:00:00").getDay();
+  if (task.scheduleType === "specific_dates") return (task.specificDates || []).includes(dateStr);
+  if (task.scheduleType === "weekly") return (task.scheduleDays || []).includes(day);
+  return false;
+}
+
+function isTaskScheduledToday(task) { return isTaskScheduledOn(task, todayStr()); }
+
+function TeacherTaskManager({ taskDefs, setTaskDefs, studentAccounts }) {
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [form, setForm] = useState({});
+  const [specificDatesText, setSpecificDatesText] = useState("");
+
+  const blank = () => ({
+    title: "", icon: "📋", description: "", link: "", linkLabel: "",
+    scheduleType: "weekly", scheduleDays: [1,2,3,4,5],
+    assignedTo: "all", points: 2,
+  });
+
+  const openNew = () => { setEditingId(null); setForm(blank()); setSpecificDatesText(""); setShowForm(true); };
+  const openEdit = (t) => {
+    setEditingId(t.id);
+    setForm({ ...t });
+    setSpecificDatesText((t.specificDates || []).join(", "));
+    setShowForm(true);
+  };
+
+  const save = () => {
+    if (!form.title?.trim()) return;
+    const item = {
+      id: editingId || ("td_" + Date.now()),
+      title: form.title, icon: form.icon || "📋",
+      description: form.description || "", link: form.link || "", linkLabel: form.linkLabel || "",
+      scheduleType: form.scheduleType || "weekly",
+      scheduleDays: form.scheduleType === "weekly" ? (form.scheduleDays || []) : [],
+      specificDates: form.scheduleType === "specific_dates"
+        ? specificDatesText.split(",").map(s => s.trim()).filter(Boolean) : [],
+      assignedTo: form.assignedTo || "all",
+      points: form.points ?? 2,
+    };
+    setTaskDefs(prev => editingId ? prev.map(x => x.id === editingId ? item : x) : [...prev, item]);
+    setShowForm(false);
+  };
+
+  const del = (id) => setTaskDefs(prev => prev.filter(t => t.id !== id));
+  const toggleDay = (d) => setForm(p => ({
+    ...p, scheduleDays: (p.scheduleDays || []).includes(d)
+      ? (p.scheduleDays || []).filter(x => x !== d)
+      : [...(p.scheduleDays || []), d].sort(),
+  }));
+
+  const assignLabel = (a) => a === "all" ? "All Students" : (studentAccounts.find(s => s.id === a)?.name || a);
+
+  const scheduleSummary = (t) => {
+    if (t.scheduleType === "specific_dates") return `${(t.specificDates || []).length} specific date${(t.specificDates||[]).length !== 1 ? "s" : ""}`;
+    const days = t.scheduleDays || [];
+    if (days.length === 7) return "Every day";
+    if (JSON.stringify(days) === JSON.stringify([1,2,3,4,5])) return "Weekdays";
+    if (JSON.stringify(days) === JSON.stringify([0,6])) return "Weekends";
+    return days.map(d => TASK_WEEK_DAYS[d]).join(", ");
+  };
+
+  return (
+    <div>
+      <div className="page-header">
+        <div className="flex-between">
+          <div>
+            <h1 className="page-title">📋 Tasks</h1>
+            <p className="page-sub">{taskDefs.length} task{taskDefs.length !== 1 ? "s" : ""} · Scheduled lessons and activities for students</p>
+          </div>
+          <button className="btn btn-primary" onClick={openNew}>+ Add Task</button>
+        </div>
+      </div>
+      <div className="page-content">
+        {taskDefs.length === 0 ? (
+          <EmptyState icon="📋" title="No tasks yet"
+            sub="Add tasks like 'Watch World Watch', 'Do today's Wordle', or 'Read this article'. Students see them as a checklist on their dashboard on the days you schedule."
+            action={<button className="btn btn-primary btn-sm" onClick={openNew}>+ Add First Task</button>} />
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {taskDefs.map(t => (
+              <div key={t.id} style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: "var(--r-lg)", padding: "14px 18px", display: "flex", alignItems: "center", gap: 14 }}>
+                <span style={{ fontSize: 22, flexShrink: 0 }}>{t.icon}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontWeight: 600, fontSize: 14, color: "var(--cream)", marginBottom: 4 }}>{t.title}</div>
+                  <div className="flex gap-6 flex-wrap">
+                    <span className="tag tag-sky">📅 {scheduleSummary(t)}</span>
+                    <span className="tag tag-muted">👤 {assignLabel(t.assignedTo)}</span>
+                    {t.link && <span className="tag tag-amber">🔗 Has link</span>}
+                    {t.points > 0 && <span className="pts-badge">+{t.points} pts</span>}
+                  </div>
+                </div>
+                <div className="flex gap-8">
+                  <button className="btn btn-ghost btn-sm" onClick={() => openEdit(t)}>Edit</button>
+                  <button className="btn btn-clay btn-sm" onClick={() => del(t.id)}>✕</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <Modal open={showForm} onClose={() => setShowForm(false)}
+        title={editingId ? "Edit Task" : "New Task"}
+        footer={<><button className="btn btn-ghost" onClick={() => setShowForm(false)}>Cancel</button><button className="btn btn-primary" onClick={save} disabled={!form.title?.trim()}>Save Task</button></>}>
+
+        <div style={{ display: "grid", gridTemplateColumns: "56px 1fr", gap: 10, marginBottom: 14 }}>
+          <div>
+            <label className="label">Icon</label>
+            <input className="input" value={form.icon || ""} onChange={e => setForm(p => ({ ...p, icon: e.target.value }))}
+              style={{ textAlign: "center", fontSize: 20, padding: "8px 4px" }} maxLength={4} />
+          </div>
+          <div>
+            <label className="label">Task Title *</label>
+            <input className="input" value={form.title || ""} onChange={e => setForm(p => ({ ...p, title: e.target.value }))}
+              placeholder="e.g. Watch World Watch · Do today's Wordle · Read this article" autoFocus />
+          </div>
+        </div>
+
+        <div className="form-row">
+          <label className="label">Instructions / Context (optional)</label>
+          <textarea className="input textarea" style={{ minHeight: 72 }} value={form.description || ""} onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
+            placeholder="What should they do, notice, or think about? Any context that helps." />
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>
+          <div>
+            <label className="label">Link (optional)</label>
+            <input className="input" value={form.link || ""} onChange={e => setForm(p => ({ ...p, link: e.target.value }))}
+              placeholder="https://…" />
+          </div>
+          <div>
+            <label className="label">Link Button Label</label>
+            <input className="input" value={form.linkLabel || ""} onChange={e => setForm(p => ({ ...p, linkLabel: e.target.value }))}
+              placeholder="e.g. Open Wordle · Watch Now" />
+          </div>
+        </div>
+
+        <div className="divider" />
+
+        {/* Schedule */}
+        <div className="form-row">
+          <label className="label">Schedule</label>
+          <div className="flex gap-8 mb-12">
+            {[["weekly","🔁 Repeat weekly"],["specific_dates","📅 Specific dates"]].map(([val, label]) => (
+              <button key={val} className={`filter-btn ${form.scheduleType === val ? "active" : ""}`}
+                onClick={() => setForm(p => ({ ...p, scheduleType: val }))}>
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {form.scheduleType === "weekly" && (
+            <div>
+              <div className="flex gap-6 mb-8 flex-wrap">
+                {[["Every day",[0,1,2,3,4,5,6]],["Weekdays",[1,2,3,4,5]],["Weekends",[0,6]],["Mon/Wed/Fri",[1,3,5]],["Tue/Thu",[2,4]]].map(([label, days]) => (
+                  <button key={label} type="button" onClick={() => setForm(p => ({ ...p, scheduleDays: days }))}
+                    style={{ padding: "4px 10px", borderRadius: 20, border: `1px solid ${JSON.stringify((form.scheduleDays||[]).slice().sort()) === JSON.stringify([...days].sort()) ? "var(--sky)" : "var(--border)"}`, background: JSON.stringify((form.scheduleDays||[]).slice().sort()) === JSON.stringify([...days].sort()) ? "var(--sky-dim)" : "var(--bg3)", color: "var(--cream-dim)", fontSize: 11, cursor: "pointer", fontFamily: "var(--font-body)" }}>
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <div className="flex gap-6">
+                {TASK_WEEK_DAYS.map((d, i) => {
+                  const selected = (form.scheduleDays || []).includes(i);
+                  return (
+                    <button key={i} type="button" onClick={() => toggleDay(i)} style={{
+                      width: 42, height: 42, borderRadius: "var(--r)",
+                      border: `2px solid ${selected ? "var(--sky)" : "var(--border)"}`,
+                      background: selected ? "var(--sky-dim)" : "var(--bg3)",
+                      color: selected ? "var(--sky)" : "var(--muted)",
+                      cursor: "pointer", fontSize: 11, fontWeight: 700, fontFamily: "var(--font-body)",
+                    }}>{d.slice(0,2)}</button>
+                  );
+                })}
+              </div>
+              <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 6 }}>
+                {(form.scheduleDays||[]).length === 0 ? "⚠ No days selected"
+                  : (form.scheduleDays||[]).map(d => ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][d]).join(", ")}
+              </div>
+            </div>
+          )}
+
+          {form.scheduleType === "specific_dates" && (
+            <div>
+              <label className="label">Dates (YYYY-MM-DD, comma-separated)</label>
+              <input className="input" value={specificDatesText} onChange={e => setSpecificDatesText(e.target.value)}
+                placeholder="e.g. 2026-04-07, 2026-04-14" />
+            </div>
+          )}
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>
+          <div>
+            <label className="label">Assign To</label>
+            <select className="input" value={form.assignedTo || "all"} onChange={e => setForm(p => ({ ...p, assignedTo: e.target.value }))}>
+              <option value="all">All Students</option>
+              {studentAccounts.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="label">Points per completion</label>
+            <input className="input" type="number" min="0" max="20" value={form.points ?? 2} onChange={e => setForm(p => ({ ...p, points: parseInt(e.target.value) || 0 }))} />
+          </div>
+        </div>
+      </Modal>
+    </div>
+  );
+}
+
+// ─── STUDENT: TASKS WIDGET ────────────────────────────────────────────────────
+
+function TasksWidget({ taskDefs, taskLogs, setTaskLogs, student, onComplete, onNavigate }) {
+  const today = todayStr();
+  const mine = (taskDefs || []).filter(t =>
+    (t.assignedTo === "all" || t.assignedTo === student?.id) && isTaskScheduledToday(t)
+  );
+  const isDone = (id) => (taskLogs[id] || []).includes(today);
+  const doneCount = mine.filter(t => isDone(t.id)).length;
+
+  const toggle = (t) => {
+    const log = taskLogs[t.id] || [];
+    const wasDone = log.includes(today);
+    setTaskLogs(prev => ({ ...prev, [t.id]: wasDone ? log.filter(d => d !== today) : [...log, today] }));
+    if (!wasDone && t.points > 0) onComplete("task_" + t.id + "_" + today, t.points);
+  };
+
+  if (mine.length === 0) return null;
+
+  return (
+    <div className="card mb-16" style={{ borderColor: doneCount === mine.length ? "rgba(0,229,168,0.4)" : "rgba(77,143,255,0.3)", transition: "border-color 0.3s" }}>
+      <div className="flex-between mb-12">
+        <div className="flex-center gap-8">
+          <span style={{ fontSize: 16 }}>📋</span>
+          <h3 style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, color: doneCount === mine.length ? "var(--sage)" : "var(--sky)" }}>
+            Today's Tasks
+          </h3>
+        </div>
+        <div className="flex-center gap-8">
+          <span style={{ fontSize: 12, color: doneCount === mine.length ? "var(--sage)" : "var(--muted)", fontWeight: 600 }}>{doneCount}/{mine.length}</span>
+          <button className="btn btn-ghost btn-xs" onClick={() => onNavigate("tasks")}>All →</button>
+        </div>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        {mine.map(t => {
+          const done = isDone(t.id);
+          return (
+            <TaskRow key={t.id} task={t} done={done} onToggle={() => toggle(t)} compact />
+          );
+        })}
+      </div>
+      {doneCount === mine.length && (
+        <div style={{ textAlign: "center", marginTop: 10, fontSize: 13, color: "var(--sage)", fontWeight: 600 }}>🎉 All tasks done!</div>
+      )}
+    </div>
+  );
+}
+
+function TaskRow({ task, done, onToggle, compact }) {
+  const [expanded, setExpanded] = useState(false);
+  const hasDetail = task.description || task.link;
+
+  return (
+    <div style={{ borderRadius: "var(--r)", background: done ? "var(--sage-dim)" : "var(--bg3)", border: `1px solid ${done ? "rgba(0,229,168,0.35)" : "var(--border)"}`, overflow: "hidden", transition: "all 0.15s" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, padding: compact ? "10px 12px" : "13px 16px" }}>
+        <div onClick={onToggle} style={{ width: 22, height: 22, borderRadius: 6, border: `2px solid ${done ? "var(--sage)" : "var(--border)"}`, background: done ? "var(--sage)" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, transition: "all 0.15s" }}>
+          {done && <span style={{ color: "#0c0c16", fontSize: 11, fontWeight: 900 }}>✓</span>}
+        </div>
+        <span style={{ fontSize: compact ? 16 : 20, flexShrink: 0 }}>{task.icon}</span>
+        <span style={{ flex: 1, fontSize: compact ? 13 : 14, fontWeight: 500, color: done ? "var(--sage)" : "var(--cream)", textDecoration: done ? "line-through" : "none" }}>{task.title}</span>
+        {task.points > 0 && !done && <span className="pts-badge" style={{ fontSize: 10 }}>+{task.points}</span>}
+        {hasDetail && (
+          <button onClick={() => setExpanded(e => !e)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", fontSize: 12, padding: 0, flexShrink: 0 }}>
+            {expanded ? "▲" : "▼"}
+          </button>
+        )}
+      </div>
+      {expanded && hasDetail && (
+        <div style={{ padding: "0 16px 14px 50px", borderTop: "1px solid var(--border)" }}>
+          {task.description && <p style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.7, marginTop: 10, marginBottom: task.link ? 12 : 0 }}>{task.description}</p>}
+          {task.link && (
+            <a href={task.link} target="_blank" rel="noopener noreferrer"
+              style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "8px 16px", background: "var(--sky-dim)", border: "1px solid rgba(77,143,255,0.35)", borderRadius: "var(--r)", color: "var(--sky)", fontSize: 13, fontWeight: 600, textDecoration: "none", marginTop: task.description ? 0 : 10 }}>
+              🔗 {task.linkLabel || "Open Link"}
+            </a>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── STUDENT: TASKS FULL PAGE ─────────────────────────────────────────────────
+
+function StudentTasksPage({ taskDefs, taskLogs, setTaskLogs, student, onComplete }) {
+  const today = todayStr();
+
+  const mine = (taskDefs || []).filter(t => t.assignedTo === "all" || t.assignedTo === student?.id);
+
+  const todayTasks = mine.filter(isTaskScheduledToday);
+  const otherTasks = mine.filter(t => !isTaskScheduledToday(t));
+
+  const isDone = (id, date = today) => (taskLogs[id] || []).includes(date);
+
+  const toggle = (t) => {
+    const log = taskLogs[t.id] || [];
+    const wasDone = log.includes(today);
+    setTaskLogs(prev => ({ ...prev, [t.id]: wasDone ? log.filter(d => d !== today) : [...log, today] }));
+    if (!wasDone && t.points > 0) onComplete("task_" + t.id + "_" + today, t.points);
+  };
+
+  const last7 = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(); d.setDate(d.getDate() - (6 - i));
+    return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+  });
+
+  const scheduleSummary = (t) => {
+    if (t.scheduleType === "specific_dates") return `${(t.specificDates||[]).length} date${(t.specificDates||[]).length !== 1 ? "s" : ""}`;
+    const days = t.scheduleDays || [];
+    if (days.length === 7) return "Every day";
+    if (JSON.stringify(days) === JSON.stringify([1,2,3,4,5])) return "Weekdays";
+    if (JSON.stringify(days) === JSON.stringify([0,6])) return "Weekends";
+    return days.map(d => TASK_WEEK_DAYS[d]).join(", ");
+  };
+
+  const doneToday = todayTasks.filter(t => isDone(t.id)).length;
+
+  return (
+    <div>
+      <div className="page-header">
+        <h1 className="page-title">📋 Tasks</h1>
+        <p className="page-sub">Today: {doneToday}/{todayTasks.length} done · {todayTasks.length === 0 ? "Nothing scheduled today" : "Click any task to open it"}</p>
+      </div>
+      <div className="page-content">
+        {mine.length === 0 ? (
+          <EmptyState icon="📋" title="No tasks yet" sub="Your teacher will add tasks here soon." />
+        ) : (
+          <>
+            {todayTasks.length > 0 && (
+              <div className="mb-24">
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--sky)", marginBottom: 10 }}>Due Today</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {todayTasks.map(t => (
+                    <TaskRow key={t.id} task={t} done={isDone(t.id)} onToggle={() => toggle(t)} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {otherTasks.length > 0 && (
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--muted)", marginBottom: 10 }}>
+                  {todayTasks.length > 0 ? "Rest of Your Schedule" : "All Tasks"}
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {otherTasks.map(t => (
+                    <div key={t.id} style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: "var(--r-lg)", padding: "14px 18px", opacity: 0.7, display: "flex", alignItems: "center", gap: 12 }}>
+                      <span style={{ fontSize: 20 }}>{t.icon}</span>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontWeight: 600, fontSize: 14, color: "var(--cream)" }}>{t.title}</div>
+                        <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 3 }}>📅 {scheduleSummary(t)}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 7-day completion history */}
+            {mine.length > 0 && (
+              <div className="mt-24">
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--muted)", marginBottom: 14 }}>Last 7 Days</div>
+                <div style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: "var(--r-lg)", overflow: "hidden" }}>
+                  {/* Day headers */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr repeat(7, 36px)", gap: 4, padding: "10px 16px", borderBottom: "1px solid var(--border)", background: "var(--bg3)" }}>
+                    <div style={{ fontSize: 11, color: "var(--muted)" }}>Task</div>
+                    {last7.map(date => (
+                      <div key={date} style={{ textAlign: "center", fontSize: 10, color: date === today ? "var(--sky)" : "var(--muted)", fontWeight: date === today ? 700 : 400 }}>
+                        {["S","M","T","W","T","F","S"][new Date(date + "T12:00:00").getDay()]}
+                      </div>
+                    ))}
+                  </div>
+                  {mine.map(t => (
+                    <div key={t.id} style={{ display: "grid", gridTemplateColumns: "1fr repeat(7, 36px)", gap: 4, padding: "8px 16px", borderBottom: "1px solid var(--border)", alignItems: "center" }}>
+                      <div className="flex-center gap-8">
+                        <span style={{ fontSize: 15 }}>{t.icon}</span>
+                        <span style={{ fontSize: 12, color: "var(--cream-dim)" }}>{t.title}</span>
+                      </div>
+                      {last7.map(date => {
+                        const scheduled = isTaskScheduledOn(t, date);
+                        const done = isDone(t.id, date);
+                        return (
+                          <div key={date} style={{ display: "flex", justifyContent: "center" }}>
+                            <div style={{ width: 22, height: 22, borderRadius: 5, background: !scheduled ? "transparent" : done ? "var(--sky)" : "var(--bg3)", border: `1px solid ${!scheduled ? "transparent" : done ? "rgba(77,143,255,0.5)" : "var(--border)"}`, opacity: scheduled ? 1 : 0.2 }} />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── ERROR BOUNDARY ───────────────────────────────────────────────────────────
 
 class ErrorBoundary extends React.Component {
@@ -4819,6 +5269,7 @@ function TeacherApp({ content, setContent, studentAccounts, setStudentAccounts, 
       { id: "teensguide", label: "Teen's Guide", icon: "📖" },
       { id: "lightroom", label: "Light Room", icon: "💡" },
       { id: "drops", label: "Daily Drops", icon: "🌤️" },
+      { id: "tasks", label: "Tasks", icon: "📋" },
       { id: "checkins", label: "Check-Ins", icon: "💬" },
       { id: "categories", label: "Transcript Categories", icon: "📋" },
     ]},
@@ -4843,6 +5294,7 @@ function TeacherApp({ content, setContent, studentAccounts, setStudentAccounts, 
       case "teensguide": return <ContentManager title="Teen's Guide" icon="📖" items={content.teensGuide} setItems={setContentKey("teensGuide")} fields={GUIDE_FIELDS} />;
       case "lightroom": return <ContentManager title="Light Room" icon="💡" items={content.lightRoom} setItems={setContentKey("lightRoom")} fields={LIGHT_FIELDS} />;
       case "drops": return <TeacherDropCalendar drops={content.dailyDrops} setDrops={setContentKey("dailyDrops")} students={studentAccounts} />;
+      case "tasks": return <TeacherTaskManager taskDefs={content.taskDefs || []} setTaskDefs={setContentKey("taskDefs")} studentAccounts={studentAccounts} />;
       case "checkins": return <CheckInManager checkIns={content.checkIns || []} setCheckIns={setContentKey("checkIns")} content={content} />;
       case "categories": return <TeacherCategories areas={content.areas} setAreas={setContentKey("areas")} skills={content.skills} />;
       case "habits": return <TeacherHabitsManager habitDefs={content.habitDefs || []} setHabitDefs={setContentKey("habitDefs")} studentAccounts={studentAccounts} />;
@@ -5063,7 +5515,7 @@ function AITutor({ open, onClose, context, apiKey }) {
 
 // ─── STUDENT: DASHBOARD ───────────────────────────────────────────────────────
 
-function StudentDashboard({ student, completed, points, content, weekPlan, grabbedGigs, onNavigate, boards, setBoards, saveToBoard, onComplete, onUncomplete, journalEntries, habitDefs, habitLogs, setHabitLogs, goals, messages }) {
+function StudentDashboard({ student, completed, points, content, weekPlan, grabbedGigs, onNavigate, boards, setBoards, saveToBoard, onComplete, onUncomplete, journalEntries, habitDefs, habitLogs, setHabitLogs, goals, messages, taskDefs, taskLogs, setTaskLogs }) {
   const pct = Math.round((points / content.areas.reduce((a,b)=>a+(b.target||0),0)) * 100);
   const todayDrop = content.dailyDrops.find(d => d.date === todayStr()) || null;
   const myInterests = student.interests || [];
@@ -5108,6 +5560,9 @@ function StudentDashboard({ student, completed, points, content, weekPlan, grabb
 
         <div className="grid-2" style={{ gap: 20 }}>
           <div>
+            {/* Tasks Widget */}
+            <TasksWidget taskDefs={taskDefs || []} taskLogs={taskLogs} setTaskLogs={setTaskLogs} student={student} onComplete={onComplete} onNavigate={onNavigate} />
+
             {/* Messages Widget */}
             <MessagesWidget messages={messages} studentId={student.id} onNavigate={onNavigate} />
 
@@ -7398,22 +7853,68 @@ function DailyDrops({ completed, content, onComplete, onUncomplete, student, boa
             )}
 
             {spotlights.length > 0 && spotlights.map(cs => (
-              <div key={cs.id} className="card" style={{ borderColor: "rgba(176,96,255,0.35)", background: "rgba(144,128,192,0.05)" }}>
-                <div className="flex-between mb-12">
-                  <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: 2, color: "var(--lavender)", fontWeight: 700 }}>💼 Career Spotlight</div>
-                  <SaveButton item={{ id: cs.id, type: "career", title: cs.name + " — " + cs.role, icon: "💼", desc: cs.bio, pts: 0 }} boards={boards} onSaveToBoard={saveToBoard} />
-                </div>
-                <div className="flex-center gap-14 mb-12">
-                  <div style={{ width: 48, height: 48, borderRadius: "50%", background: "var(--lavender-dim)", border: "2px solid rgba(176,96,255,0.45)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>{cs.name?.[0] || "?"}</div>
-                  <div>
-                    <div style={{ fontFamily: "var(--font-display)", fontSize: 17, fontWeight: 700, color: "var(--cream)" }}>{cs.name}</div>
-                    <div style={{ fontSize: 12, color: "var(--lavender)", marginTop: 2 }}>{cs.role}</div>
+              <div key={cs.id} className="card" style={{ borderColor: "rgba(176,96,255,0.3)", background: "rgba(176,96,255,0.04)", padding: 0, overflow: "hidden" }}>
+                {/* Career overview section */}
+                {cs.careerTitle && (
+                  <div style={{ padding: "20px 22px", borderBottom: cs.name ? "1px solid var(--border)" : "none" }}>
+                    <div className="flex-between mb-14">
+                      <div>
+                        <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: 2, color: "var(--lavender)", fontWeight: 700, marginBottom: 6 }}>💼 Career Spotlight</div>
+                        <div style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 900, color: "var(--cream)", lineHeight: 1.1 }}>{cs.careerTitle}</div>
+                        {cs.careerField && <div style={{ fontSize: 13, color: "var(--lavender)", marginTop: 4, fontWeight: 600 }}>{cs.careerField}</div>}
+                      </div>
+                      <SaveButton item={{ id: cs.id, type: "career", title: cs.careerTitle, icon: "💼", desc: cs.careerDesc, pts: 0 }} boards={boards} onSaveToBoard={saveToBoard} />
+                    </div>
+                    {cs.careerDesc && <p style={{ fontSize: 14, color: "var(--cream-dim)", lineHeight: 1.8, marginBottom: 16 }}>{cs.careerDesc}</p>}
+                    {cs.careerSkills && (
+                      <div style={{ marginBottom: 16 }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "var(--lavender)", marginBottom: 8 }}>Skills it takes</div>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                          {cs.careerSkills.split("\n").filter(s => s.trim()).map((skill, i) => (
+                            <span key={i} style={{ padding: "4px 12px", borderRadius: 20, background: "var(--lavender-dim)", border: "1px solid rgba(176,96,255,0.3)", fontSize: 12, color: "var(--lavender)", fontWeight: 500 }}>
+                              {skill.trim()}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {cs.careerAwesome && (
+                      <div style={{ marginBottom: cs.careerTryIt ? 12 : 0, padding: "12px 14px", background: "var(--bg3)", borderRadius: "var(--r)", borderLeft: "3px solid var(--lavender)" }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "var(--lavender)", marginBottom: 5 }}>Why it's awesome</div>
+                        <p style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.7 }}>{cs.careerAwesome}</p>
+                      </div>
+                    )}
+                    {cs.careerTryIt && (
+                      <div style={{ marginTop: 12, padding: "12px 14px", background: "rgba(176,96,255,0.08)", borderRadius: "var(--r)", border: "1px solid rgba(176,96,255,0.2)" }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "var(--lavender)", marginBottom: 5 }}>Want to try it?</div>
+                        <p style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.7 }}>{cs.careerTryIt}</p>
+                      </div>
+                    )}
                   </div>
-                </div>
-                {cs.bio && <p style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.75, marginBottom: 12 }}>{cs.bio}</p>}
-                {cs.insight && (
-                  <div style={{ padding: "12px 16px", background: "var(--bg3)", borderRadius: "var(--r)", borderLeft: "3px solid var(--lavender)" }}>
-                    <p style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.8, fontStyle: "italic" }}>{cs.insight}</p>
+                )}
+                {/* Real person section */}
+                {cs.name && (
+                  <div style={{ padding: "18px 22px" }}>
+                    {!cs.careerTitle && (
+                      <div className="flex-between mb-12">
+                        <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: 2, color: "var(--lavender)", fontWeight: 700 }}>💼 Career Spotlight</div>
+                        <SaveButton item={{ id: cs.id, type: "career", title: cs.name + " — " + cs.role, icon: "💼", desc: cs.bio, pts: 0 }} boards={boards} onSaveToBoard={saveToBoard} />
+                      </div>
+                    )}
+                    {cs.careerTitle && <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "var(--muted)", marginBottom: 12 }}>Real person in this field</div>}
+                    <div className="flex-center gap-14 mb-12">
+                      <div style={{ width: 48, height: 48, borderRadius: "50%", background: "var(--lavender-dim)", border: "2px solid rgba(176,96,255,0.45)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>{cs.name?.[0] || "?"}</div>
+                      <div>
+                        <div style={{ fontFamily: "var(--font-display)", fontSize: 17, fontWeight: 700, color: "var(--cream)" }}>{cs.name}</div>
+                        <div style={{ fontSize: 12, color: "var(--lavender)", marginTop: 2 }}>{cs.role}</div>
+                      </div>
+                    </div>
+                    {cs.bio && <p style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.75, marginBottom: 12 }}>{cs.bio}</p>}
+                    {cs.insight && (
+                      <div style={{ padding: "12px 16px", background: "var(--bg3)", borderRadius: "var(--r)", borderLeft: "3px solid var(--lavender)" }}>
+                        <p style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.8, fontStyle: "italic" }}>{cs.insight}</p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -8291,6 +8792,7 @@ function StudentApp({ student, setStudent, content, apiKey, messages, setMessage
   const [seenCheckIns, setSeenCheckIns] = useState([]); // ids seen this session
   const [journalEntries, setJournalEntries] = useState({}); // dropId → { text, prompt, title, dropDate }
   const [habitLogs, setHabitLogs] = useState({}); // habitId → [dateStr]
+  const [taskLogs, setTaskLogs] = useState({});   // taskId → [dateStr]
   const [goals, setGoals] = useState([]); // [{id, title, targetDate, milestones, status, reflection}]
 
   const saveJournalEntry = useCallback((dropId, entry) => {
@@ -8346,6 +8848,7 @@ function StudentApp({ student, setStudent, content, apiKey, messages, setMessage
     { id: "drops", label: "Daily Drops", icon: "🌤️" },
     { id: "journal", label: "Journal", icon: "📓" },
     { id: "habits", label: "Habits & Chores", icon: "✅" },
+    { id: "tasks", label: "Tasks", icon: "📋" },
     { id: "goals", label: "Goals", icon: "🎯" },
     { id: "messages", label: "Messages", icon: "✉️" },
     null,
@@ -8357,7 +8860,8 @@ function StudentApp({ student, setStudent, content, apiKey, messages, setMessage
 
   const renderView = () => {
     switch (view) {
-      case "dashboard": return <StudentDashboard student={student} completed={completed} points={points} content={content} weekPlan={weekPlan} grabbedGigs={grabbedGigs} onNavigate={setView} boards={boards} setBoards={setBoards} saveToBoard={saveToBoard} onComplete={complete} onUncomplete={uncomplete} journalEntries={journalEntries} habitDefs={content.habitDefs || []} habitLogs={habitLogs} setHabitLogs={setHabitLogs} goals={goals} messages={messages} />;
+      case "dashboard": return <StudentDashboard student={student} completed={completed} points={points} content={content} weekPlan={weekPlan} grabbedGigs={grabbedGigs} onNavigate={setView} boards={boards} setBoards={setBoards} saveToBoard={saveToBoard} onComplete={complete} onUncomplete={uncomplete} journalEntries={journalEntries} habitDefs={content.habitDefs || []} habitLogs={habitLogs} setHabitLogs={setHabitLogs} goals={goals} messages={messages} taskDefs={content.taskDefs || []} taskLogs={taskLogs} setTaskLogs={setTaskLogs} />;
+      case "tasks": return <StudentTasksPage taskDefs={content.taskDefs || []} taskLogs={taskLogs} setTaskLogs={setTaskLogs} student={student} onComplete={complete} />;
       case "habits": return <StudentHabitsPage habitDefs={content.habitDefs || []} habitLogs={habitLogs} setHabitLogs={setHabitLogs} student={student} onComplete={complete} />;
       case "goals": return <StudentGoalsPage goals={goals} setGoals={setGoals} />;
       case "messages": return <StudentMessagesPage messages={messages} setMessages={setMessages} studentId={student.id} />;
@@ -8485,7 +8989,7 @@ function buildDefaultPlatformDoc() {
       gigs: SANDBOX_GIGS_DEFAULT, ripple: RIPPLE_MISSIONS_DEFAULT,
       teensGuide: TEENS_GUIDE_DEFAULT, lightRoom: LIGHT_ROOM_DEFAULT,
       dailyDrops: DAILY_DROPS_DEFAULT, checkIns: CHECK_INS_DEFAULT,
-      profileQuestions: PROFILE_QUESTIONS_DEFAULT, habitDefs: [],
+      profileQuestions: PROFILE_QUESTIONS_DEFAULT, habitDefs: [], taskDefs: [],
     },
     studentAccounts: DEFAULT_STUDENT_ACCOUNTS,
     apiKey: "",
