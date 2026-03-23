@@ -994,7 +994,6 @@ const BLOCK_TYPES_CONFIG = [
   { id: "writing",      label: "Writing",      icon: "✍️", color: "var(--amber)",    desc: "Student writing prompt" },
   { id: "quiz",         label: "Quiz",         icon: "❓", color: "var(--clay)",     desc: "Multiple choice question" },
   { id: "image",        label: "Image",        icon: "🖼️", color: "var(--lavender)", desc: "Display an image" },
-  { id: "ai_tutor",     label: "AI Tutor",     icon: "🤖", color: "var(--amber)",    desc: "AI tutor with custom context" },
   { id: "upload",       label: "Upload",       icon: "📤", color: "var(--sage)",     desc: "Student submission prompt" },
   { id: "link",         label: "Link",         icon: "🔗", color: "var(--sky)",      desc: "External resource link" },
   { id: "reflect",      label: "Reflect",      icon: "🪞", color: "var(--lavender)", desc: "Reflection prompt" },
@@ -1012,7 +1011,6 @@ function newBlock(type) {
     case "writing":      return { ...base, prompt: "", placeholder: "Write your response here…", minWords: "" };
     case "quiz":         return { ...base, question: "", options: ["", "", "", ""], correctIndex: 0, explanation: "" };
     case "image":        return { ...base, url: "", caption: "" };
-    case "ai_tutor":     return { ...base, context: "", buttonLabel: "Ask AI Tutor" };
     case "upload":       return { ...base, instructions: "", acceptedTypes: "" };
     case "link":         return { ...base, url: "", label: "", description: "" };
     case "reflect":      return { ...base, prompt: "", lines: 4 };
@@ -1099,10 +1097,9 @@ function SingleBlockEditor({ block, onChange, onRemove, onMoveUp, onMoveDown, is
           <div className="form-row"><label className="label">Caption</label><input className="input" value={block.caption || ""} onChange={e => upd("caption", e.target.value)} placeholder="Image caption or attribution" /></div>
         </>
       );
-      case "ai_tutor": return (
         <>
           <div className="form-row"><label className="label">Context / Topic for AI</label><textarea className="input textarea" style={{ minHeight: 60 }} value={block.context || ""} onChange={e => upd("context", e.target.value)} placeholder="What should the AI tutor help with? e.g. 'Help the student understand photosynthesis using the Socratic method'" /></div>
-          <div className="form-row"><label className="label">Button Label</label><input className="input" value={block.buttonLabel || "Ask AI Tutor"} onChange={e => upd("buttonLabel", e.target.value)} placeholder="Ask AI Tutor" /></div>
+          <div className="form-row"><label className="label">Button Label</label><input className="input" value={block.buttonLabel || "Open Tutor"} onChange={e => upd("buttonLabel", e.target.value)} placeholder="Button label" /></div>
         </>
       );
       case "upload": return (
@@ -1232,13 +1229,12 @@ function ContentBlockEditor({ blocks, setBlocks }) {
 }
 
 // ── Student: renders one block ─────────────────────────────────────────
-function BlockRendererItem({ block, apiKey, context }) {
+function BlockRendererItem({ block, context }) {
   const [quizAnswer, setQuizAnswer] = useState(null);
   const [writingText, setWritingText] = useState("");
   const [reflectText, setReflectText] = useState("");
   const [cardIndex, setCardIndex] = useState(0);
   const [cardFlipped, setCardFlipped] = useState(false);
-  const [tutorOpen, setTutorOpen] = useState(false);
   const cfg = BLOCK_TYPES_CONFIG.find(b => b.id === block.type);
 
   switch (block.type) {
@@ -1323,13 +1319,6 @@ function BlockRendererItem({ block, apiKey, context }) {
         {block.caption && <div style={{ padding: "10px 14px", fontSize: 12, color: "var(--muted)", fontStyle: "italic" }}>{block.caption}</div>}
       </div>
     ) : null;
-    case "ai_tutor": return (
-      <div className="card" style={{ borderColor: "rgba(0,212,255,0.35)", background: "rgba(232,160,32,0.04)", textAlign: "center", padding: 24 }}>
-        <div style={{ fontSize: 28, marginBottom: 8 }}>🤖</div>
-        <button className="btn btn-primary" onClick={() => setTutorOpen(true)}>{block.buttonLabel || "Ask AI Tutor"}</button>
-        {tutorOpen && <AITutor open={true} onClose={() => setTutorOpen(false)} context={block.context || context || ""} apiKey={apiKey} />}
-      </div>
-    );
     case "upload": return (
       <div className="card" style={{ borderColor: "rgba(0,229,168,0.35)", background: "rgba(122,170,122,0.04)" }}>
         <div className="flex-center gap-8 mb-10">
@@ -1450,12 +1439,12 @@ try{${code}}catch(e){_err(e)}
 }
 
 // ── Student: renders all blocks for an item ────────────────────────────
-function ContentBlockRenderer({ blocks, apiKey, context }) {
+function ContentBlockRenderer({ blocks, context }) {
   if (!blocks || blocks.length === 0) return null;
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       {blocks.map(block => (
-        <BlockRendererItem key={block.id} block={block} apiKey={apiKey} context={context} />
+        <BlockRendererItem key={block.id} block={block} context={context} />
       ))}
     </div>
   );
@@ -2045,25 +2034,25 @@ function TeacherApprovals({ approvals, setApprovals }) {
 
 // ─── TEACHER: API SETTINGS ────────────────────────────────────────────────────
 
-function APISettings({ apiKey, setApiKey }) {
-  const [val, setVal] = useState(apiKey);
+function TeacherSettings({ teacherPassword, setTeacherPassword }) {
+  const [pw, setPw] = useState(teacherPassword || "");
   const [saved, setSaved] = useState(false);
-  const save = () => { setApiKey(val); setSaved(true); setTimeout(() => setSaved(false), 2000); };
+  const save = () => { setTeacherPassword(pw); setSaved(true); setTimeout(() => setSaved(false), 2000); };
   return (
     <div>
       <div className="page-header">
-        <h1 className="page-title">⚙️ API Settings</h1>
-        <p className="page-sub">Configure the Anthropic API key for AI Tutor and Mastery Check features</p>
+        <h1 className="page-title">⚙️ Settings</h1>
+        <p className="page-sub">Manage your teacher password</p>
       </div>
       <div className="page-content">
-        <div className="card" style={{ maxWidth: 560 }}>
-          <h3 style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 600, color: "var(--cream)", marginBottom: 8 }}>Anthropic API Key</h3>
-          <p style={{ fontSize: 13, color: "var(--muted)", marginBottom: 16, lineHeight: 1.6 }}>This enables the AI Tutor on the student dashboard. Your key is stored locally and never sent anywhere except Anthropic's API. Get a key at console.anthropic.com.</p>
+        <div className="card" style={{ maxWidth: 480 }}>
+          <h3 style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 600, color: "var(--cream)", marginBottom: 8 }}>Teacher Password</h3>
+          <p style={{ fontSize: 13, color: "var(--muted)", marginBottom: 16, lineHeight: 1.6 }}>This is the password required to access the Teacher side of the platform.</p>
           <div className="form-row">
-            <label className="label">API Key</label>
-            <input className="input" type="password" value={val} onChange={e => setVal(e.target.value)} placeholder="sk-ant-..." />
+            <label className="label">New Password</label>
+            <input className="input" type="password" value={pw} onChange={e => setPw(e.target.value)} placeholder="Enter new password" />
           </div>
-          <button className="btn btn-primary" onClick={save}>{saved ? "✓ Saved!" : "Save Key"}</button>
+          <button className="btn btn-primary" onClick={save} disabled={!pw.trim()}>{saved ? "✓ Saved!" : "Save Password"}</button>
         </div>
       </div>
     </div>
@@ -5191,7 +5180,7 @@ class ErrorBoundary extends React.Component {
 
 // ─── TEACHER APP ──────────────────────────────────────────────────────────────
 
-function TeacherApp({ content, setContent, studentAccounts, setStudentAccounts, approvals, setApprovals, apiKey, setApiKey, messages, setMessages, onSwitchRole }) {
+function TeacherApp({ content, setContent, studentAccounts, setStudentAccounts, approvals, setApprovals, teacherPassword, setTeacherPassword, messages, setMessages, onSwitchRole }) {
   const [view, setView] = useState("overview");
 
   const setContentKey = (key) => (fn) => setContent(prev => ({ ...prev, [key]: typeof fn === "function" ? fn(prev[key]) : fn }));
@@ -5286,8 +5275,7 @@ function TeacherApp({ content, setContent, studentAccounts, setStudentAccounts, 
       { id: "students", label: "Progress", icon: "👥" },
       { id: "approvals", label: "Approvals", icon: "✅", badge: pendingCount > 0 ? pendingCount : null },
     ]},
-    { section: "settings", items: [{ id: "settings", label: "API Settings", icon: "⚙️" }] },
-  ];
+    { section: "settings", items: [{ id: "settings", label: "Settings", icon: "⚙️" }] }];
 
   const renderView = () => {
     switch (view) {
@@ -5308,7 +5296,7 @@ function TeacherApp({ content, setContent, studentAccounts, setStudentAccounts, 
       case "profileqs": return <ProfileQuestionsManager questions={content.profileQuestions || []} setQuestions={setContentKey("profileQuestions")} content={content} />;
       case "students": return <TeacherStudents students={studentAccounts} content={content} />;
       case "approvals": return <TeacherApprovals approvals={approvals} setApprovals={setApprovals} />;
-      case "settings": return <APISettings apiKey={apiKey} setApiKey={setApiKey} />;
+      case "settings": return <TeacherSettings teacherPassword={teacherPassword} setTeacherPassword={setTeacherPassword} />;
       default: return null;
     }
   };
@@ -5455,80 +5443,88 @@ function Onboarding({ onComplete }) {
 
 // ─── STUDENT: AI TUTOR ────────────────────────────────────────────────────────
 
-function AITutor({ open, onClose, context, apiKey }) {
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const bottomRef = useRef(null);
+// ─── DASHBOARD WORK ITEM ─────────────────────────────────────────────────────
 
-  useEffect(() => {
-    if (open && messages.length === 0) {
-      setMessages([{ role: "assistant", content: context ? `I'm your AI tutor. I can see you're working on **${context}**. What would you like help with — understanding concepts, finding resources, or thinking through your approach?` : "I'm your AI tutor. What are you working on today? I'm here to help you think through ideas, understand concepts, or figure out your next steps." }]);
-    }
-  }, [open]);
+function DashboardWorkItem({ item, meta, isDone, onComplete, onUncomplete, content }) {
+  const [expanded, setExpanded] = useState(false);
 
-  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
+  const accentColor = meta.color || "var(--amber)";
 
-  const send = async () => {
-    if (!input.trim() || loading) return;
-    const userMsg = { role: "user", content: input };
-    setMessages(prev => [...prev, userMsg]);
-    setInput("");
-    setLoading(true);
-    if (!apiKey) {
-      setMessages(prev => [...prev, { role: "assistant", content: "The AI Tutor needs an Anthropic API key to work. Ask your teacher to add one in the API Settings panel." }]);
-      setLoading(false);
-      return;
-    }
-    try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 800,
-          system: `You are a Socratic AI tutor for a self-directed homeschool teen on the Forge platform. You ask questions rather than just giving answers. You're warm, encouraging, and intellectually curious. Keep responses concise and conversational. Context: ${context || "general learning"}`,
-          messages: [...messages.filter(m => m.role !== "assistant" || messages.indexOf(m) > 0).map(m => ({ role: m.role, content: m.content })), userMsg],
-        }),
-      });
-      const data = await res.json();
-      setMessages(prev => [...prev, { role: "assistant", content: data.content?.[0]?.text || "Something went wrong. Please try again." }]);
-    } catch {
-      setMessages(prev => [...prev, { role: "assistant", content: "Couldn't connect to the AI right now. Check your API key in settings." }]);
-    }
-    setLoading(false);
+  const renderPreview = () => {
+    if (!expanded) return null;
+    const lines = (str) => (str || "").split("\n").map(s => s.trim()).filter(Boolean);
+    return (
+      <div style={{ padding: "12px 14px 0", borderTop: "1px solid var(--border)", marginTop: 10 }}>
+        {item.desc && <p style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.7, marginBottom: 10 }}>{item.desc}</p>}
+        {item.content && <p style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.7, marginBottom: 10 }}>{item.content}</p>}
+        {item.how?.length > 0 && (
+          <div style={{ marginBottom: 10 }}>
+            {item.how.slice(0, 3).map((step, i) => (
+              <div key={i} style={{ display: "flex", gap: 8, fontSize: 12, color: "var(--muted)", padding: "3px 0" }}>
+                <span style={{ color: accentColor, flexShrink: 0 }}>{i + 1}.</span>{step}
+              </div>
+            ))}
+            {item.how.length > 3 && <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 3 }}>+{item.how.length - 3} more steps</div>}
+          </div>
+        )}
+        {item.problem && <p style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.65, marginBottom: 10 }}>{item.problem.substring(0, 120)}…</p>}
+        {lines(item.deliverable).length > 0 && (
+          <div style={{ marginBottom: 10 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "var(--muted)", marginBottom: 4 }}>Deliverables</div>
+            {lines(item.deliverable).map((d, i) => (
+              <div key={i} style={{ fontSize: 12, color: "var(--cream-dim)", display: "flex", gap: 6 }}>
+                <span style={{ color: accentColor }}>→</span>{d}
+              </div>
+            ))}
+          </div>
+        )}
+        <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid var(--border)", display: "flex", justifyContent: "flex-end" }}>
+          {isDone ? (
+            <div className="flex-center gap-8">
+              <span style={{ fontSize: 12, color: "var(--sage)", fontWeight: 600 }}>✓ Done +{item.pts || 0} pts</span>
+              <button className="btn btn-ghost btn-xs" onClick={() => { onUncomplete(item.id, item.pts || 0); setExpanded(false); }}>↩ Undo</button>
+            </div>
+          ) : (
+            <button className="btn btn-sage btn-sm" onClick={() => { onComplete(item.id, item.pts || 0); setExpanded(false); }}>
+              Mark Complete ✓ {item.pts ? `+${item.pts} pts` : ""}
+            </button>
+          )}
+        </div>
+      </div>
+    );
   };
 
   return (
-    <Modal open={open} onClose={onClose} title="🤖 AI Tutor">
-      <div className="ai-chat">
-        <div className="ai-messages">
-          {messages.map((m, i) => (
-            <div key={i} className={`ai-msg ${m.role}`}>{m.content}</div>
-          ))}
-          {loading && <div className="ai-msg assistant" style={{ opacity: 0.6 }}>Thinking…</div>}
-          <div ref={bottomRef} />
+    <div style={{ borderRadius: "var(--r)", background: isDone ? "var(--sage-dim)" : "var(--bg3)", border: `1px solid ${isDone ? "rgba(0,229,168,0.35)" : "var(--border)"}`, overflow: "hidden", transition: "all 0.15s" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 13px", cursor: "pointer" }} onClick={() => setExpanded(e => !e)}>
+        <div style={{ width: 28, height: 28, borderRadius: 7, background: isDone ? "var(--sage)" : accentColor + "20", border: `1.5px solid ${isDone ? "var(--sage)" : accentColor + "50"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>
+          {isDone ? <span style={{ color: "#0c0c16", fontSize: 11, fontWeight: 900 }}>✓</span> : (item.icon || meta.icon || "◈")}
         </div>
-        <div className="ai-input-row">
-          <input className="input" value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()} placeholder="Ask anything…" />
-          <button className="btn btn-primary btn-sm" onClick={send} disabled={loading || !input.trim()}>Send</button>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: isDone ? "var(--sage)" : "var(--cream)", textDecoration: isDone ? "line-through" : "none", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {item.name || item.title}
+          </div>
+          <div style={{ fontSize: 10, color: "var(--muted)", marginTop: 1 }}>
+            <span style={{ color: accentColor }}>{meta.label}</span>
+            {item.pts ? ` · ${item.pts} pts` : ""}
+          </div>
         </div>
+        <span style={{ color: "var(--muted)", fontSize: 11, flexShrink: 0 }}>{expanded ? "▲" : "▼"}</span>
       </div>
-    </Modal>
+      {renderPreview()}
+    </div>
   );
 }
 
 // ─── STUDENT: DASHBOARD ───────────────────────────────────────────────────────
 
-function StudentDashboard({ student, completed, points, content, weekPlan, grabbedGigs, onNavigate, boards, setBoards, saveToBoard, onComplete, onUncomplete, journalEntries, habitDefs, habitLogs, setHabitLogs, goals, messages, taskDefs, taskLogs, setTaskLogs }) {
+function StudentDashboard({ student, completed, points, content, weekPlan, grabbedGigs, onNavigate, boards, setBoards, saveToBoard, onComplete, onUncomplete, journalEntries, habitDefs, habitLogs, setHabitLogs, goals, messages, taskDefs, taskLogs, setTaskLogs, dailyPlan }) {
   const pct = Math.round((points / content.areas.reduce((a,b)=>a+(b.target||0),0)) * 100);
   const todayDrop = content.dailyDrops.find(d => d.date === todayStr()) || null;
   const myInterests = student.interests || [];
   const suggestedSkills = content.skills.filter(s => s.interests?.some(i => myInterests.includes(i)) && !completed.includes(s.id)).slice(0, 3);
   const recentCompleted = completed.slice(-6).reverse();
   const activeGigs = content.gigs.filter(g => grabbedGigs?.[g.id] && !completed.includes(g.id));
-  const weekTotal = Object.values(weekPlan).flat().filter(x => x).length;
-  const weekTarget = 15;
 
   return (
     <div>
@@ -5554,7 +5550,7 @@ function StudentDashboard({ student, completed, points, content, weekPlan, grabb
             { num: completed.filter(id => content.skills.find(s => s.id === id)).length, label: "Skills Mastered", color: "var(--sage)" },
             { num: completed.filter(id => content.projects.find(p => p.id === id)).length, label: "Projects Done", color: "var(--amber)" },
             { num: completed.filter(id => content.gigs.find(g => g.id === id)).length, label: "Gigs Completed", color: "var(--sky)" },
-            { num: `${weekTotal}/${weekTarget}`, label: "This Week", color: "var(--lavender)" },
+            { num: (() => { const dk = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date().getDay()]; const t = (dailyPlan?.[dk]||[]); return t.length ? `${t.filter(e=>completed.includes(e.id)).length}/${t.length}` : "—"; })(), label: "Today's Work", color: "var(--lavender)" },
           ].map((s, i) => (
             <div key={i} className="stat-card">
               <div className="stat-num" style={{ color: s.color }}>{s.num}</div>
@@ -5587,33 +5583,72 @@ function StudentDashboard({ student, completed, points, content, weekPlan, grabb
               </div>
             )}
 
-            {/* Weekly Rhythm */}
-            <div className="card mb-16">
-              <div className="flex-between mb-12">
-                <h3 style={{ fontFamily: "var(--font-display)", fontSize: 17, fontWeight: 600, color: "var(--cream)" }}>This Week</h3>
-                <div className="flex-center gap-8">
-                  <ProgressRing pct={Math.round((weekTotal / weekTarget) * 100)} size={36} stroke={3} />
-                  <button className="btn btn-ghost btn-xs" onClick={() => onNavigate("planner")}>Open Planner →</button>
-                </div>
-              </div>
-              {[
-                { label: "Skills", target: 10, done: (weekPlan.skills || []).filter(Boolean).length, color: "var(--amber)" },
-                { label: "Mission", target: 1, done: weekPlan.mission ? 1 : 0, color: "var(--clay)" },
-                { label: "Sandbox Gig", target: 1, done: weekPlan.gig ? 1 : 0, color: "var(--sky)" },
-                { label: "Ripple Mission", target: 1, done: weekPlan.ripple ? 1 : 0, color: "var(--sage)" },
-                { label: "Teen's Guide", target: 1, done: weekPlan.guide ? 1 : 0, color: "var(--lavender)" },
-                { label: "Light Room", target: 1, done: weekPlan.lightroom ? 1 : 0, color: "var(--sky)" },
-              ].map(row => (
-                <div key={row.label} className="flex-between mb-8">
-                  <span style={{ fontSize: 12, color: "var(--cream-dim)" }}>{row.label}</span>
-                  <div className="flex-center gap-8">
-                    {Array.from({ length: row.target }).map((_, i) => (
-                      <div key={i} style={{ width: 10, height: 10, borderRadius: 3, background: i < row.done ? row.color : "var(--border)" }} />
-                    ))}
+            {/* Today's Work — from daily plan */}
+            {(() => {
+              const DAY_KEYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+              const todayKey = DAY_KEYS[new Date().getDay()];
+              const todayItems = (dailyPlan?.[todayKey] || []);
+              const RHYTHM_META = {
+                skills:    { label: "Skill",         icon: "◈",  color: "var(--amber)",   pool: content.skills },
+                mission:   { label: "Project",        icon: "🎯", color: "var(--clay)",    pool: content.projects },
+                gig:       { label: "Sandbox Gig",    icon: "⚡", color: "var(--sky)",     pool: content.gigs },
+                ripple:    { label: "Ripple Mission",  icon: "🌊", color: "var(--sage)",    pool: content.ripple },
+                guide:     { label: "Teen's Guide",   icon: "📖", color: "var(--lavender)",pool: content.teensGuide },
+                lightroom: { label: "Light Room",     icon: "💡", color: "var(--sky)",     pool: content.lightRoom },
+              };
+
+              const doneCount = todayItems.filter(entry => completed.includes(entry.id)).length;
+
+              return (
+                <div className="card mb-16" style={{ borderColor: doneCount === todayItems.length && todayItems.length > 0 ? "rgba(0,229,168,0.4)" : "var(--border)" }}>
+                  <div className="flex-between mb-12">
+                    <div className="flex-center gap-8">
+                      <span style={{ fontSize: 16 }}>📅</span>
+                      <h3 style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, color: doneCount === todayItems.length && todayItems.length > 0 ? "var(--sage)" : "var(--cream)" }}>
+                        Today's Work
+                      </h3>
+                      {todayItems.length > 0 && (
+                        <span style={{ fontSize: 12, color: doneCount === todayItems.length ? "var(--sage)" : "var(--muted)", fontWeight: 600 }}>
+                          {doneCount}/{todayItems.length}
+                        </span>
+                      )}
+                    </div>
+                    <button className="btn btn-ghost btn-xs" onClick={() => onNavigate("planner")}>Edit Plan →</button>
                   </div>
+                  {todayItems.length === 0 ? (
+                    <div style={{ textAlign: "center", padding: "16px 0", color: "var(--muted)", fontSize: 13 }}>
+                      Nothing planned for today.{" "}
+                      <span style={{ color: "var(--amber)", cursor: "pointer", textDecoration: "underline" }} onClick={() => onNavigate("planner")}>
+                        Open planner →
+                      </span>
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                      {todayItems.map((entry, i) => {
+                        const meta = RHYTHM_META[entry.rhythmKey] || {};
+                        const item = (meta.pool || []).find(x => x.id === entry.id);
+                        if (!item) return null;
+                        const isDone = completed.includes(entry.id);
+                        return (
+                          <DashboardWorkItem
+                            key={entry.id + i}
+                            item={item}
+                            meta={meta}
+                            isDone={isDone}
+                            onComplete={onComplete}
+                            onUncomplete={onUncomplete}
+                            content={content}
+                          />
+                        );
+                      })}
+                      {doneCount === todayItems.length && todayItems.length > 0 && (
+                        <div style={{ textAlign: "center", marginTop: 6, fontSize: 13, color: "var(--sage)", fontWeight: 600 }}>🎉 All done for today!</div>
+                      )}
+                    </div>
+                  )}
                 </div>
-              ))}
-            </div>
+              );
+            })()}
           </div>
 
           <div>
@@ -5740,312 +5775,43 @@ function StudentDashboard({ student, completed, points, content, weekPlan, grabb
   );
 }
 
-// ─── STUDENT: WEEKLY PLANNER ──────────────────────────────────────────────────
-
-// ─── PLANNER PICKER: grouped item row ─────────────────────────────────────────
-
-function PlannerPickerRow({ item, isSelected, isDone, accentColor, onPick }) {
-  return (
-    <div onClick={() => !isDone && onPick(item)}
-      style={{
-        display: "flex", alignItems: "center", gap: 12, padding: "10px 13px",
-        borderRadius: "var(--r)", cursor: isDone ? "default" : "pointer",
-        border: `1px solid ${isSelected ? (accentColor || "var(--amber)") : "var(--border)"}`,
-        background: isSelected ? (accentColor || "var(--amber)") + "18" : "var(--bg3)",
-        opacity: isDone ? 0.5 : 1, transition: "all 0.12s",
-      }}>
-      <span style={{ fontSize: 18, flexShrink: 0 }}>{item.icon || "◈"}</span>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--cream)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item.name || item.title}</div>
-        {item.desc && <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{String(item.desc).substring(0, 75)}</div>}
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-        {item.pts && <span className="pts-badge">{item.pts}pts</span>}
-        {isDone && <span className="tag tag-sage" style={{ fontSize: 10 }}>Done</span>}
-        {isSelected && <span style={{ color: accentColor || "var(--amber)", fontWeight: 800, fontSize: 16 }}>✓</span>}
-      </div>
-    </div>
-  );
-}
-
-// ─── PLANNER PICKER: grouped section header ────────────────────────────────────
-
-function PickerGroup({ label, icon, color, count, isOpen, onToggle, children }) {
-  return (
-    <div style={{ marginBottom: 4 }}>
-      <div onClick={onToggle}
-        style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 10px", borderRadius: "var(--r)", cursor: "pointer", userSelect: "none", background: "var(--bg2)", border: "1px solid var(--border)" }}>
-        {icon && <span style={{ fontSize: 15 }}>{icon}</span>}
-        <span style={{ flex: 1, fontSize: 12, fontWeight: 700, color: color || "var(--cream-dim)", textTransform: "uppercase", letterSpacing: 1 }}>{label}</span>
-        <span style={{ fontSize: 11, color: "var(--muted)" }}>{count}</span>
-        <span style={{ color: "var(--muted)", fontSize: 11 }}>{isOpen ? "▲" : "▼"}</span>
-      </div>
-      {isOpen && <div style={{ paddingLeft: 12, paddingTop: 6, display: "flex", flexDirection: "column", gap: 5 }}>{children}</div>}
-    </div>
-  );
-}
-
-// ─── PLANNER PICKER: skills grouped by area → subcat ──────────────────────────
-
-function SkillPickerContent({ pool, areas, weekPlan, completed, onPick }) {
-  const [openG, setOpenG] = useState({});
-  const [openSC, setOpenSC] = useState({});
-  const selectedIds = weekPlan.skills || [];
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-      {areas.map(area => {
-        const areaSkills = pool.filter(s => s.area === area.id);
-        if (areaSkills.length === 0) return null;
-        const color = `var(${area.color || "--amber"})`;
-        const isAreaOpen = openG[area.id] === true;
-        const subcats = area.subcats || [];
-        const subcatMap = {};
-        areaSkills.forEach(s => {
-          const k = s.subcat || "__none__";
-          if (!subcatMap[k]) subcatMap[k] = [];
-          subcatMap[k].push(s);
-        });
-
-        return (
-          <div key={area.id}>
-            {/* Area header */}
-            <div onClick={() => setOpenG(p => ({ ...p, [area.id]: !isAreaOpen }))}
-              style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 12px", borderRadius: "var(--r)", cursor: "pointer", userSelect: "none", background: "var(--bg2)", border: `1px solid var(--border)`, marginBottom: 2 }}>
-              <span style={{ fontSize: 16 }}>{area.icon}</span>
-              <span style={{ flex: 1, fontSize: 13, fontWeight: 700, color: "var(--cream)" }}>{area.name}</span>
-              <span style={{ fontSize: 11, color: "var(--muted)" }}>{areaSkills.length}</span>
-              <span style={{ color: "var(--muted)", fontSize: 11 }}>{isAreaOpen ? "▲" : "▼"}</span>
-            </div>
-
-            {isAreaOpen && (
-              <div style={{ paddingLeft: 14, marginBottom: 6 }}>
-                {(() => {
-                  const rows = [];
-                  // Ordered subcats
-                  subcats.forEach(sc => {
-                    const scSkills = subcatMap[sc.id] || [];
-                    if (!scSkills.length) return;
-                    const key = area.id + ":" + sc.id;
-                    const isOpen = openSC[key] === true;
-                    rows.push(
-                      <div key={sc.id} style={{ marginBottom: 4 }}>
-                        <div onClick={() => setOpenSC(p => ({ ...p, [key]: !isOpen }))}
-                          style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 10px", borderRadius: 6, cursor: "pointer", userSelect: "none", background: "var(--bg3)" }}>
-                          <span style={{ fontSize: 9, color, fontWeight: 800 }}>◆</span>
-                          <span style={{ flex: 1, fontSize: 11, fontWeight: 700, color: "var(--cream-dim)", textTransform: "uppercase", letterSpacing: 1 }}>{sc.name}</span>
-                          <span style={{ fontSize: 10, color: "var(--muted)" }}>{scSkills.length}</span>
-                          <span style={{ fontSize: 10, color: "var(--muted)" }}>{isOpen ? "▲" : "▼"}</span>
-                        </div>
-                        {isOpen && (
-                          <div style={{ paddingLeft: 10, paddingTop: 4, display: "flex", flexDirection: "column", gap: 4 }}>
-                            {scSkills.map(item => (
-                              <PlannerPickerRow key={item.id} item={item} isSelected={selectedIds.includes(item.id)}
-                                isDone={completed.includes(item.id)} accentColor={color}
-                                onPick={onPick} />
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  });
-                  // Uncategorized
-                  const uncat = subcatMap["__none__"] || [];
-                  if (uncat.length) {
-                    const key = area.id + ":__none__";
-                    const isOpen = openSC[key] === true;
-                    rows.push(
-                      <div key="__none__" style={{ marginBottom: 4 }}>
-                        <div onClick={() => setOpenSC(p => ({ ...p, [key]: !isOpen }))}
-                          style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 10px", borderRadius: 6, cursor: "pointer", userSelect: "none", background: "var(--bg3)" }}>
-                          <span style={{ fontSize: 9, color: "var(--muted)", fontWeight: 800 }}>◆</span>
-                          <span style={{ flex: 1, fontSize: 11, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: 1 }}>General</span>
-                          <span style={{ fontSize: 10, color: "var(--muted)" }}>{uncat.length}</span>
-                          <span style={{ fontSize: 10, color: "var(--muted)" }}>{isOpen ? "▲" : "▼"}</span>
-                        </div>
-                        {isOpen && (
-                          <div style={{ paddingLeft: 10, paddingTop: 4, display: "flex", flexDirection: "column", gap: 4 }}>
-                            {uncat.map(item => (
-                              <PlannerPickerRow key={item.id} item={item} isSelected={selectedIds.includes(item.id)}
-                                isDone={completed.includes(item.id)} accentColor={color} onPick={onPick} />
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  }
-                  return rows;
-                })()}
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-// ─── PLANNER PICKER: gigs grouped by faction ──────────────────────────────────
-
-function GigPickerContent({ pool, weekPlan, completed, onPick }) {
-  const [openG, setOpenG] = useState({});
-  const selectedId = weekPlan.gig?.id || weekPlan.gig;
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-      {FACTIONS.map(faction => {
-        const fGigs = pool.filter(g => g.faction === faction.id);
-        if (!fGigs.length) return null;
-        const isOpen = openG[faction.id] === true;
-        const color = `var(--${faction.color})`;
-        return (
-          <PickerGroup key={faction.id} label={faction.name} icon={faction.icon} color={color}
-            count={fGigs.length} isOpen={isOpen} onToggle={() => setOpenG(p => ({ ...p, [faction.id]: !isOpen }))}>
-            {fGigs.map(item => (
-              <PlannerPickerRow key={item.id} item={{ ...item, icon: faction.icon, desc: item.problem || item.deliverable }}
-                isSelected={selectedId === item.id} isDone={completed.includes(item.id)}
-                accentColor={color} onPick={onPick} />
-            ))}
-          </PickerGroup>
-        );
-      })}
-    </div>
-  );
-}
-
-// ─── PLANNER PICKER: ripple grouped by cause ──────────────────────────────────
-
-function RipplePickerContent({ pool, weekPlan, completed, onPick }) {
-  const [openG, setOpenG] = useState({});
-  const selectedId = weekPlan.ripple?.id || weekPlan.ripple;
-  const causes = [...new Set(pool.map(r => r.cause || "General"))];
-
-  const colorMap = { "Connection": "var(--sky)", "Food Security": "var(--amber)", "Education": "var(--sage)",
-    "Community": "var(--clay)", "Material Needs": "var(--amber)", "Information Access": "var(--sky)",
-    "Service": "var(--lavender)" };
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-      {causes.map(cause => {
-        const causeItems = pool.filter(r => (r.cause || "General") === cause);
-        const isOpen = openG[cause] === true;
-        const color = colorMap[cause] || "var(--sage)";
-        return (
-          <PickerGroup key={cause} label={cause} color={color} count={causeItems.length}
-            isOpen={isOpen} onToggle={() => setOpenG(p => ({ ...p, [cause]: !isOpen }))}>
-            {causeItems.map(item => (
-              <PlannerPickerRow key={item.id} item={item} isSelected={selectedId === item.id}
-                isDone={completed.includes(item.id)} accentColor={color} onPick={onPick} />
-            ))}
-          </PickerGroup>
-        );
-      })}
-    </div>
-  );
-}
-
-// ─── PLANNER PICKER: projects grouped by theme color ──────────────────────────
-
-function ProjectPickerContent({ pool, weekPlan, completed, onPick }) {
-  const [openG, setOpenG] = useState({});
-  const selectedId = weekPlan.mission?.id || weekPlan.mission;
-  const colorVars = { amber: "var(--amber)", sage: "var(--sage)", clay: "var(--clay)", sky: "var(--sky)", lavender: "var(--lavender)" };
-  const colorLabels = { amber: "Entrepreneurship & Life", sage: "Nature & Science", clay: "Community & Craft", sky: "Tech & Story", lavender: "Arts & Design" };
-  const themes = [...new Set(pool.map(p => p.color || "amber"))];
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-      {themes.map(theme => {
-        const themeItems = pool.filter(p => (p.color || "amber") === theme);
-        const isOpen = openG[theme] === true;
-        const color = colorVars[theme] || "var(--amber)";
-        return (
-          <PickerGroup key={theme} label={colorLabels[theme] || theme} color={color} count={themeItems.length}
-            isOpen={isOpen} onToggle={() => setOpenG(p => ({ ...p, [theme]: !isOpen }))}>
-            {themeItems.map(item => (
-              <PlannerPickerRow key={item.id} item={item} isSelected={selectedId === item.id}
-                isDone={completed.includes(item.id)} accentColor={color} onPick={onPick} />
-            ))}
-          </PickerGroup>
-        );
-      })}
-    </div>
-  );
-}
-
-// ─── PLANNER PICKER: guide/lightroom grouped by category/topic ─────────────────
-
-function SimpleGroupedPickerContent({ pool, groupKey, weekPlanKey, weekPlan, completed, onPick, accentColor }) {
-  const [openG, setOpenG] = useState({});
-  const selectedId = weekPlan[weekPlanKey]?.id || weekPlan[weekPlanKey];
-  const groups = [...new Set(pool.map(i => i[groupKey] || "General"))];
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-      {groups.map(group => {
-        const groupItems = pool.filter(i => (i[groupKey] || "General") === group);
-        const isOpen = openG[group] === true;
-        return (
-          <PickerGroup key={group} label={group} color={accentColor} count={groupItems.length}
-            isOpen={isOpen} onToggle={() => setOpenG(p => ({ ...p, [group]: !isOpen }))}>
-            {groupItems.map(item => (
-              <PlannerPickerRow key={item.id} item={item} isSelected={selectedId === item.id}
-                isDone={completed.includes(item.id)} accentColor={accentColor} onPick={onPick} />
-            ))}
-          </PickerGroup>
-        );
-      })}
-    </div>
-  );
-}
-
-// ─── WEEKLY PLANNER ───────────────────────────────────────────────────────────
-
-function WeeklyPlanner({ content, completed, weekPlan, setWeekPlan, onComplete, onUncomplete }) {
+function WeeklyPlanner({ content, completed, weekPlan, setWeekPlan, dailyPlan, setDailyPlan, onComplete, onUncomplete }) {
+  const DAYS = ["Mon","Tue","Wed","Thu","Fri"];
+  const DAY_LABELS = { Mon: "Monday", Tue: "Tuesday", Wed: "Wednesday", Thu: "Thursday", Fri: "Friday" };
+  const DAY_NUM = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+  const todayKey = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date().getDay()];
+  const [activeDay, setActiveDay] = useState(DAYS.includes(todayKey) ? todayKey : "Mon");
   const [picking, setPicking] = useState(null);
   const [search, setSearch] = useState("");
-  const [viewItem, setViewItem] = useState(null); // { item, rhythmKey }
+  const [viewItem, setViewItem] = useState(null);
 
   const RHYTHM = [
-    { key: "skills", label: "Skills", count: 10, icon: "◈", color: "var(--amber)", desc: "10 skills to work on this week", pool: content.skills },
-    { key: "mission", label: "Mission", count: 1, icon: "🎯", color: "var(--clay)", desc: "1 project or mission", pool: content.projects },
-    { key: "gig", label: "Sandbox Gig", count: 1, icon: "⚡", color: "var(--sky)", desc: "1 faction gig to complete", pool: content.gigs },
-    { key: "ripple", label: "Ripple Mission", count: 1, icon: "🌊", color: "var(--sage)", desc: "1 act of service or community care", pool: content.ripple },
-    { key: "guide", label: "Teen's Guide", count: 1, icon: "📖", color: "var(--lavender)", desc: "1 life skills entry to read", pool: content.teensGuide },
-    { key: "lightroom", label: "Light Room", count: 1, icon: "💡", color: "var(--sky)", desc: "1 curated piece to explore", pool: content.lightRoom },
+    { key: "skills",    label: "Skill",          icon: "◈",  color: "var(--amber)",    pool: content.skills },
+    { key: "mission",   label: "Project",         icon: "🎯", color: "var(--clay)",     pool: content.projects },
+    { key: "gig",       label: "Sandbox Gig",     icon: "⚡", color: "var(--sky)",      pool: content.gigs },
+    { key: "ripple",    label: "Ripple Mission",   icon: "🌊", color: "var(--sage)",     pool: content.ripple },
+    { key: "guide",     label: "Teen's Guide",    icon: "📖", color: "var(--lavender)", pool: content.teensGuide },
+    { key: "lightroom", label: "Light Room",      icon: "💡", color: "var(--sky)",      pool: content.lightRoom },
   ];
 
-  const getSlotItems = (rhythm) => {
-    if (rhythm.count === 1) return weekPlan[rhythm.key] ? [weekPlan[rhythm.key]] : [];
-    return (weekPlan[rhythm.key] || []).filter(Boolean);
+  const dayItems = dailyPlan[activeDay] || [];
+
+  const addToDay = (rhythmKey, item) => {
+    const entry = { id: item.id, rhythmKey };
+    setDailyPlan(p => {
+      const existing = p[activeDay] || [];
+      if (existing.some(e => e.id === item.id)) return p; // already there
+      return { ...p, [activeDay]: [...existing, entry] };
+    });
+    setPicking(null);
+    setSearch("");
   };
 
-  const pickItem = (rhythm, item) => {
-    if (rhythm.count === 1) {
-      setWeekPlan(p => ({ ...p, [rhythm.key]: item }));
-      setPicking(null);
-    } else {
-      const current = weekPlan[rhythm.key] || [];
-      if (current.includes(item.id)) {
-        setWeekPlan(p => ({ ...p, [rhythm.key]: current.filter(x => x !== item.id) }));
-      } else if (current.length < rhythm.count) {
-        setWeekPlan(p => ({ ...p, [rhythm.key]: [...current, item.id] }));
-      }
-    }
+  const removeFromDay = (itemId) => {
+    setDailyPlan(p => ({ ...p, [activeDay]: (p[activeDay] || []).filter(e => e.id !== itemId) }));
   };
 
-  const removeItem = (rhythmKey, itemId) => {
-    if (RHYTHM.find(r => r.key === rhythmKey)?.count === 1) {
-      setWeekPlan(p => ({ ...p, [rhythmKey]: null }));
-    } else {
-      setWeekPlan(p => ({ ...p, [rhythmKey]: (p[rhythmKey] || []).filter(x => x !== itemId) }));
-    }
-  };
-
-  const totalFilled = RHYTHM.reduce((acc, r) => acc + getSlotItems(r).length, 0);
-  const totalTarget = RHYTHM.reduce((a, r) => a + r.count, 0);
   const pickingRhythm = picking ? RHYTHM.find(r => r.key === picking) : null;
-
   const searchFiltered = pickingRhythm
     ? pickingRhythm.pool.filter(item =>
         (item.name || item.title || "").toLowerCase().includes(search.toLowerCase()) ||
@@ -6053,20 +5819,16 @@ function WeeklyPlanner({ content, completed, weekPlan, setWeekPlan, onComplete, 
       )
     : [];
 
-  // ── Item detail modal renderer ──────────────────────────────────────────────
+  // Item detail modal (reused from old planner)
   const renderItemDetail = () => {
     if (!viewItem) return null;
     const { item, rhythmKey } = viewItem;
     const isDone = completed.includes(item.id);
     const rhythm = RHYTHM.find(r => r.key === rhythmKey);
     const accentColor = rhythm?.color || "var(--amber)";
-
-    // Parse multi-line fields
     const parseLines = (str) => (str || "").split("\n").map(s => s.trim()).filter(Boolean);
 
-    // Render type-specific content
     const renderContent = () => {
-      // SKILL
       if (rhythmKey === "skills") return (
         <>
           <p style={{ fontSize: 14, color: "var(--cream-dim)", lineHeight: 1.75, marginBottom: 20 }}>{item.desc}</p>
@@ -6083,16 +5845,9 @@ function WeeklyPlanner({ content, completed, weekPlan, setWeekPlan, onComplete, 
           )}
         </>
       );
-
-      // PROJECT / MISSION
       if (rhythmKey === "mission") return (
         <>
           <p style={{ fontSize: 14, color: "var(--cream-dim)", lineHeight: 1.75, marginBottom: 16 }}>{item.desc}</p>
-          {item.output && (
-            <div style={{ padding: "10px 13px", background: "var(--bg3)", borderRadius: "var(--r)", fontSize: 12, color: "var(--muted)", marginBottom: 16 }}>
-              <strong style={{ color: "var(--cream-dim)" }}>Output: </strong>{item.output}
-            </div>
-          )}
           {item.steps?.length > 0 && (
             <div className="card" style={{ marginBottom: 16 }}>
               <h3 style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 600, color: "var(--cream)", marginBottom: 12 }}>Steps</h3>
@@ -6104,254 +5859,65 @@ function WeeklyPlanner({ content, completed, weekPlan, setWeekPlan, onComplete, 
               ))}
             </div>
           )}
-          {item.duration && <div className="duration-badge" style={{ marginBottom: 16 }}>🕐 {item.duration}</div>}
         </>
       );
-
-      // GIG
       if (rhythmKey === "gig") {
         const faction = FACTIONS.find(f => f.id === item.faction);
         const deliverables = parseLines(item.deliverable);
-        const checklist = parseLines(item.qualityChecklist);
-        const tips = parseLines(item.studentTips);
         return (
           <>
-            {faction && (
-              <div className="flex-center gap-8 mb-12">
-                <span style={{ fontSize: 16 }}>{faction.icon}</span>
-                <span style={{ fontSize: 12, fontWeight: 700, color: "var(--" + faction.color + ")" }}>{faction.name}</span>
-                {item.difficulty && <span className="tag tag-muted">{item.difficulty}</span>}
-                {item.time && <span className="tag tag-muted">⏱ {item.time}</span>}
-              </div>
-            )}
-            {item.clientBackground && (
-              <div style={{ marginBottom: 16 }}>
-                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, color: "var(--muted)", textTransform: "uppercase", marginBottom: 6 }}>Client Background</div>
-                <p style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.75 }}>{item.clientBackground}</p>
-              </div>
-            )}
-            {item.problem && (
-              <div style={{ marginBottom: 16 }}>
-                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, color: "var(--muted)", textTransform: "uppercase", marginBottom: 6 }}>The Problem</div>
-                <p style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.75 }}>{item.problem}</p>
-              </div>
-            )}
-            {deliverables.length > 0 && (
-              <div className="card" style={{ marginBottom: 16 }}>
-                <h3 style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 600, color: "var(--cream)", marginBottom: 10 }}>Your Deliverables</h3>
-                {deliverables.map((d, i) => (
-                  <div key={i} style={{ display: "flex", gap: 10, padding: "7px 0", borderBottom: "1px solid var(--border)", fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.5 }}>
-                    <span style={{ color: "var(--amber)", flexShrink: 0 }}>→</span>{d}
-                  </div>
-                ))}
-              </div>
-            )}
-            {!deliverables.length && item.deliverable && (
-              <div style={{ marginBottom: 16 }}>
-                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, color: "var(--muted)", textTransform: "uppercase", marginBottom: 6 }}>Your Deliverable</div>
-                <p style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.75 }}>{item.deliverable}</p>
-              </div>
-            )}
-            {checklist.length > 0 && (
-              <div className="card" style={{ marginBottom: 16 }}>
-                <h3 style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 600, color: "var(--cream)", marginBottom: 10 }}>Quality Checklist</h3>
-                {checklist.map((c, i) => (
-                  <div key={i} style={{ display: "flex", gap: 10, padding: "7px 0", borderBottom: "1px solid var(--border)", fontSize: 13, color: "var(--cream-dim)" }}>
-                    <span style={{ color: "var(--sage)", flexShrink: 0 }}>□</span>{c}
-                  </div>
-                ))}
-              </div>
-            )}
-            {tips.length > 0 && (
-              <div style={{ padding: "12px 14px", background: "var(--amber-dim)", border: "1px solid rgba(0,212,255,0.35)", borderRadius: "var(--r)", marginBottom: 16 }}>
-                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, color: "var(--amber)", textTransform: "uppercase", marginBottom: 6 }}>💡 Tips</div>
-                {tips.map((t, i) => <div key={i} style={{ fontSize: 12, color: "var(--cream-dim)", lineHeight: 1.7 }}>{t}</div>)}
-              </div>
-            )}
-            {item.reflectionPrompt && (
-              <div style={{ padding: "12px 14px", background: "var(--bg3)", borderRadius: "var(--r)", marginBottom: 16, border: "1px solid var(--border)", fontSize: 13, color: "var(--muted)", fontStyle: "italic" }}>
-                💭 {item.reflectionPrompt}
-              </div>
-            )}
+            {faction && <div className="flex-center gap-8 mb-12"><span>{faction.icon}</span><span style={{ fontSize: 12, fontWeight: 700, color: `var(--${faction.color})` }}>{faction.name}</span>{item.time && <span className="tag tag-muted">⏱ {item.time}</span>}</div>}
+            {item.problem && <p style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.75, marginBottom: 14 }}>{item.problem}</p>}
+            {deliverables.length > 0 && <div className="card" style={{ marginBottom: 14 }}><h3 style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 600, color: "var(--cream)", marginBottom: 8 }}>Deliverables</h3>{deliverables.map((d, i) => <div key={i} style={{ display: "flex", gap: 8, padding: "5px 0", borderBottom: "1px solid var(--border)", fontSize: 13, color: "var(--cream-dim)" }}><span style={{ color: "var(--amber)" }}>→</span>{d}</div>)}</div>}
           </>
         );
       }
-
-      // RIPPLE
       if (rhythmKey === "ripple") return (
         <>
           {item.cause && <span className="tag tag-sage" style={{ marginBottom: 14, display: "inline-flex" }}>{item.cause}</span>}
-          <p style={{ fontSize: 14, color: "var(--cream-dim)", lineHeight: 1.75, marginBottom: 16 }}>{item.desc}</p>
-          {item.steps?.length > 0 && (
-            <div className="card" style={{ marginBottom: 16 }}>
-              <h3 style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 600, color: "var(--cream)", marginBottom: 12 }}>How to Complete It</h3>
-              {item.steps.map((step, i) => (
-                <div key={i} className="checklist-item">
-                  <div style={{ width: 22, height: 22, borderRadius: "50%", background: "var(--bg4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "var(--muted)", fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
-                  <span style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.5 }}>{step}</span>
-                </div>
-              ))}
-            </div>
-          )}
+          <p style={{ fontSize: 14, color: "var(--cream-dim)", lineHeight: 1.75, marginBottom: 14 }}>{item.desc}</p>
         </>
       );
-
-      // TEEN'S GUIDE
-      if (rhythmKey === "guide") return (
-        <>
-          <div className="flex gap-8 mb-16">
-            {item.category && <span className="tag tag-sky">{item.category}</span>}
-            {item.readTime && <span className="tag tag-muted">📖 {item.readTime}</span>}
-          </div>
-          <div className="card" style={{ marginBottom: 16 }}>
-            <p style={{ fontSize: 14, color: "var(--cream-dim)", lineHeight: 1.85 }}>{item.content}</p>
-          </div>
-        </>
-      );
-
-      // LIGHT ROOM
-      if (rhythmKey === "lightroom") return (
-        <>
-          <div className="flex gap-8 mb-16">
-            {item.type && <span className="tag tag-lavender">{item.type}</span>}
-            {item.topic && <span className="tag tag-muted">{item.topic}</span>}
-            {item.duration && <span className="tag tag-muted">{item.duration}</span>}
-          </div>
-          <div className="card" style={{ border: "1px solid rgba(176,96,255,0.35)", marginBottom: 16 }}>
-            <p style={{ fontSize: 14, color: "var(--cream-dim)", lineHeight: 1.85 }}>{item.content}</p>
-          </div>
-        </>
-      );
-
-      return <p style={{ fontSize: 13, color: "var(--muted)" }}>No detail available.</p>;
+      if (rhythmKey === "guide") return <div className="card" style={{ marginBottom: 14 }}><p style={{ fontSize: 14, color: "var(--cream-dim)", lineHeight: 1.85 }}>{item.content}</p></div>;
+      if (rhythmKey === "lightroom") return <div className="card" style={{ border: "1px solid rgba(176,96,255,0.35)", marginBottom: 14 }}><p style={{ fontSize: 14, color: "var(--cream-dim)", lineHeight: 1.85 }}>{item.content}</p></div>;
+      return null;
     };
 
     return (
       <Modal open={!!viewItem} onClose={() => setViewItem(null)} size="modal-lg"
-        title={item.name || item.title || "Item Detail"}
+        title={item.name || item.title || ""}
         footer={
           <div style={{ display: "flex", gap: 10, justifyContent: "space-between", width: "100%" }}>
             <button className="btn btn-ghost" onClick={() => setViewItem(null)}>Close</button>
-            <div className="flex gap-8">
-              {isDone ? (
-                <>
-                  <div className="flex-center gap-6" style={{ color: "var(--sage)", fontSize: 13, fontWeight: 600 }}>
-                    <span>✓</span><span>Done! +{item.pts || 0} pts</span>
-                  </div>
-                  <button className="btn btn-ghost btn-sm" onClick={() => { onUncomplete(item.id, item.pts || 0); setViewItem(null); }}>↩ Undo</button>
-                </>
-              ) : (
-                <button className="btn btn-sage" onClick={() => { onComplete(item.id, item.pts || 0); setViewItem(null); }}>
-                  Mark Complete ✓ {item.pts ? "+ " + item.pts + " pts" : ""}
-                </button>
-              )}
-            </div>
+            {isDone ? (
+              <div className="flex-center gap-8">
+                <span style={{ color: "var(--sage)", fontSize: 13, fontWeight: 600 }}>✓ Done +{item.pts || 0} pts</span>
+                <button className="btn btn-ghost btn-sm" onClick={() => { onUncomplete(item.id, item.pts || 0); setViewItem(null); }}>↩ Undo</button>
+              </div>
+            ) : (
+              <button className="btn btn-sage" onClick={() => { onComplete(item.id, item.pts || 0); setViewItem(null); }}>
+                Mark Complete ✓ {item.pts ? `+${item.pts} pts` : ""}
+              </button>
+            )}
           </div>
         }>
-
-        {/* Header */}
-        <div className="flex-center gap-12 mb-20" style={{ paddingBottom: 16, borderBottom: "1px solid var(--border)" }}>
-          <div style={{ width: 48, height: 48, borderRadius: "var(--r)", background: accentColor + "18", border: "2px solid " + accentColor + "44", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>
-            {item.icon || rhythm?.icon || "📌"}
-          </div>
+        <div className="flex-center gap-12 mb-16" style={{ paddingBottom: 14, borderBottom: "1px solid var(--border)" }}>
+          <div style={{ width: 44, height: 44, borderRadius: "var(--r)", background: accentColor + "18", border: "2px solid " + accentColor + "44", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>{item.icon || rhythm?.icon || "📌"}</div>
           <div>
-            <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: 2, color: accentColor, fontWeight: 700, marginBottom: 3 }}>{rhythm?.label}</div>
-            <div style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 700, color: "var(--cream)", lineHeight: 1.2 }}>{item.name || item.title}</div>
-            {item.pts > 0 && <span className="pts-badge" style={{ marginTop: 6, display: "inline-flex" }}>⭐ {item.pts} pts</span>}
+            <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: 2, color: accentColor, fontWeight: 700, marginBottom: 2 }}>{rhythm?.label}</div>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, color: "var(--cream)" }}>{item.name || item.title}</div>
+            {item.pts > 0 && <span className="pts-badge" style={{ marginTop: 4, display: "inline-flex" }}>⭐ {item.pts} pts</span>}
           </div>
           {isDone && <span className="tag tag-sage" style={{ marginLeft: "auto" }}>✓ Done</span>}
         </div>
-
-        {/* Type-specific content */}
-        <div style={{ maxHeight: "60vh", overflowY: "auto", paddingRight: 4 }}>
-          {renderContent()}
-        </div>
+        <div style={{ maxHeight: "60vh", overflowY: "auto" }}>{renderContent()}</div>
       </Modal>
     );
   };
 
-  // ── Picker body renderer ────────────────────────────────────────────────────
-  const renderPickerBody = () => {
-    if (!pickingRhythm) return null;
-    const r = pickingRhythm;
-
-    if (search.trim()) {
-      return (
-        <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-          {searchFiltered.length === 0
-            ? <div style={{ textAlign: "center", color: "var(--muted)", padding: 24 }}>No items found</div>
-            : searchFiltered.map(item => {
-                const isSelected = r.count === 1
-                  ? (weekPlan[r.key]?.id === item.id || weekPlan[r.key] === item.id)
-                  : (weekPlan[r.key] || []).includes(item.id);
-                return (
-                  <PlannerPickerRow key={item.id} item={item} isSelected={isSelected}
-                    isDone={completed.includes(item.id)} accentColor={r.color}
-                    onPick={(it) => pickItem(r, it)} />
-                );
-              })}
-        </div>
-      );
-    }
-
-    if (r.key === "skills") return (
-      <SkillPickerContent pool={r.pool} areas={content.areas} weekPlan={weekPlan}
-        completed={completed} onPick={(item) => pickItem(r, item)} />
-    );
-    if (r.key === "gig") return (
-      <GigPickerContent pool={r.pool} weekPlan={weekPlan} completed={completed}
-        onPick={(item) => pickItem(r, item)} />
-    );
-    if (r.key === "ripple") return (
-      <RipplePickerContent pool={r.pool} weekPlan={weekPlan} completed={completed}
-        onPick={(item) => pickItem(r, item)} />
-    );
-    if (r.key === "mission") return (
-      <ProjectPickerContent pool={r.pool} weekPlan={weekPlan} completed={completed}
-        onPick={(item) => pickItem(r, item)} />
-    );
-    if (r.key === "guide") return (
-      <SimpleGroupedPickerContent pool={r.pool} groupKey="category" weekPlanKey="guide"
-        weekPlan={weekPlan} completed={completed} accentColor="var(--lavender)"
-        onPick={(item) => pickItem(r, item)} />
-    );
-    if (r.key === "lightroom") return (
-      <SimpleGroupedPickerContent pool={r.pool} groupKey="topic" weekPlanKey="lightroom"
-        weekPlan={weekPlan} completed={completed} accentColor="var(--sky)"
-        onPick={(item) => pickItem(r, item)} />
-    );
-    return null;
-  };
-
-  // ── Slot renderer helper ────────────────────────────────────────────────────
-  const renderSlotItem = (item, itemId, rhythmKey, rhythm) => {
-    const isDone = completed.includes(itemId);
-    return (
-      <div key={itemId} className="planner-slot filled"
-        style={{ cursor: "pointer", transition: "all 0.15s" }}
-        onClick={() => setViewItem({ item, rhythmKey })}
-        onMouseEnter={e => e.currentTarget.style.borderColor = rhythm.color}
-        onMouseLeave={e => e.currentTarget.style.borderColor = isDone ? "var(--sage)" : "var(--border)"}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0 }}>
-          <span style={{ fontSize: isDone ? 16 : 16 }}>{isDone ? "✅" : (item.icon || rhythm.icon || "◈")}</span>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: isDone ? "var(--sage)" : "var(--cream)", textDecoration: isDone ? "line-through" : "none", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-              {item.name || item.title}
-            </div>
-            <div style={{ fontSize: 10, color: "var(--muted)", marginTop: 2 }}>
-              {isDone ? "Done ✓" : "Tap to open & complete"} {item.pts ? "· " + item.pts + " pts" : ""}
-            </div>
-          </div>
-        </div>
-        <div className="flex gap-4" onClick={e => e.stopPropagation()}>
-          {isDone && (
-            <button className="btn btn-ghost btn-xs" style={{ fontSize: 10 }} onClick={() => onUncomplete(itemId, item.pts || 0)} title="Undo">↩</button>
-          )}
-          <button className="btn btn-ghost btn-xs" onClick={() => removeItem(rhythmKey, itemId)} title="Remove from plan">✕</button>
-        </div>
-      </div>
-    );
-  };
+  // Total across all days for the week summary
+  const allPlanned = Object.values(dailyPlan).flat();
+  const allDone = allPlanned.filter(e => completed.includes(e.id)).length;
 
   return (
     <div>
@@ -6359,125 +5925,146 @@ function WeeklyPlanner({ content, completed, weekPlan, setWeekPlan, onComplete, 
         <div className="flex-between">
           <div>
             <h1 className="page-title">📅 Weekly Planner</h1>
-            <p className="page-sub">Pick what you'll work on this week. Tap any item to open and complete it.</p>
+            <p className="page-sub">Schedule your work day by day. Items show up on your dashboard on the day they're planned.</p>
           </div>
-          <div className="flex-center gap-10">
-            <ProgressRing pct={Math.round((totalFilled / totalTarget) * 100)} size={48} stroke={4} />
-            <div>
-              <div style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 700, color: "var(--amber)" }}>{totalFilled}/{totalTarget}</div>
-              <div style={{ fontSize: 11, color: "var(--muted)" }}>slots filled</div>
-            </div>
+          <div style={{ textAlign: "right" }}>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, color: "var(--amber)" }}>{allDone}/{allPlanned.length}</div>
+            <div style={{ fontSize: 11, color: "var(--muted)" }}>done this week</div>
           </div>
         </div>
       </div>
 
       <div className="page-content">
-        <div className="card mb-20" style={{ background: "var(--bg3)" }}>
-          <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 2, color: "var(--muted)", marginBottom: 10 }}>Weekly Rhythm Guide</div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+        {/* Day tabs */}
+        <div style={{ display: "flex", gap: 6, marginBottom: 20 }}>
+          {DAYS.map(day => {
+            const items = dailyPlan[day] || [];
+            const done = items.filter(e => completed.includes(e.id)).length;
+            const isToday = day === todayKey;
+            const isActive = activeDay === day;
+            return (
+              <button key={day} onClick={() => setActiveDay(day)} style={{
+                flex: 1, padding: "12px 8px", borderRadius: "var(--r-lg)",
+                border: `2px solid ${isActive ? "var(--amber)" : isToday ? "rgba(0,212,255,0.3)" : "var(--border)"}`,
+                background: isActive ? "var(--amber-dim)" : isToday ? "rgba(0,212,255,0.05)" : "var(--bg2)",
+                cursor: "pointer", fontFamily: "var(--font-body)", transition: "all 0.15s",
+                textAlign: "center",
+              }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: isActive ? "var(--amber)" : isToday ? "var(--amber)" : "var(--cream)", marginBottom: 4 }}>
+                  {day}{isToday && " ·"}
+                </div>
+                <div style={{ fontSize: 10, color: isActive ? "var(--amber)" : "var(--muted)" }}>
+                  {items.length === 0 ? "empty" : `${done}/${items.length}`}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Day label */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+          <div style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 700, color: "var(--cream)" }}>
+            {DAY_LABELS[activeDay]}
+            {activeDay === todayKey && <span style={{ fontSize: 12, color: "var(--amber)", marginLeft: 10, fontFamily: "var(--font-body)", fontWeight: 600 }}>Today</span>}
+          </div>
+          <div className="flex gap-6 flex-wrap">
             {RHYTHM.map(r => (
-              <div key={r.key} style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 20, background: "var(--bg2)", border: "1px solid var(--border)" }}>
-                <span style={{ color: r.color }}>{r.icon}</span>
-                <span style={{ fontSize: 12, color: "var(--cream-dim)" }}>{r.count}× {r.label}</span>
-              </div>
+              <button key={r.key} className="btn btn-ghost btn-xs"
+                style={{ borderColor: r.color + "60", color: r.color }}
+                onClick={() => { setPicking(r.key); setSearch(""); }}>
+                {r.icon} + {r.label}
+              </button>
             ))}
           </div>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {RHYTHM.map(rhythm => {
-            const slotItems = getSlotItems(rhythm);
-            const filled = slotItems.length;
-            const target = rhythm.count;
-            const doneCount = rhythm.count === 1
-              ? (slotItems[0] && completed.includes(slotItems[0]?.id || slotItems[0]) ? 1 : 0)
-              : (weekPlan[rhythm.key] || []).filter(id => completed.includes(id)).length;
-
-            return (
-              <div key={rhythm.key} className="card">
-                <div className="flex-between mb-12">
-                  <div className="flex-center gap-10">
-                    <span style={{ fontSize: 20, color: rhythm.color }}>{rhythm.icon}</span>
-                    <div>
-                      <div style={{ fontWeight: 600, color: "var(--cream)", fontSize: 15 }}>{rhythm.label}</div>
-                      <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 1 }}>{rhythm.desc}</div>
+        {/* Day items */}
+        {dayItems.length === 0 ? (
+          <div className="card" style={{ textAlign: "center", padding: 32, color: "var(--muted)", borderStyle: "dashed" }}>
+            <div style={{ fontSize: 28, marginBottom: 8 }}>📋</div>
+            <div style={{ fontSize: 14, marginBottom: 6 }}>Nothing planned for {DAY_LABELS[activeDay]} yet</div>
+            <div style={{ fontSize: 12 }}>Use the buttons above to add skills, projects, gigs, and more</div>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {dayItems.map((entry, i) => {
+              const rhythm = RHYTHM.find(r => r.key === entry.rhythmKey);
+              const item = rhythm ? rhythm.pool.find(x => x.id === entry.id) : null;
+              if (!item) return null;
+              const isDone = completed.includes(entry.id);
+              return (
+                <div key={entry.id + i} onClick={() => setViewItem({ item, rhythmKey: entry.rhythmKey })}
+                  style={{ display: "flex", alignItems: "center", gap: 12, padding: "13px 16px", borderRadius: "var(--r-lg)", background: isDone ? "var(--sage-dim)" : "var(--bg2)", border: `1px solid ${isDone ? "rgba(0,229,168,0.4)" : "var(--border)"}`, cursor: "pointer", transition: "all 0.15s" }}
+                  onMouseEnter={e => e.currentTarget.style.borderColor = rhythm?.color || "var(--amber)"}
+                  onMouseLeave={e => e.currentTarget.style.borderColor = isDone ? "rgba(0,229,168,0.4)" : "var(--border)"}>
+                  <div style={{ width: 36, height: 36, borderRadius: "var(--r)", background: (rhythm?.color || "var(--amber)") + "18", border: `1.5px solid ${(rhythm?.color || "var(--amber)") + "44"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, flexShrink: 0 }}>
+                    {isDone ? "✅" : (item.icon || rhythm?.icon || "◈")}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: isDone ? "var(--sage)" : "var(--cream)", textDecoration: isDone ? "line-through" : "none", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {item.name || item.title}
+                    </div>
+                    <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 2 }}>
+                      <span style={{ color: rhythm?.color }}>{rhythm?.label}</span>
+                      {item.pts ? ` · ${item.pts} pts` : ""}
+                      {isDone ? " · ✓ Done" : " · Tap to open"}
                     </div>
                   </div>
-                  <div className="flex-center gap-8">
-                    {/* Progress dots */}
-                    {Array.from({ length: target }).map((_, i) => (
-                      <div key={i} style={{ width: 10, height: 10, borderRadius: 3, background: i < doneCount ? "var(--sage)" : i < filled ? rhythm.color : "var(--border)" }} />
-                    ))}
-                    {filled < target && (
-                      <button className="btn btn-ghost btn-xs" style={{ marginLeft: 4, borderColor: rhythm.color, color: rhythm.color }}
-                        onClick={() => { setPicking(rhythm.key); setSearch(""); }}>
-                        + Add
-                      </button>
-                    )}
+                  <button className="btn btn-ghost btn-xs" style={{ flexShrink: 0 }} onClick={e => { e.stopPropagation(); removeFromDay(entry.id); }}>✕</button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Detail modal */}
+      {renderItemDetail()}
+
+      {/* Picker modal */}
+      <Modal open={!!picking} onClose={() => { setPicking(null); setSearch(""); }}
+        title={`Add ${pickingRhythm?.label || ""} to ${DAY_LABELS[activeDay]}`}
+        size="modal-lg"
+        footer={<button className="btn btn-primary" onClick={() => { setPicking(null); setSearch(""); }}>Done</button>}>
+        <div className="search-bar mb-14" style={{ marginBottom: 14 }}>
+          <span style={{ color: "var(--muted)" }}>🔍</span>
+          <input placeholder={`Search ${pickingRhythm?.label?.toLowerCase() || ""}…`} value={search} onChange={e => setSearch(e.target.value)} autoFocus />
+        </div>
+        <div style={{ maxHeight: 480, overflowY: "auto" }}>
+          {pickingRhythm && (search.trim() ? searchFiltered : pickingRhythm.pool).map(item => {
+            const alreadyAdded = (dailyPlan[activeDay] || []).some(e => e.id === item.id);
+            const isDone = completed.includes(item.id);
+            return (
+              <div key={item.id} onClick={() => !alreadyAdded && addToDay(picking, item)}
+                style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 14px", borderRadius: "var(--r)", background: alreadyAdded ? "var(--sage-dim)" : "var(--bg3)", border: `1px solid ${alreadyAdded ? "rgba(0,229,168,0.35)" : "var(--border)"}`, marginBottom: 6, cursor: alreadyAdded ? "default" : "pointer", transition: "all 0.15s", opacity: isDone ? 0.6 : 1 }}
+                onMouseEnter={e => { if (!alreadyAdded) e.currentTarget.style.borderColor = pickingRhythm.color; }}
+                onMouseLeave={e => { if (!alreadyAdded) e.currentTarget.style.borderColor = "var(--border)"; }}>
+                <span style={{ fontSize: 18, flexShrink: 0 }}>{item.icon || pickingRhythm.icon}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: alreadyAdded ? "var(--sage)" : "var(--cream)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {item.name || item.title}
+                  </div>
+                  <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 1 }}>
+                    {isDone ? "✓ Already completed" : item.pts ? `${item.pts} pts` : ""}
                   </div>
                 </div>
-
-                {slotItems.length === 0 ? (
-                  <div className="planner-slot empty" onClick={() => { setPicking(rhythm.key); setSearch(""); }}>
-                    <div style={{ textAlign: "center", color: "var(--muted)", fontSize: 13 }}>Click to pick {rhythm.label.toLowerCase()}</div>
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                    {rhythm.count === 1 ? (() => {
-                      const itemId = weekPlan[rhythm.key]?.id || weekPlan[rhythm.key];
-                      const item = rhythm.pool.find(i => i.id === itemId) || weekPlan[rhythm.key];
-                      if (!item) return null;
-                      return renderSlotItem(item, item.id, rhythm.key, rhythm);
-                    })() : (weekPlan[rhythm.key] || []).map(itemId => {
-                      const item = rhythm.pool.find(i => i.id === itemId);
-                      if (!item) return null;
-                      return renderSlotItem(item, itemId, rhythm.key, rhythm);
-                    })}
-                    {rhythm.count > 1 && filled < target && (
-                      <div className="planner-slot empty" onClick={() => { setPicking(rhythm.key); setSearch(""); }}>
-                        <div style={{ textAlign: "center", color: "var(--muted)", fontSize: 12 }}>+ Add more ({target - filled} remaining)</div>
-                      </div>
-                    )}
-                  </div>
-                )}
+                {alreadyAdded
+                  ? <span style={{ fontSize: 11, color: "var(--sage)", fontWeight: 600, flexShrink: 0 }}>✓ Added</span>
+                  : <span style={{ fontSize: 12, color: pickingRhythm.color, flexShrink: 0 }}>+ Add</span>
+                }
               </div>
             );
           })}
         </div>
-      </div>
-
-      {/* Item detail modal */}
-      {renderItemDetail()}
-
-      {/* Picker modal */}
-      <Modal open={!!picking} onClose={() => setPicking(null)}
-        title={"Pick " + (pickingRhythm?.label || "") + (pickingRhythm?.count > 1 ? " (" + (weekPlan[picking] || []).length + "/" + pickingRhythm.count + ")" : "")}
-        size="modal-lg"
-        footer={<button className="btn btn-primary" onClick={() => setPicking(null)}>Done</button>}>
-        <div className="search-bar mb-14" style={{ marginBottom: 14 }}>
-          <span style={{ color: "var(--muted)" }}>🔍</span>
-          <input placeholder={"Search " + (pickingRhythm?.label?.toLowerCase() || "") + "…"} value={search} onChange={e => setSearch(e.target.value)} autoFocus />
-        </div>
-        {pickingRhythm?.count > 1 && (
-          <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 12, padding: "7px 10px", background: "var(--bg3)", borderRadius: "var(--r)", border: "1px solid var(--border)" }}>
-            Select up to {pickingRhythm.count} skills — {(weekPlan[picking] || []).length} chosen so far. Click a selected skill to deselect it.
-          </div>
-        )}
-        <div style={{ maxHeight: 480, overflowY: "auto", paddingRight: 2 }}>
-          {renderPickerBody()}
-        </div>
       </Modal>
     </div>
   );
-}
-
 // ─── STUDENT: SKILL EXPLORER ──────────────────────────────────────────────────
 
-function SkillExplorer({ student, completed, content, apiKey, onComplete, onUncomplete, onSubmitApproval, boards, saveToBoard, submissions, setSubmission }) {
+function SkillExplorer({ student, completed, content, onComplete, onUncomplete, onSubmitApproval, boards, saveToBoard, submissions, setSubmission }) {
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState(null);
-  const [tutorOpen, setTutorOpen] = useState(false);
   const [approvalNotes, setApprovalNotes] = useState("");
   const [showApproval, setShowApproval] = useState(false);
   const [openAreas, setOpenAreas] = useState({});   // area.id → bool, default true
@@ -6552,7 +6139,6 @@ function SkillExplorer({ student, completed, content, apiKey, onComplete, onUnco
                 ) : (
                   <>
                     <button className="btn btn-primary mb-8" style={{ width: "100%" }} onClick={() => setShowApproval(true)}>Submit for Mastery Check ✓</button>
-                    <button className="btn btn-ghost btn-sm" style={{ width: "100%" }} onClick={() => setTutorOpen(true)}>🤖 Ask AI Tutor</button>
                   </>
                 )}
               </div>
@@ -6570,7 +6156,7 @@ function SkillExplorer({ student, completed, content, apiKey, onComplete, onUnco
             </div>
           </div>
           {selected.blocks?.length > 0 && (
-            <ContentBlockRenderer blocks={selected.blocks} apiKey={apiKey} context={selected.name} />
+            <ContentBlockRenderer blocks={selected.blocks} context={selected.name} />
           )}
 
           {/* Submission / Portfolio Documentation */}
@@ -6594,7 +6180,6 @@ function SkillExplorer({ student, completed, content, apiKey, onComplete, onUnco
             </div>
           </div>
         </div>
-        <AITutor open={tutorOpen} onClose={() => setTutorOpen(false)} context={selected.name} apiKey={apiKey} />
         <Modal open={showApproval} onClose={() => setShowApproval(false)} title="Submit Mastery Check"
           footer={<><button className="btn btn-ghost" onClick={() => setShowApproval(false)}>Cancel</button><button className="btn btn-primary" onClick={() => { onSubmitApproval({ skillId: selected.id, skillName: selected.name, pts: selected.pts, notes: approvalNotes }); setShowApproval(false); onComplete(selected.id, selected.pts); }}>Submit →</button></>}>
           <p style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.7, marginBottom: 16 }}>Tell your teacher what you did to master this skill. Include evidence — what you made, wrote, built, or documented.</p>
@@ -6616,7 +6201,6 @@ function SkillExplorer({ student, completed, content, apiKey, onComplete, onUnco
             <span style={{ color: "var(--muted)" }}>🔍</span>
             <input placeholder="Search skills…" value={search} onChange={e => setSearch(e.target.value)} />
           </div>
-          <button className="btn btn-ghost btn-sm" onClick={() => setTutorOpen(true)}>🤖 AI Tutor</button>
         </div>
 
         {/* Area filter pills */}
@@ -6790,7 +6374,6 @@ function SkillExplorer({ student, completed, content, apiKey, onComplete, onUnco
           );
         })()}
       </div>
-      <AITutor open={tutorOpen} onClose={() => setTutorOpen(false)} context="skill exploration" apiKey={apiKey} />
     </div>
   );
 }
@@ -7018,7 +6601,7 @@ function SubmissionBuilder({ submission, onChange, itemTitle }) {
 
 // ─── STUDENT: PROJECT LAB ─────────────────────────────────────────────────────
 
-function ProjectLab({ student, completed, content, apiKey, onComplete, onUncomplete, boards, saveToBoard, submissions, setSubmission, portfolioFeatured, setPortfolioFeatured }) {
+function ProjectLab({ student, completed, content, onComplete, onUncomplete, boards, saveToBoard, submissions, setSubmission, portfolioFeatured, setPortfolioFeatured }) {
   const [filter, setFilter] = useState("all");
   const [selected, setSelected] = useState(null);
 
@@ -7085,7 +6668,7 @@ function ProjectLab({ student, completed, content, apiKey, onComplete, onUncompl
             </div>
           </div>
           {selected.blocks?.length > 0 && (
-            <ContentBlockRenderer blocks={selected.blocks} apiKey={apiKey} context={selected.title} />
+            <ContentBlockRenderer blocks={selected.blocks} context={selected.title} />
           )}
 
           {/* Submission — always visible */}
@@ -7484,7 +7067,7 @@ function FactionsView({ completed, content, studentFaction, setStudentFaction, g
 
 // ─── STUDENT: RIPPLE MISSIONS ─────────────────────────────────────────────────
 
-function RippleMissions({ completed, content, apiKey, onComplete, onUncomplete, boards, saveToBoard }) {
+function RippleMissions({ completed, content, onComplete, onUncomplete, boards, saveToBoard }) {
   const [selected, setSelected] = useState(null);
   const missions = content.ripple;
 
@@ -7541,7 +7124,7 @@ function RippleMissions({ completed, content, apiKey, onComplete, onUncomplete, 
             </div>
           </div>
           {selected.blocks?.length > 0 && (
-            <ContentBlockRenderer blocks={selected.blocks} apiKey={apiKey} context={selected.title} />
+            <ContentBlockRenderer blocks={selected.blocks} context={selected.title} />
           )}
         </div>
       </div>
@@ -7586,7 +7169,7 @@ function RippleMissions({ completed, content, apiKey, onComplete, onUncomplete, 
 
 // ─── STUDENT: TEEN'S GUIDE ────────────────────────────────────────────────────
 
-function TeensGuide({ completed, content, apiKey, onComplete, onUncomplete, boards, saveToBoard }) {
+function TeensGuide({ completed, content, onComplete, onUncomplete, boards, saveToBoard }) {
   const [selected, setSelected] = useState(null);
   const entries = content.teensGuide;
 
@@ -7615,7 +7198,7 @@ function TeensGuide({ completed, content, apiKey, onComplete, onUncomplete, boar
             </div>
           </div>
           {selected.blocks?.length > 0 && (
-            <ContentBlockRenderer blocks={selected.blocks} apiKey={apiKey} context={selected.title} />
+            <ContentBlockRenderer blocks={selected.blocks} context={selected.title} />
           )}
           <div style={{ maxWidth: 680, marginTop: 16 }}>
             {!isDone ? (
@@ -7671,7 +7254,7 @@ function TeensGuide({ completed, content, apiKey, onComplete, onUncomplete, boar
 
 // ─── STUDENT: LIGHT ROOM ──────────────────────────────────────────────────────
 
-function LightRoom({ completed, content, apiKey, onComplete, onUncomplete, boards, saveToBoard }) {
+function LightRoom({ completed, content, onComplete, onUncomplete, boards, saveToBoard }) {
   const [selected, setSelected] = useState(null);
   const items = content.lightRoom;
 
@@ -7701,7 +7284,7 @@ function LightRoom({ completed, content, apiKey, onComplete, onUncomplete, board
             </div>
           </div>
           {selected.blocks?.length > 0 && (
-            <ContentBlockRenderer blocks={selected.blocks} apiKey={apiKey} context={selected.title} />
+            <ContentBlockRenderer blocks={selected.blocks} context={selected.title} />
           )}
           <div style={{ maxWidth: 680, marginTop: 16 }}>
             {!isDone ? (
@@ -8782,11 +8365,12 @@ function StudentJournal({ journalEntries, content, onNavigate }) {
 
 // ─── STUDENT APP ──────────────────────────────────────────────────────────────
 
-function StudentApp({ student, setStudent, content, apiKey, messages, setMessages, onSwitchRole }) {
+function StudentApp({ student, setStudent, content, messages, setMessages, onSwitchRole }) {
   const [view, setView] = useState("dashboard");
   const [completed, setCompleted] = useState([]);
   const [points, setPoints] = useState(0);
   const [weekPlan, setWeekPlan] = useState({ skills: [], mission: null, gig: null, ripple: null, guide: null, lightroom: null });
+  const [dailyPlan, setDailyPlan] = useState({ Mon: [], Tue: [], Wed: [], Thu: [], Fri: [] });
   const [roadmap, setRoadmap] = useState(defaultRoadmap);
   const [studentFaction, setStudentFaction] = useState(null);
   const [approvals, setApprovals] = useState([]);
@@ -8865,18 +8449,18 @@ function StudentApp({ student, setStudent, content, apiKey, messages, setMessage
 
   const renderView = () => {
     switch (view) {
-      case "dashboard": return <StudentDashboard student={student} completed={completed} points={points} content={content} weekPlan={weekPlan} grabbedGigs={grabbedGigs} onNavigate={setView} boards={boards} setBoards={setBoards} saveToBoard={saveToBoard} onComplete={complete} onUncomplete={uncomplete} journalEntries={journalEntries} habitDefs={content.habitDefs || []} habitLogs={habitLogs} setHabitLogs={setHabitLogs} goals={goals} messages={messages} taskDefs={content.taskDefs || []} taskLogs={taskLogs} setTaskLogs={setTaskLogs} />;
+      case "dashboard": return <StudentDashboard student={student} completed={completed} points={points} content={content} weekPlan={weekPlan} grabbedGigs={grabbedGigs} onNavigate={setView} boards={boards} setBoards={setBoards} saveToBoard={saveToBoard} onComplete={complete} onUncomplete={uncomplete} journalEntries={journalEntries} habitDefs={content.habitDefs || []} habitLogs={habitLogs} setHabitLogs={setHabitLogs} goals={goals} messages={messages} taskDefs={content.taskDefs || []} taskLogs={taskLogs} setTaskLogs={setTaskLogs} dailyPlan={dailyPlan} />;
       case "tasks": return <StudentTasksPage taskDefs={content.taskDefs || []} taskLogs={taskLogs} setTaskLogs={setTaskLogs} student={student} onComplete={complete} />;
       case "habits": return <StudentHabitsPage habitDefs={content.habitDefs || []} habitLogs={habitLogs} setHabitLogs={setHabitLogs} student={student} onComplete={complete} />;
       case "goals": return <StudentGoalsPage goals={goals} setGoals={setGoals} />;
       case "messages": return <StudentMessagesPage messages={messages} setMessages={setMessages} studentId={student.id} />;
-      case "planner": return <WeeklyPlanner content={content} completed={completed} weekPlan={weekPlan} setWeekPlan={setWeekPlan} onComplete={complete} onUncomplete={uncomplete} />;
-      case "skills": return <SkillExplorer student={student} completed={completed} content={content} apiKey={apiKey} onComplete={complete} onUncomplete={uncomplete} onSubmitApproval={submitApproval} boards={boards} saveToBoard={saveToBoard} submissions={submissions} setSubmission={setSubmission} />;
-      case "projects": return <ProjectLab student={student} completed={completed} content={content} apiKey={apiKey} onComplete={complete} onUncomplete={uncomplete} boards={boards} saveToBoard={saveToBoard} submissions={submissions} setSubmission={setSubmission} portfolioFeatured={portfolioFeatured} setPortfolioFeatured={setPortfolioFeatured} />;
+      case "planner": return <WeeklyPlanner content={content} completed={completed} weekPlan={weekPlan} setWeekPlan={setWeekPlan} onComplete={complete} onUncomplete={uncomplete} dailyPlan={dailyPlan} setDailyPlan={setDailyPlan} />;
+      case "skills": return <SkillExplorer student={student} completed={completed} content={content} onComplete={complete} onUncomplete={uncomplete} onSubmitApproval={submitApproval} boards={boards} saveToBoard={saveToBoard} submissions={submissions} setSubmission={setSubmission} />;
+      case "projects": return <ProjectLab student={student} completed={completed} content={content} onComplete={complete} onUncomplete={uncomplete} boards={boards} saveToBoard={saveToBoard} submissions={submissions} setSubmission={setSubmission} portfolioFeatured={portfolioFeatured} setPortfolioFeatured={setPortfolioFeatured} />;
       case "factions": return <FactionsView completed={completed} content={content} studentFaction={studentFaction} setStudentFaction={setStudentFaction} grabbed={grabbedGigs} setGrabbed={setGrabbedGigs} onComplete={complete} onUncomplete={uncomplete} boards={boards} saveToBoard={saveToBoard} submissions={submissions} setSubmission={setSubmission} portfolioFeatured={portfolioFeatured} setPortfolioFeatured={setPortfolioFeatured} />;
-      case "ripple": return <RippleMissions completed={completed} content={content} apiKey={apiKey} onComplete={complete} onUncomplete={uncomplete} boards={boards} saveToBoard={saveToBoard} />;
-      case "teensguide": return <TeensGuide completed={completed} content={content} apiKey={apiKey} onComplete={complete} onUncomplete={uncomplete} boards={boards} saveToBoard={saveToBoard} />;
-      case "lightroom": return <LightRoom completed={completed} content={content} apiKey={apiKey} onComplete={complete} onUncomplete={uncomplete} boards={boards} saveToBoard={saveToBoard} />;
+      case "ripple": return <RippleMissions completed={completed} content={content} onComplete={complete} onUncomplete={uncomplete} boards={boards} saveToBoard={saveToBoard} />;
+      case "teensguide": return <TeensGuide completed={completed} content={content} onComplete={complete} onUncomplete={uncomplete} boards={boards} saveToBoard={saveToBoard} />;
+      case "lightroom": return <LightRoom completed={completed} content={content} onComplete={complete} onUncomplete={uncomplete} boards={boards} saveToBoard={saveToBoard} />;
       case "drops": return <DailyDrops completed={completed} content={content} onComplete={complete} onUncomplete={uncomplete} student={student} boards={boards} saveToBoard={saveToBoard} journalEntries={journalEntries} onSaveJournal={saveJournalEntry} />;
       case "portfolio": return <Portfolio student={student} completed={completed} content={content} onUncomplete={uncomplete} submissions={submissions} setSubmission={setSubmission} portfolioFeatured={portfolioFeatured} setPortfolioFeatured={setPortfolioFeatured} />;
       case "journal": return <StudentJournal journalEntries={journalEntries} content={content} onNavigate={setView} />;
@@ -8996,8 +8580,7 @@ function buildDefaultPlatformDoc() {
       dailyDrops: DAILY_DROPS_DEFAULT, checkIns: CHECK_INS_DEFAULT,
       profileQuestions: PROFILE_QUESTIONS_DEFAULT, habitDefs: [], taskDefs: [],
     },
-    studentAccounts: DEFAULT_STUDENT_ACCOUNTS,
-    apiKey: "",
+    studentAccounts: DEFAULT_STUDENT_ACCOUNTS
     teacherPassword: "forge2026",
     messages: {},
   };
@@ -9011,7 +8594,6 @@ export default function App() {
 
   const [content, setContentLocal]       = useState(null);
   const [studentAccounts, setAcctsLocal] = useState([]);
-  const [apiKey, setApiKeyLocal]         = useState("");
   const [teacherPassword, setTpwLocal]   = useState("forge2026");
   const [messages, setMsgsLocal]         = useState({});
   const [approvals, setApprovalsLocal]   = useState([]);
@@ -9039,7 +8621,6 @@ export default function App() {
         );
         setContentLocal(d.content || buildDefaultPlatformDoc().content);
         setAcctsLocal(enriched);
-        setApiKeyLocal(d.apiKey || "");
         setTpwLocal(d.teacherPassword || "forge2026");
         setMsgsLocal(d.messages || {});
         setAppReady(true);
@@ -9071,11 +8652,6 @@ export default function App() {
       setDoc(doc(db, "platform", "main"), { studentAccounts: lean }, { merge: true }).catch(console.error);
       return next;
     });
-  }, []);
-
-  const setApiKey = useCallback((val) => {
-    setApiKeyLocal(val);
-    setDoc(doc(db, "platform", "main"), { apiKey: val }, { merge: true }).catch(console.error);
   }, []);
 
   const setTeacherPassword = useCallback((val) => {
@@ -9145,7 +8721,6 @@ export default function App() {
         content={content} setContent={setContent}
         studentAccounts={studentAccounts} setStudentAccounts={setStudentAccounts}
         approvals={approvals} setApprovals={setApprovals}
-        apiKey={apiKey} setApiKey={setApiKey}
         teacherPassword={teacherPassword} setTeacherPassword={setTeacherPassword}
         messages={messages} setMessages={setMessages}
         onSwitchRole={() => setRole(null)}
@@ -9161,7 +8736,7 @@ export default function App() {
       <><GlobalStyles />
         <StudentApp
           student={student} setStudent={handleSetStudent}
-          content={content} apiKey={apiKey}
+          content={content}
           messages={messages} setMessages={setMessages}
           onSwitchRole={() => { setStudentLocal(null); setRole(null); }}
         /></>
