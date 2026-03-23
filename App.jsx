@@ -5559,9 +5559,6 @@ function StudentDashboard({ student, completed, points, content, weekPlan, grabb
             {/* Tasks Widget */}
             <TasksWidget taskDefs={taskDefs || []} taskLogs={taskLogs} setTaskLogs={setTaskLogs} student={student} onComplete={onComplete} onNavigate={onNavigate} />
 
-            {/* Messages Widget */}
-            <MessagesWidget messages={messages} studentId={student.id} onNavigate={onNavigate} />
-
             {/* Today's Drop */}
             {todayDrop && (todayDrop.video || todayDrop.journal || todayDrop.kindnessChallenge || todayDrop.careerSpotlights?.length > 0) && (
               <div className="drop-card mb-16" style={{ background: "var(--amber-dim)", borderColor: "rgba(0,212,255,0.35)" }}>
@@ -5650,8 +5647,53 @@ function StudentDashboard({ student, completed, points, content, weekPlan, grabb
             {/* Goals Widget */}
             <GoalsWidget goals={goals} onNavigate={onNavigate} />
 
+            {/* Messages Widget */}
+            <MessagesWidget messages={messages} studentId={student.id} onNavigate={onNavigate} />
+
             {/* Habits & Chores Widget */}
             <HabitsWidget habitDefs={habitDefs || []} habitLogs={habitLogs} setHabitLogs={setHabitLogs} student={student} onComplete={onComplete} onNavigate={onNavigate} />
+
+            {/* Weekly Progress Summary */}
+            {(() => {
+              const DAYS = ["Mon","Tue","Wed","Thu","Fri"];
+              const hasAny = DAYS.some(d => (dailyPlan?.[d] || []).length > 0);
+              if (!hasAny) return null;
+              return (
+                <div className="card mb-16" style={{ borderColor: "var(--border)" }}>
+                  <div className="flex-between mb-12">
+                    <div className="flex-center gap-8">
+                      <span style={{ fontSize: 16 }}>📊</span>
+                      <h3 style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 700, color: "var(--cream)" }}>This Week</h3>
+                    </div>
+                    <button className="btn btn-ghost btn-xs" onClick={() => onNavigate("planner")}>Edit →</button>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                    {DAYS.map(day => {
+                      const items = dailyPlan?.[day] || [];
+                      const done = items.filter(e => completed.includes(e.id)).length;
+                      const isToday = day === ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date().getDay()];
+                      const isCoOp = day === "Thu";
+                      const pct = items.length > 0 ? Math.round((done / items.length) * 100) : 0;
+                      return (
+                        <div key={day} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                          <div style={{ width: 32, fontSize: 11, fontWeight: isToday ? 700 : 500, color: isCoOp ? "var(--lavender)" : isToday ? "var(--amber)" : "var(--muted)", flexShrink: 0 }}>{day}</div>
+                          {items.length === 0 ? (
+                            <div style={{ flex: 1, height: 6, background: "var(--bg4)", borderRadius: 4, opacity: 0.4 }} />
+                          ) : (
+                            <div style={{ flex: 1, height: 6, background: "var(--border)", borderRadius: 4, overflow: "hidden" }}>
+                              <div style={{ width: `${pct}%`, height: "100%", background: pct === 100 ? "var(--sage)" : isToday ? "var(--amber)" : "var(--sky)", borderRadius: 4, transition: "width 0.4s" }} />
+                            </div>
+                          )}
+                          <div style={{ width: 36, fontSize: 11, color: done === items.length && items.length > 0 ? "var(--sage)" : "var(--muted)", textAlign: "right", flexShrink: 0 }}>
+                            {items.length === 0 ? (isCoOp ? "co-op" : "—") : `${done}/${items.length}`}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Active Gigs */}
             {activeGigs.length > 0 && (
@@ -8459,22 +8501,39 @@ function StudentJournal({ journalEntries, content, onNavigate }) {
 
 function StudentApp({ student, setStudent, content, messages, setMessages, onSwitchRole }) {
   const [view, setView] = useState("dashboard");
-  const [completed, setCompleted] = useState([]);
-  const [points, setPoints] = useState(0);
-  const [weekPlan, setWeekPlan] = useState({ skills: [], mission: null, gig: null, ripple: null, guide: null, lightroom: null });
-  const [dailyPlan, setDailyPlan] = useState({ Mon: [], Tue: [], Wed: [], Thu: [], Fri: [] });
-  const [roadmap, setRoadmap] = useState(defaultRoadmap);
-  const [studentFaction, setStudentFaction] = useState(null);
+  const [completed, setCompleted] = useState(student.completed || []);
+  const [points, setPoints] = useState(student.points || 0);
+  const [weekPlan, setWeekPlan] = useState(student.weekPlan || { skills: [], mission: null, gig: null, ripple: null, guide: null, lightroom: null });
+  const [dailyPlan, setDailyPlan] = useState(student.dailyPlan || { Mon: [], Tue: [], Wed: [], Thu: [], Fri: [] });
+  const [roadmap, setRoadmap] = useState(student.roadmap || defaultRoadmap);
+  const [studentFaction, setStudentFaction] = useState(student.studentFaction || null);
   const [approvals, setApprovals] = useState([]);
-  const [grabbedGigs, setGrabbedGigs] = useState({});
-  const [boards, setBoards] = useState(DEFAULT_BOARDS);
-  const [submissions, setSubmissions] = useState({}); // itemId → { blocks: [], featured: bool, reflection: string }
-  const [portfolioFeatured, setPortfolioFeatured] = useState({}); // itemId → bool
-  const [seenCheckIns, setSeenCheckIns] = useState([]); // ids seen this session
-  const [journalEntries, setJournalEntries] = useState({}); // dropId → { text, prompt, title, dropDate }
-  const [habitLogs, setHabitLogs] = useState({}); // habitId → [dateStr]
-  const [taskLogs, setTaskLogs] = useState({});   // taskId → [dateStr]
-  const [goals, setGoals] = useState([]); // [{id, title, targetDate, milestones, status, reflection}]
+  const [grabbedGigs, setGrabbedGigs] = useState(student.grabbedGigs || {});
+  const [boards, setBoards] = useState(student.boards || DEFAULT_BOARDS);
+  const [submissions, setSubmissions] = useState(student.submissions || {});
+  const [portfolioFeatured, setPortfolioFeatured] = useState(student.portfolioFeatured || {});
+  const [seenCheckIns, setSeenCheckIns] = useState([]);
+  const [journalEntries, setJournalEntries] = useState(student.journalEntries || {});
+  const [habitLogs, setHabitLogs] = useState(student.habitLogs || {});
+  const [taskLogs, setTaskLogs] = useState(student.taskLogs || {});
+  const [goals, setGoals] = useState(student.goals || []);
+
+  // Auto-save all student state to Firebase whenever it changes
+  const saveRef = useRef(null);
+  useEffect(() => {
+    if (saveRef.current) clearTimeout(saveRef.current);
+    saveRef.current = setTimeout(() => {
+      setStudent(prev => ({
+        ...prev,
+        completed, points, weekPlan, dailyPlan, roadmap, studentFaction,
+        grabbedGigs, boards, submissions, portfolioFeatured,
+        journalEntries, habitLogs, taskLogs, goals,
+      }));
+    }, 800); // debounce 800ms so rapid clicks don't spam Firestore
+    return () => clearTimeout(saveRef.current);
+  }, [completed, points, weekPlan, dailyPlan, roadmap, studentFaction,
+      grabbedGigs, boards, submissions, portfolioFeatured,
+      journalEntries, habitLogs, taskLogs, goals]);
 
   const saveJournalEntry = useCallback((dropId, entry) => {
     setJournalEntries(prev => ({ ...prev, [dropId]: entry }));
@@ -8782,7 +8841,14 @@ export default function App() {
       if (snap.exists()) {
         setStudentLocal({ ...acct, ...snap.data() });
       } else {
-        const init = { ...acct, points: 0, completed: [], profileAnswers: {} };
+        const init = {
+          ...acct, points: 0, completed: [], profileAnswers: {},
+          weekPlan: { skills: [], mission: null, gig: null, ripple: null, guide: null, lightroom: null },
+          dailyPlan: { Mon: [], Tue: [], Wed: [], Thu: [], Fri: [] },
+          goals: [], habitLogs: {}, taskLogs: {}, journalEntries: {},
+          grabbedGigs: {}, submissions: {}, portfolioFeatured: {},
+          boards: null, roadmap: null, studentFaction: null,
+        };
         await setDoc(doc(db, "students", acct.id), init);
         setStudentLocal(init);
       }
