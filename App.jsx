@@ -5513,7 +5513,7 @@ function DashboardWorkItem({ item, meta, isDone, onComplete, onUncomplete, conte
 
 // ─── STUDENT: DASHBOARD ───────────────────────────────────────────────────────
 
-function StudentDashboard({ student, completed, points, content, weekPlan, grabbedGigs, onNavigate, boards, setBoards, saveToBoard, onComplete, onUncomplete, journalEntries, habitDefs, habitLogs, setHabitLogs, goals, messages, taskDefs, taskLogs, setTaskLogs, dailyPlan }) {
+function StudentDashboard({ student, completed, points, content, weekPlan, grabbedGigs, onNavigate, boards, setBoards, saveToBoard, onComplete, onUncomplete, journalEntries, habitDefs, habitLogs, setHabitLogs, goals, messages, taskDefs, taskLogs, setTaskLogs, dailyPlan, completionDates }) {
   const pct = Math.round((points / content.areas.reduce((a,b)=>a+(b.target||0),0)) * 100);
   const todayDrop = content.dailyDrops.find(d => d.date === todayStr()) || null;
   const myInterests = student.interests || [];
@@ -5553,6 +5553,67 @@ function StudentDashboard({ student, completed, points, content, weekPlan, grabb
             </div>
           ))}
         </div>
+
+        {/* Monthly Progress Tracker */}
+        {(() => {
+          const now = new Date();
+          const monthStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
+          const monthName = now.toLocaleString("default", { month: "long" });
+
+          const MONTHLY_TARGETS = [
+            { key: "projects",  label: "Projects",       icon: "🎯", color: "var(--clay)",     pool: content.projects, target: 1 },
+            { key: "gigs",      label: "Sandbox Gigs",   icon: "⚡", color: "var(--sky)",      pool: content.gigs,     target: 2 },
+            { key: "ripple",    label: "Ripple Missions", icon: "🌊", color: "var(--sage)",     pool: content.ripple,   target: 2 },
+            { key: "guide",     label: "Teen's Guide",   icon: "📖", color: "var(--lavender)", pool: content.teensGuide, target: 2 },
+            { key: "lightroom", label: "Light Room",     icon: "💡", color: "var(--sky)",      pool: content.lightRoom, target: 2 },
+          ];
+
+          const countThisMonth = (pool) => pool.filter(item =>
+            completed.includes(item.id) &&
+            (completionDates?.[item.id] || "").startsWith(monthStr)
+          ).length;
+
+          const totDone = MONTHLY_TARGETS.reduce((a, t) => a + Math.min(countThisMonth(t.pool), t.target), 0);
+          const totTarget = MONTHLY_TARGETS.reduce((a, t) => a + t.target, 0);
+          const allDone = totDone === totTarget;
+
+          return (
+            <div className="card mb-20" style={{ borderColor: allDone ? "rgba(0,229,168,0.4)" : "rgba(0,212,255,0.15)" }}>
+              <div className="flex-between mb-14">
+                <div className="flex-center gap-8">
+                  <span style={{ fontSize: 16 }}>📆</span>
+                  <h3 style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, color: allDone ? "var(--sage)" : "var(--cream)" }}>
+                    {monthName} Goals
+                  </h3>
+                  <span style={{ fontSize: 12, color: allDone ? "var(--sage)" : "var(--muted)", fontWeight: 600 }}>
+                    {totDone}/{totTarget}
+                  </span>
+                </div>
+                {allDone && <span style={{ fontSize: 12, color: "var(--sage)", fontWeight: 700 }}>🎉 Month complete!</span>}
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 10 }}>
+                {MONTHLY_TARGETS.map(t => {
+                  const done = countThisMonth(t.pool);
+                  const pct = Math.min((done / t.target) * 100, 100);
+                  const complete = done >= t.target;
+                  return (
+                    <div key={t.key} style={{ textAlign: "center", padding: "12px 8px", background: complete ? "rgba(0,229,168,0.07)" : "var(--bg3)", borderRadius: "var(--r)", border: `1px solid ${complete ? "rgba(0,229,168,0.3)" : "var(--border)"}`, transition: "all 0.3s" }}>
+                      <div style={{ fontSize: 20, marginBottom: 6 }}>{t.icon}</div>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: complete ? "var(--sage)" : "var(--muted)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8, lineHeight: 1.3 }}>{t.label}</div>
+                      <div style={{ height: 4, background: "var(--border)", borderRadius: 4, overflow: "hidden", marginBottom: 6 }}>
+                        <div style={{ width: `${pct}%`, height: "100%", background: complete ? "var(--sage)" : t.color, borderRadius: 4, transition: "width 0.5s ease" }} />
+                      </div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: complete ? "var(--sage)" : "var(--cream)" }}>
+                        {done}<span style={{ fontSize: 10, color: "var(--muted)", fontWeight: 400 }}>/{t.target}</span>
+                      </div>
+                      {complete && <div style={{ fontSize: 10, color: "var(--sage)", marginTop: 3 }}>✓ Done</div>}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })()}
 
         <div className="grid-2" style={{ gap: 20 }}>
           <div>
@@ -8503,6 +8564,7 @@ function StudentApp({ student, setStudent, content, messages, setMessages, onSwi
   const [view, setView] = useState("dashboard");
   const [completed, setCompleted] = useState(student.completed || []);
   const [points, setPoints] = useState(student.points || 0);
+  const [completionDates, setCompletionDates] = useState(student.completionDates || {}); // itemId → dateStr
   const [weekPlan, setWeekPlan] = useState(student.weekPlan || { skills: [], mission: null, gig: null, ripple: null, guide: null, lightroom: null });
   const [dailyPlan, setDailyPlan] = useState(student.dailyPlan || { Mon: [], Tue: [], Wed: [], Thu: [], Fri: [] });
   const [roadmap, setRoadmap] = useState(student.roadmap || defaultRoadmap);
@@ -8525,13 +8587,13 @@ function StudentApp({ student, setStudent, content, messages, setMessages, onSwi
     saveRef.current = setTimeout(() => {
       setStudent(prev => ({
         ...prev,
-        completed, points, weekPlan, dailyPlan, roadmap, studentFaction,
+        completed, points, completionDates, weekPlan, dailyPlan, roadmap, studentFaction,
         grabbedGigs, boards, submissions, portfolioFeatured,
         journalEntries, habitLogs, taskLogs, goals,
       }));
-    }, 800); // debounce 800ms so rapid clicks don't spam Firestore
+    }, 800);
     return () => clearTimeout(saveRef.current);
-  }, [completed, points, weekPlan, dailyPlan, roadmap, studentFaction,
+  }, [completed, points, completionDates, weekPlan, dailyPlan, roadmap, studentFaction,
       grabbedGigs, boards, submissions, portfolioFeatured,
       journalEntries, habitLogs, taskLogs, goals]);
 
@@ -8557,11 +8619,13 @@ function StudentApp({ student, setStudent, content, messages, setMessages, onSwi
   const complete = useCallback((id, pts) => {
     setCompleted(prev => prev.includes(id) ? prev : [...prev, id]);
     setPoints(prev => prev + (pts || 0));
+    setCompletionDates(prev => prev[id] ? prev : { ...prev, [id]: todayStr() });
   }, []);
 
   const uncomplete = useCallback((id, pts) => {
     setCompleted(prev => prev.filter(x => x !== id));
     setPoints(prev => Math.max(0, prev - (pts || 0)));
+    setCompletionDates(prev => { const n = { ...prev }; delete n[id]; return n; });
   }, []);
 
   const submitApproval = (data) => {
@@ -8600,7 +8664,7 @@ function StudentApp({ student, setStudent, content, messages, setMessages, onSwi
 
   const renderView = () => {
     switch (view) {
-      case "dashboard": return <StudentDashboard student={student} completed={completed} points={points} content={content} weekPlan={weekPlan} grabbedGigs={grabbedGigs} onNavigate={setView} boards={boards} setBoards={setBoards} saveToBoard={saveToBoard} onComplete={complete} onUncomplete={uncomplete} journalEntries={journalEntries} habitDefs={content.habitDefs || []} habitLogs={habitLogs} setHabitLogs={setHabitLogs} goals={goals} messages={messages} taskDefs={content.taskDefs || []} taskLogs={taskLogs} setTaskLogs={setTaskLogs} dailyPlan={dailyPlan} />;
+      case "dashboard": return <StudentDashboard student={student} completed={completed} points={points} content={content} weekPlan={weekPlan} grabbedGigs={grabbedGigs} onNavigate={setView} boards={boards} setBoards={setBoards} saveToBoard={saveToBoard} onComplete={complete} onUncomplete={uncomplete} journalEntries={journalEntries} habitDefs={content.habitDefs || []} habitLogs={habitLogs} setHabitLogs={setHabitLogs} goals={goals} messages={messages} taskDefs={content.taskDefs || []} taskLogs={taskLogs} setTaskLogs={setTaskLogs} dailyPlan={dailyPlan} completionDates={completionDates} />;
       case "tasks": return <StudentTasksPage taskDefs={content.taskDefs || []} taskLogs={taskLogs} setTaskLogs={setTaskLogs} student={student} onComplete={complete} />;
       case "habits": return <StudentHabitsPage habitDefs={content.habitDefs || []} habitLogs={habitLogs} setHabitLogs={setHabitLogs} student={student} onComplete={complete} />;
       case "goals": return <StudentGoalsPage goals={goals} setGoals={setGoals} />;
@@ -8842,7 +8906,7 @@ export default function App() {
         setStudentLocal({ ...acct, ...snap.data() });
       } else {
         const init = {
-          ...acct, points: 0, completed: [], profileAnswers: {},
+          ...acct, points: 0, completed: [], completionDates: {}, profileAnswers: {},
           weekPlan: { skills: [], mission: null, gig: null, ripple: null, guide: null, lightroom: null },
           dailyPlan: { Mon: [], Tue: [], Wed: [], Thu: [], Fri: [] },
           goals: [], habitLogs: {}, taskLogs: {}, journalEntries: {},
