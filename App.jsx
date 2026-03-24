@@ -7823,100 +7823,115 @@ function Portfolio({ student, completed, content, onUncomplete, submissions, set
   const [editingItem, setEditingItem] = useState(null);
 
   const filtered = filter === "all" ? allItems
-    : filter === "featured" ? allItems.filter(i => portfolioFeatured[i.id] !== false && (submissions[i.id]?.blocks?.length > 0))
+    : filter === "featured" ? allItems.filter(i => portfolioFeatured[i.id] !== false)
     : allItems.filter(i => i.type === filter);
 
-  const featuredCount = allItems.filter(i => portfolioFeatured[i.id] !== false && submissions[i.id]?.blocks?.length > 0).length;
+  const featuredCount = allItems.filter(i => portfolioFeatured[i.id] !== false).length;
 
   // Generate and download portfolio as HTML
   const downloadPortfolio = () => {
     const featuredItems = allItems.filter(i => portfolioFeatured[i.id] !== false);
     const now = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+    const escH = (s) => String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    const typeColor = { skill: "#00d4ff", project: "#4d8fff", gig: "#00e5a8", ripple: "#ff3d78" };
 
     const renderBlocksHTML = (blocks) => {
-      if (!blocks || !blocks.length) return "";
+      if (!blocks?.length) return "";
       return blocks.map(b => {
-        if (b.type === "heading") return "<h3 class=\"sub-heading\">" + escH(b.value) + "</h3>";
-        if (b.type === "text") return "<p class=\"block-text\">" + escH(b.value).replace(/\n/g, "<br>") + "</p>";
-        if (b.type === "image") return "<figure class=\"block-image\"><img src=\"" + b.value + "\" alt=\"" + escH(b.caption || "") + "\"><figcaption>" + escH(b.caption || "") + "</figcaption></figure>";
-        if (b.type === "link") return "<a class=\"block-link\" href=\"" + escH(b.value) + "\" target=\"_blank\">" + escH(b.label || b.value) + " →</a>";
-        if (b.type === "file") return "<div class=\"block-file\">📎 " + escH(b.filename || "File") + "</div>";
+        if (b.type === "heading") return `<h3 class="sub-heading">${escH(b.value)}</h3>`;
+        if (b.type === "text") return `<p class="block-text">${escH(b.value).replace(/\n/g, "<br>")}</p>`;
+        if (b.type === "image") return `<figure class="block-image"><img src="${escH(b.value)}" alt="${escH(b.caption||"")}"><figcaption>${escH(b.caption||"")}</figcaption></figure>`;
+        if (b.type === "link") return `<a class="block-link" href="${escH(b.value)}" target="_blank">🔗 ${escH(b.label||b.value)}</a>`;
+        if (b.type === "file") return `<div class="block-file">📎 ${escH(b.filename||"File")}</div>`;
         return "";
       }).join("\n");
     };
-    const escH = (s) => String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 
     const itemsHTML = featuredItems.map(item => {
       const sub = submissions[item.id] || {};
-      const color = { skill: "#e8a020", project: "#6090b8", gig: "#7aaa7a", ripple: "#c87060" }[item.type] || "#e8a020";
-      const hasBlocks = sub.blocks && sub.blocks.length > 0;
-      return [
-        "<article class=\"portfolio-item\">",
-        "  <div class=\"item-header\" style=\"border-left: 4px solid " + color + "\">",
-        "    <div class=\"item-meta\"><span class=\"item-type\" style=\"color:" + color + "\">" + escH(item.label) + "</span>" + (item.pts ? " <span class=\"item-pts\">+" + item.pts + " pts</span>" : "") + "</div>",
-        "    <h2 class=\"item-title\">" + escH(item.name || item.title || "") + "</h2>",
-        "    " + (item.desc ? "<p class=\"item-desc\">" + escH(String(item.desc).substring(0, 200)) + (String(item.desc).length > 200 ? "…" : "") + "</p>" : ""),
-        "  </div>",
-        hasBlocks ? ("  <div class=\"submission\">\n    <h3 class=\"submission-label\">My Submission</h3>\n" + renderBlocksHTML(sub.blocks) + "\n  </div>") : "",
-        "</article>",
-      ].filter(Boolean).join("\n");
-    }).join("\n\n");
+      const color = typeColor[item.type] || "#00d4ff";
+      const hasBlocks = sub.blocks?.length > 0;
+      const thumbBlock = sub.blocks?.find(b => b.type === "image");
+      return `
+<article class="portfolio-item">
+  <div class="item-cover" style="background:linear-gradient(135deg,${color}15,${color}05)">
+    ${thumbBlock ? `<img src="${escH(thumbBlock.value)}" class="cover-img" alt="${escH(item.name)}">` : `<div class="cover-icon">${escH(item.icon||"◈")}</div>`}
+    <div class="cover-overlay">
+      <span class="item-type-badge" style="background:${color};color:#0c0c16">${escH(item.label)}</span>
+    </div>
+  </div>
+  <div class="item-body">
+    <h2 class="item-title">${escH(item.name||"")}</h2>
+    ${item.desc ? `<p class="item-desc">${escH(String(item.desc).substring(0,180))}${String(item.desc).length>180?"…":""}</p>` : ""}
+    ${item.pts ? `<div class="item-pts">+${item.pts} pts</div>` : ""}
+  </div>
+  ${hasBlocks ? `<div class="submission"><h3 class="submission-label">My Work</h3>${renderBlocksHTML(sub.blocks)}</div>` : ""}
+</article>`;
+    }).join("\n");
 
-    const html = [
-      "<!DOCTYPE html>",
-      "<html lang=\"en\">",
-      "<head>",
-      "<meta charset=\"UTF-8\">",
-      "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">",
-      "<title>" + escH(student.name) + " — Learning Portfolio</title>",
-      "<style>",
-      "  *{box-sizing:border-box;margin:0;padding:0}",
-      "  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f7f4;color:#2d2d2a;line-height:1.6;padding:0}",
-      "  .cover{background:linear-gradient(135deg,#141410,#272720);color:#f0ead8;padding:64px 40px;text-align:center}",
-      "  .cover-name{font-size:48px;font-weight:900;letter-spacing:-2px;margin-bottom:8px}",
-      "  .cover-sub{font-size:18px;opacity:.65;margin-bottom:24px}",
-      "  .cover-stats{display:flex;gap:32px;justify-content:center;flex-wrap:wrap}",
-      "  .stat{background:rgba(255,255,255,.08);border-radius:12px;padding:16px 28px;text-align:center}",
-      "  .stat-num{font-size:32px;font-weight:800;color:#e8a020}",
-      "  .stat-label{font-size:12px;opacity:.6;text-transform:uppercase;letter-spacing:1px;margin-top:4px}",
-      "  .main{max-width:760px;margin:0 auto;padding:48px 24px}",
-      "  .portfolio-item{background:#fff;border-radius:16px;margin-bottom:28px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.07)}",
-      "  .item-header{padding:28px 32px;background:#fafaf8}",
-      "  .item-meta{margin-bottom:8px}",
-      "  .item-type{font-size:11px;text-transform:uppercase;letter-spacing:2px;font-weight:700}",
-      "  .item-pts{font-size:11px;color:#888;margin-left:10px}",
-      "  .item-title{font-size:24px;font-weight:800;margin-bottom:10px;letter-spacing:-0.5px}",
-      "  .item-desc{font-size:14px;color:#666;line-height:1.7}",
-      "  .submission{padding:28px 32px;border-top:1px solid #eee}",
-      "  .submission-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:#aaa;font-weight:700;margin-bottom:20px}",
-      "  .sub-heading{font-size:20px;font-weight:700;margin:20px 0 10px;color:#1a1a18}",
-      "  .block-text{font-size:15px;color:#444;line-height:1.8;margin-bottom:16px}",
-      "  .block-image{margin:20px 0;border-radius:12px;overflow:hidden}",
-      "  .block-image img{width:100%;display:block;max-height:500px;object-fit:cover}",
-      "  .block-image figcaption{padding:8px 14px;font-size:12px;color:#888;font-style:italic;background:#f5f5f3}",
-      "  .block-link{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:#f0f7ff;color:#2563eb;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;margin:8px 0;border:1px solid #dbeafe}",
-      "  .block-file{padding:12px 16px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;font-size:14px;color:#92400e;margin:8px 0}",
-      "  .footer{text-align:center;padding:40px;color:#aaa;font-size:13px;border-top:1px solid #eee;margin-top:48px}",
-      "</style>",
-      "</head>",
-      "<body>",
-      "<div class=\"cover\">",
-      "  <div class=\"cover-name\">" + escH(student.name || "Student") + "</div>",
-      "  <div class=\"cover-sub\">Learning Portfolio · " + now + "</div>",
-      "  <div class=\"cover-stats\">",
-      "    <div class=\"stat\"><div class=\"stat-num\">" + allItems.reduce((a, b) => a + (b.pts || 0), 0) + "</div><div class=\"stat-label\">Total Points</div></div>",
-      "    <div class=\"stat\"><div class=\"stat-num\">" + allItems.filter(i => i.type === "skill").length + "</div><div class=\"stat-label\">Skills Mastered</div></div>",
-      "    <div class=\"stat\"><div class=\"stat-num\">" + allItems.filter(i => i.type === "project").length + "</div><div class=\"stat-label\">Projects</div></div>",
-      "    <div class=\"stat\"><div class=\"stat-num\">" + allItems.filter(i => i.type === "gig").length + "</div><div class=\"stat-label\">Gigs Completed</div></div>",
-      "  </div>",
-      "</div>",
-      "<div class=\"main\">",
-      itemsHTML || "<p style=\"color:#aaa;text-align:center;padding:40px\">No items in portfolio yet.</p>",
-      "</div>",
-      "<div class=\"footer\">Generated by Forge Learning Platform · " + now + "</div>",
-      "</body>",
-      "</html>",
-    ].join("\n");
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>${escH(student.name)} — Learning Portfolio</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f4f4f8;color:#1a1a2e;line-height:1.6}
+  .cover{background:linear-gradient(135deg,#0c0c16,#1a1a36);color:#e8eeff;padding:72px 40px;text-align:center}
+  .cover-name{font-size:52px;font-weight:900;letter-spacing:-2px;margin-bottom:6px;background:linear-gradient(90deg,#00d4ff,#b060ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .cover-sub{font-size:16px;opacity:.5;margin-bottom:32px;letter-spacing:1px;text-transform:uppercase}
+  .cover-stats{display:flex;gap:24px;justify-content:center;flex-wrap:wrap}
+  .stat{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:20px 32px;text-align:center}
+  .stat-num{font-size:36px;font-weight:800;color:#00d4ff}
+  .stat-label{font-size:11px;opacity:.5;text-transform:uppercase;letter-spacing:1.5px;margin-top:4px}
+  .main{max-width:900px;margin:0 auto;padding:56px 24px}
+  .section-title{font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#6a6a90;margin-bottom:28px;padding-bottom:12px;border-bottom:1px solid #e0e0f0}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:24px;margin-bottom:48px}
+  .portfolio-item{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);transition:transform .2s}
+  .portfolio-item:hover{transform:translateY(-2px)}
+  .item-cover{position:relative;height:200px;overflow:hidden;background:#f0f0f8}
+  .cover-img{width:100%;height:100%;object-fit:cover;display:block}
+  .cover-icon{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:56px;opacity:.4}
+  .cover-overlay{position:absolute;bottom:12px;left:14px}
+  .item-type-badge{font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:4px 10px;border-radius:20px}
+  .item-body{padding:22px 24px}
+  .item-title{font-size:22px;font-weight:800;color:#1a1a2e;margin-bottom:8px;letter-spacing:-0.5px;line-height:1.2}
+  .item-desc{font-size:14px;color:#6a6a90;line-height:1.7;margin-bottom:12px}
+  .item-pts{display:inline-block;font-size:11px;font-weight:700;color:#00d4ff;background:#f0faff;border:1px solid #cceeff;padding:3px 10px;border-radius:20px}
+  .submission{padding:20px 24px;border-top:1px solid #f0f0f8;background:#fafafa}
+  .submission-label{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:#aaa;font-weight:700;margin-bottom:16px}
+  .sub-heading{font-size:19px;font-weight:700;margin:18px 0 8px;color:#1a1a2e}
+  .block-text{font-size:14px;color:#444;line-height:1.85;margin-bottom:14px;white-space:pre-wrap}
+  .block-image{margin:16px 0;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.1)}
+  .block-image img{width:100%;display:block;max-height:420px;object-fit:cover}
+  .block-image figcaption{padding:8px 14px;font-size:12px;color:#888;font-style:italic;background:#f5f5f3}
+  .block-link{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:#f0f7ff;color:#2563eb;border-radius:10px;text-decoration:none;font-weight:600;font-size:13px;margin:6px 0;border:1px solid #dbeafe}
+  .block-file{padding:12px 16px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;font-size:13px;color:#92400e;margin:6px 0}
+  .footer{text-align:center;padding:48px;color:#aaa;font-size:12px;border-top:1px solid #e8e8f0;margin-top:24px}
+  @media(max-width:600px){.grid{grid-template-columns:1fr}.cover-name{font-size:36px}}
+</style>
+</head>
+<body>
+<div class="cover">
+  <div class="cover-name">${escH(student.name||"Student")}</div>
+  <div class="cover-sub">Learning Portfolio · ${now}</div>
+  <div class="cover-stats">
+    <div class="stat"><div class="stat-num">${allItems.reduce((a,b)=>a+(b.pts||0),0)}</div><div class="stat-label">Total Points</div></div>
+    <div class="stat"><div class="stat-num">${allItems.filter(i=>i.type==="skill").length}</div><div class="stat-label">Skills</div></div>
+    <div class="stat"><div class="stat-num">${allItems.filter(i=>i.type==="project").length}</div><div class="stat-label">Projects</div></div>
+    <div class="stat"><div class="stat-num">${featuredItems.length}</div><div class="stat-label">In Portfolio</div></div>
+  </div>
+</div>
+<div class="main">
+  <div class="section-title">Portfolio — ${featuredItems.length} Item${featuredItems.length!==1?"s":""}</div>
+  <div class="grid">
+    ${itemsHTML || "<p style=\"color:#aaa;text-align:center;padding:40px;grid-column:1/-1\">No items added to portfolio yet.</p>"}
+  </div>
+</div>
+<div class="footer">Generated by Forge Learning Platform · ${now}</div>
+</body>
+</html>`;
 
     const blob = new Blob([html], { type: "text/html" });
     const url = URL.createObjectURL(blob);
@@ -7933,7 +7948,7 @@ function Portfolio({ student, completed, content, onUncomplete, submissions, set
         <div className="flex-between">
           <div>
             <h1 className="page-title">🗂 Portfolio</h1>
-            <p className="page-sub">{allItems.length} items · {featuredCount} with submissions</p>
+            <p className="page-sub">{allItems.length} completed items · {featuredCount} in portfolio</p>
           </div>
           <div className="flex gap-10" style={{ alignItems: "center" }}>
             <div style={{ textAlign: "right" }}>
@@ -7955,12 +7970,12 @@ function Portfolio({ student, completed, content, onUncomplete, submissions, set
         ) : (
           <>
             <div className="filter-row">
-              {[{ id: "all", label: "All" }, { id: "featured", label: "With Submissions ✦" }, { id: "skill", label: "Skills" }, { id: "project", label: "Projects" }, { id: "gig", label: "Gigs" }, { id: "ripple", label: "Ripple" }].map(f => (
+              {[{ id: "all", label: "All Completed" }, { id: "featured", label: "✦ In Portfolio" }, { id: "skill", label: "Skills" }, { id: "project", label: "Projects" }, { id: "gig", label: "Gigs" }, { id: "ripple", label: "Ripple" }].map(f => (
                 <button key={f.id} className={"filter-btn " + (filter === f.id ? "active" : "")} onClick={() => setFilter(f.id)}>{f.label}</button>
               ))}
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 20 }}>
               {filtered.map(item => {
                 const sub = submissions[item.id] || {};
                 const hasBlocks = sub.blocks && sub.blocks.length > 0;
@@ -7968,75 +7983,102 @@ function Portfolio({ student, completed, content, onUncomplete, submissions, set
                 const isExpanded = expandedItem === item.id;
                 const isEditing = editingItem === item.id;
                 const accentColor = "var(--" + typeColors[item.type] + ")";
+                const accentHex = { skill: "#00d4ff", project: "#4d8fff", gig: "#00e5a8", ripple: "#ff3d78" }[item.type] || "#00d4ff";
+
+                // Find first image block for thumbnail
+                const thumbBlock = sub.blocks?.find(b => b.type === "image");
+                const firstText = sub.blocks?.find(b => b.type === "text")?.value || item.desc || "";
 
                 return (
-                  <div key={item.id} style={{ background: "var(--bg2)", border: "1px solid " + (isEditing ? "var(--amber)" : isFeatured && hasBlocks ? accentColor + "55" : "var(--border)"), borderRadius: "var(--r-lg)", overflow: "hidden", transition: "border 0.2s" }}>
-                    {/* Color bar */}
-                    <div style={{ height: 3, background: accentColor }} />
+                  <div key={item.id} style={{
+                    background: "var(--bg2)", borderRadius: "var(--r-lg)", overflow: "hidden",
+                    border: `1px solid ${isFeatured && hasBlocks ? accentHex + "55" : "var(--border)"}`,
+                    transition: "all 0.2s", display: "flex", flexDirection: "column",
+                  }}>
+                    {/* Thumbnail / Cover */}
+                    <div style={{ position: "relative", height: 160, flexShrink: 0, overflow: "hidden", cursor: hasBlocks ? "pointer" : "default" }}
+                      onClick={() => hasBlocks && setExpandedItem(isExpanded ? null : item.id)}>
+                      {thumbBlock ? (
+                        <img src={thumbBlock.value} alt={item.name}
+                          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                      ) : (
+                        <div style={{ width: "100%", height: "100%", background: `linear-gradient(135deg, ${accentHex}18, ${accentHex}06)`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                          <div style={{ fontSize: 40, opacity: 0.7 }}>{item.icon || "◈"}</div>
+                          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: accentHex, opacity: 0.8 }}>{item.label}</div>
+                        </div>
+                      )}
+                      {/* Overlay gradient */}
+                      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 60, background: "linear-gradient(transparent, rgba(12,12,22,0.85))" }} />
+                      {/* Featured badge */}
+                      {isFeatured && hasBlocks && (
+                        <div style={{ position: "absolute", top: 10, right: 10, background: accentHex, color: "#0c0c16", fontSize: 9, fontWeight: 900, letterSpacing: 1.5, textTransform: "uppercase", padding: "3px 8px", borderRadius: 20 }}>
+                          ✦ Featured
+                        </div>
+                      )}
+                      {/* Type tag overlay */}
+                      <div style={{ position: "absolute", bottom: 10, left: 12 }}>
+                        <span className={"tag tag-" + typeColors[item.type]} style={{ fontSize: 9 }}>{item.label}</span>
+                      </div>
+                      {hasBlocks && (
+                        <div style={{ position: "absolute", bottom: 10, right: 12, fontSize: 10, color: "rgba(255,255,255,0.6)" }}>
+                          {isExpanded ? "▲ Collapse" : "▼ Expand"}
+                        </div>
+                      )}
+                    </div>
 
-                    {/* Item header row */}
-                    <div style={{ padding: "16px 20px", display: "flex", alignItems: "flex-start", gap: 14 }}>
-                      <div style={{ width: 44, height: 44, borderRadius: "var(--r)", background: accentColor + "18", border: "2px solid " + accentColor + "44", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
-                        {item.icon || "◈"}
+                    {/* Card body */}
+                    <div style={{ padding: "14px 16px", flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
+                      <div style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, color: "var(--cream)", lineHeight: 1.2 }}>
+                        {item.name}
                       </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div className="flex-center gap-8 mb-3">
-                          <span className={"tag tag-" + typeColors[item.type]}>{item.label}</span>
-                          {item.area && <span style={{ fontSize: 11, color: "var(--muted)" }}>{content.areas.find(a => a.id === item.area)?.name}</span>}
-                          {hasBlocks && <span className="tag tag-sage" style={{ fontSize: 10 }}>📁 {sub.blocks.length} block{sub.blocks.length !== 1 ? "s" : ""}</span>}
+                      {firstText && !thumbBlock && (
+                        <div style={{ fontSize: 12, color: "var(--muted)", lineHeight: 1.6, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
+                          {firstText.substring(0, 120)}
                         </div>
-                        <div style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, color: "var(--cream)", marginBottom: 3 }}>{item.name}</div>
-                        <div style={{ fontSize: 12, color: "var(--muted)", lineHeight: 1.5 }}>{item.desc?.substring(0, 90)}{item.desc?.length > 90 ? "…" : ""}</div>
-                      </div>
-                      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8, flexShrink: 0 }}>
-                        <span className="pts-badge">+{item.pts} pts</span>
-                        <div className="flex gap-6">
-                          <label style={{ display: "flex", alignItems: "center", gap: 5, cursor: "pointer" }}>
-                            <input type="checkbox" checked={isFeatured}
-                              onChange={e => setPortfolioFeatured(p => ({ ...p, [item.id]: e.target.checked }))} />
-                            <span style={{ fontSize: 11, color: "var(--muted)" }}>Feature</span>
-                          </label>
-                          {hasBlocks && !isEditing && (
-                            <button className="btn btn-ghost btn-xs" onClick={() => setExpandedItem(isExpanded ? null : item.id)}>
-                              {isExpanded ? "▲ Hide" : "▼ Preview"}
-                            </button>
-                          )}
-                          <button
-                            className={"btn btn-xs " + (isEditing ? "btn-primary" : "btn-ghost")}
-                            onClick={() => { setEditingItem(isEditing ? null : item.id); setExpandedItem(null); }}>
-                            {isEditing ? "✓ Done Editing" : hasBlocks ? "✏️ Edit Submission" : "+ Add Submission"}
-                          </button>
-                          <button className="btn btn-ghost btn-xs" style={{ fontSize: 10, color: "var(--muted)" }}
-                            onClick={() => onUncomplete(item.id, item.pts || 0)} title="Remove from portfolio">↩</button>
-                        </div>
+                      )}
+                      <div className="flex-center gap-8" style={{ marginTop: "auto", paddingTop: 8, borderTop: "1px solid var(--border)" }}>
+                        <span className="pts-badge" style={{ fontSize: 10 }}>+{item.pts} pts</span>
+                        {hasBlocks && <span style={{ fontSize: 10, color: "var(--muted)" }}>📁 {sub.blocks.length} block{sub.blocks.length !== 1 ? "s" : ""}</span>}
+                        <div style={{ flex: 1 }} />
+                        {/* Show in Portfolio toggle */}
+                        <button onClick={() => setPortfolioFeatured(p => ({ ...p, [item.id]: !isFeatured }))}
+                          style={{ fontSize: 10, fontWeight: 700, padding: "4px 10px", borderRadius: 20, border: `1px solid ${isFeatured ? accentHex + "60" : "var(--border)"}`, background: isFeatured ? accentHex + "18" : "transparent", color: isFeatured ? accentHex : "var(--muted)", cursor: "pointer", transition: "all 0.15s", fontFamily: "var(--font-body)" }}>
+                          {isFeatured ? "✦ In Portfolio" : "○ Add to Portfolio"}
+                        </button>
+                        <button className={"btn btn-xs " + (isEditing ? "btn-primary" : "btn-ghost")}
+                          onClick={() => { setEditingItem(isEditing ? null : item.id); setExpandedItem(null); }}>
+                          {isEditing ? "✓ Done" : hasBlocks ? "✏️ Edit" : "+ Add Work"}
+                        </button>
                       </div>
                     </div>
 
-                    {/* Submission preview */}
+                    {/* Expanded submission view */}
                     {isExpanded && hasBlocks && !isEditing && (
-                      <div style={{ padding: "0 20px 20px", borderTop: "1px solid var(--border)" }}>
-                        <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 2, color: "var(--muted)", fontWeight: 700, padding: "14px 0 12px" }}>Submission Preview</div>
-                        <SubmissionRenderer blocks={sub.blocks} compact={true} />
+                      <div style={{ borderTop: `2px solid ${accentHex}44`, background: "var(--bg3)" }}>
+                        <div style={{ padding: "14px 18px", display: "flex", alignItems: "center", gap: 10, borderBottom: "1px solid var(--border)" }}>
+                          <span style={{ fontSize: 14, color: accentColor, fontWeight: 700 }}>📁</span>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: "var(--cream)", flex: 1 }}>Submission</span>
+                          <button className="btn btn-ghost btn-xs" onClick={() => setExpandedItem(null)}>✕ Close</button>
+                        </div>
+                        <div style={{ padding: "18px 20px" }}>
+                          <SubmissionRenderer blocks={sub.blocks} compact={false} />
+                        </div>
                       </div>
                     )}
 
-                    {/* Submission editor — full and obvious */}
+                    {/* Submission editor */}
                     {isEditing && (
-                      <div style={{ borderTop: "2px solid var(--amber)" }}>
-                        <div style={{ padding: "14px 20px", background: "var(--amber-dim)", display: "flex", alignItems: "center", gap: 10 }}>
-                          <span style={{ fontSize: 16 }}>📁</span>
+                      <div style={{ borderTop: `2px solid var(--amber)` }}>
+                        <div style={{ padding: "12px 16px", background: "var(--amber-dim)", display: "flex", alignItems: "center", gap: 10 }}>
+                          <span style={{ fontSize: 14 }}>📁</span>
                           <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--amber)" }}>Portfolio Submission Editor</div>
-                            <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 1 }}>Add text, images, links, and files to document your work</div>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--amber)" }}>Submission Editor</div>
+                            <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 1 }}>Add text, images, links and files to document your work</div>
                           </div>
                           <button className="btn btn-primary btn-sm" onClick={() => setEditingItem(null)}>✓ Done</button>
                         </div>
-                        <div style={{ padding: 20 }}>
-                          <SubmissionBuilder
-                            submission={sub}
-                            onChange={(updated) => setSubmission(item.id, updated)}
-                            itemTitle={item.name}
-                          />
+                        <div style={{ padding: 18 }}>
+                          <SubmissionBuilder submission={sub} onChange={(updated) => setSubmission(item.id, updated)} itemTitle={item.name} />
                         </div>
                       </div>
                     )}
