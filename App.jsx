@@ -1979,6 +1979,173 @@ function TeacherStudents({ students = [], content }) {
   );
 }
 
+// ─── TEACHER: ANSWER LOG ──────────────────────────────────────────────────────
+
+function AnswerLog({ students, checkIns, content }) {
+  const [filterStudent, setFilterStudent] = useState("all");
+  const [filterQuestion, setFilterQuestion] = useState("all");
+
+  // Collect all answers from all students
+  const allAnswers = students.flatMap(s =>
+    (s.checkInAnswers || []).map(a => ({ ...a, studentName: s.name, studentId: s.id }))
+  ).sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+
+  const filtered = allAnswers.filter(a => {
+    if (filterStudent !== "all" && a.studentId !== filterStudent) return false;
+    if (filterQuestion !== "all" && a.checkInId !== filterQuestion) return false;
+    return true;
+  });
+
+  // Unique questions that have answers
+  const answeredQuestions = [...new Map(
+    allAnswers.map(a => {
+      const ci = checkIns.find(c => c.id === a.checkInId);
+      return [a.checkInId, { id: a.checkInId, title: ci?.title || a.question }];
+    })
+  ).values()];
+
+  const typeColors = { discovery: "amber", would_rather: "clay", mental_health: "lavender", skill_check: "sky", fact: "sage", question: "sage", reflection: "lavender" };
+
+  const getItemFromRule = (rule) => {
+    if (!rule.recommendId || !rule.recommendType || rule.recommendType === "none") return null;
+    const map = { skill: content.skills, project: content.projects, gig: content.gigs, ripple: content.ripple, lightroom: content.lightRoom, teensguide: content.teensGuide };
+    return (map[rule.recommendType] || []).find(i => i.id === rule.recommendId) || null;
+  };
+
+  return (
+    <div>
+      <div className="page-header">
+        <div className="flex-between">
+          <div>
+            <h1 className="page-title">🔭 Answer Log</h1>
+            <p className="page-sub">{allAnswers.length} response{allAnswers.length !== 1 ? "s" : ""} collected · See what your students are telling you</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="page-content">
+        {allAnswers.length === 0 ? (
+          <div>
+            <EmptyState icon="🔭" title="No answers yet"
+              sub="Once students start answering your Mentor Touch-Points, every response shows up here. You'll see patterns, interests, and signals you can act on." />
+            <div className="card mt-16" style={{ background: "var(--bg3)", maxWidth: 600 }}>
+              <div style={{ fontWeight: 700, color: "var(--amber)", marginBottom: 8, fontSize: 14 }}>How to use the Answer Log</div>
+              <p style={{ fontSize: 15, color: "var(--cream-dim)", lineHeight: 1.75, margin: 0 }}>
+                When a student answers a Discovery Question or Would You Rather, their answer is logged here with the date and which content was recommended. Use this to spot interests, inform new content you create, and follow up in conversations.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Filters */}
+            <div className="flex gap-10 mb-20 flex-wrap">
+              <div style={{ flex: 1, minWidth: 160 }}>
+                <label className="label">Filter by student</label>
+                <select className="input" value={filterStudent} onChange={e => setFilterStudent(e.target.value)}>
+                  <option value="all">All students</option>
+                  {students.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                </select>
+              </div>
+              <div style={{ flex: 2, minWidth: 200 }}>
+                <label className="label">Filter by question</label>
+                <select className="input" value={filterQuestion} onChange={e => setFilterQuestion(e.target.value)}>
+                  <option value="all">All questions</option>
+                  {answeredQuestions.map(q => <option key={q.id} value={q.id}>{q.title}</option>)}
+                </select>
+              </div>
+            </div>
+
+            {/* Answer cards */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {filtered.length === 0 ? (
+                <div style={{ padding: 32, textAlign: "center", color: "var(--muted)", fontSize: 14 }}>No answers match this filter.</div>
+              ) : filtered.map(a => {
+                const ci = checkIns.find(c => c.id === a.checkInId);
+                const typeInfo = CI_TYPES.find(t => t.value === ci?.type) || CI_TYPES[4];
+                const C = typeInfo.color;
+                const hasRecs = (a.matchedRules || []).some(r => r.recommendType && r.recommendType !== "none" && r.recommendId);
+                return (
+                  <div key={a.id} style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: "var(--r-lg)", overflow: "hidden" }}>
+                    {/* Answer header */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 18px", borderBottom: hasRecs ? "1px solid var(--border)" : "none" }}>
+                      <div style={{ width: 40, height: 40, borderRadius: 10, background: `var(--${C}-dim)`, border: `2px solid var(--${C})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
+                        {ci?.icon || typeInfo.icon}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 12, color: `var(--${C})`, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 3 }}>
+                          {typeInfo.label} · {a.studentName} · {a.date ? formatDisplayDate(a.date) : ""}
+                        </div>
+                        <div style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 700, color: "var(--cream)", marginBottom: 4 }}>{a.question}</div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <span style={{ fontSize: 14, color: `var(--${C})`, fontWeight: 600, background: `var(--${C}-dim)`, border: `1px solid var(--${C})`, padding: "3px 10px", borderRadius: 20 }}>
+                            {a.answerText}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* What was recommended */}
+                    {hasRecs && (
+                      <div style={{ padding: "12px 18px", background: "var(--bg3)" }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 8 }}>
+                          What Forge recommended based on this answer
+                        </div>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                          {(a.matchedRules || []).filter(r => r.recommendType && r.recommendType !== "none" && r.recommendId).map((rule, ri) => {
+                            const item = getItemFromRule(rule);
+                            if (!item) return null;
+                            const typeLabel = { skill: "Skill", project: "Project", gig: "Gig", ripple: "Contribution", lightroom: "Deep Room", teensguide: "Foundations" }[rule.recommendType] || "";
+                            return (
+                              <div key={ri} style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 12px", background: "var(--bg2)", borderRadius: "var(--r)", border: "1px solid var(--border)" }}>
+                                <span style={{ fontSize: 16 }}>{item.icon || "◈"}</span>
+                                <div>
+                                  <div style={{ fontSize: 10, color: "var(--amber)", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>{typeLabel}</div>
+                                  <div style={{ fontSize: 13, color: "var(--cream)", fontWeight: 600 }}>{item.name || item.title}</div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        {(a.matchedRules || []).some(r => r.message) && (
+                          <div style={{ marginTop: 8, fontSize: 13, color: "var(--muted)", fontStyle: "italic", lineHeight: 1.65 }}>
+                            Message shown: "{(a.matchedRules || []).find(r => r.message)?.message}"
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Insight summary */}
+            {allAnswers.length >= 3 && (
+              <div className="card mt-20" style={{ borderColor: "rgba(0,212,255,0.25)", background: "var(--amber-dim)" }}>
+                <div style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, color: "var(--amber)", marginBottom: 10 }}>
+                  🔭 Patterns worth noticing
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12 }}>
+                  {students.filter(s => (s.checkInAnswers || []).length > 0).map(s => {
+                    const answers = s.checkInAnswers || [];
+                    return (
+                      <div key={s.id} style={{ background: "var(--bg2)", borderRadius: "var(--r)", padding: "12px 14px", border: "1px solid var(--border)" }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--cream)", marginBottom: 4 }}>{s.name}</div>
+                        <div style={{ fontSize: 13, color: "var(--muted)", lineHeight: 1.65 }}>
+                          {answers.length} response{answers.length !== 1 ? "s" : ""} · last: {answers[0]?.date ? formatDisplayDate(answers[0].date) : "—"}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── TEACHER: APPROVALS ───────────────────────────────────────────────────────
 
 function TeacherApprovals({ approvals, setApprovals }) {
@@ -2745,11 +2912,13 @@ function TeacherCategories({ areas, setAreas, skills }) {
 // ─── CHECK-IN CONSTANTS & HELPERS ─────────────────────────────────────────────
 
 const CI_TYPES = [
-  { value: "mental_health", label: "Mental Health", icon: "💭", color: "lavender" },
-  { value: "skill_check", label: "Skill Check", icon: "🎯", color: "amber" },
-  { value: "fact", label: "Fun Fact / Info", icon: "💡", color: "sky" },
-  { value: "question", label: "Open Question", icon: "🤔", color: "sage" },
-  { value: "reflection", label: "Reflection", icon: "🪞", color: "clay" },
+  { value: "discovery",    label: "Discovery Question", icon: "🔭", color: "amber"   },
+  { value: "mental_health",label: "Mental Health",      icon: "💭", color: "lavender"},
+  { value: "skill_check",  label: "Skill Check",        icon: "🎯", color: "sky"     },
+  { value: "fact",         label: "Fun Fact / Info",    icon: "💡", color: "sage"    },
+  { value: "question",     label: "Open Question",      icon: "🤔", color: "sage"    },
+  { value: "would_rather", label: "Would You Rather",   icon: "⚡", color: "clay"   },
+  { value: "reflection",   label: "Reflection",         icon: "🪞", color: "lavender"},
 ];
 
 const CI_ANSWER_FORMATS = [
@@ -3159,13 +3328,14 @@ function CheckInManager({ checkIns, setCheckIns, content }) {
 
 // ─── STUDENT: CHECK-IN POPUP ──────────────────────────────────────────────────
 
-function CheckInPopup({ checkIns, content, seenToday, onSeen, onNavigate }) {
+function CheckInPopup({ checkIns, content, seenToday, onSeen, onNavigate, onLogAnswer, onAddToPlanner }) {
   const pending = (checkIns || []).filter(ci => ciIsScheduledToday(ci) && !seenToday.includes(ci.id));
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answer, setAnswer] = useState(null);
   const [textAnswer, setTextAnswer] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [matchedRules, setMatchedRules] = useState([]);
+  const [addedToPlanner, setAddedToPlanner] = useState({});
 
   if (pending.length === 0 || currentIdx >= pending.length) return null;
   const ci = pending[currentIdx];
@@ -3173,11 +3343,25 @@ function CheckInPopup({ checkIns, content, seenToday, onSeen, onNavigate }) {
   const typeInfo = CI_TYPES.find(t => t.value === ci.type) || CI_TYPES[3];
   const C = typeInfo.color;
 
+  // Human-readable answer text for logging
+  const getAnswerText = () => {
+    if (ci.answerFormat === "text") return textAnswer;
+    if (ci.answerFormat === "multiple_choice") return (ci.choices || [])[answer] || String(answer);
+    if (ci.answerFormat === "yes_no") return answer === "yes" ? "Yes" : "No";
+    if (ci.answerFormat === "scale_1_5") return `${answer} out of 5`;
+    if (ci.answerFormat === "none") return "acknowledged";
+    return String(answer);
+  };
+
   const handleSubmit = () => {
     const ans = ci.answerFormat === "text" ? textAnswer : answer;
     const matched = (ci.routing || []).filter(r => ciEvaluateRule(r, ans, ci.answerFormat));
     setMatchedRules(matched);
     setSubmitted(true);
+    // Log the answer
+    if (onLogAnswer) {
+      onLogAnswer(ci.id, ci.title, getAnswerText(), answer, matched);
+    }
   };
 
   const advance = () => {
@@ -3186,15 +3370,24 @@ function CheckInPopup({ checkIns, content, seenToday, onSeen, onNavigate }) {
     setTextAnswer("");
     setSubmitted(false);
     setMatchedRules([]);
+    setAddedToPlanner({});
     setCurrentIdx(i => i + 1);
   };
 
   const handleNavigate = (rule) => {
-    const viewMap = { skill: "skills", project: "projects", gig: "Guilds", ripple: "ripple", lightroom: "lightroom", teensguide: "teensguide" };
+    const viewMap = { skill: "skills", project: "projects", gig: "factions", ripple: "ripple", lightroom: "lightroom", teensguide: "teensguide" };
     if (rule.recommendType && rule.recommendType !== "none" && viewMap[rule.recommendType]) {
       onNavigate(viewMap[rule.recommendType]);
     }
     advance();
+  };
+
+  const handleAddToPlanner = (rule, item) => {
+    const rhythmKeyMap = { skill: "skills", project: "mission", gig: "gig", ripple: "ripple", lightroom: "lightroom", teensguide: "guide" };
+    if (onAddToPlanner && item) {
+      onAddToPlanner(item, rhythmKeyMap[rule.recommendType] || "skills");
+      setAddedToPlanner(p => ({ ...p, [rule.id]: true }));
+    }
   };
 
   const getRecommendedItem = (rule) => {
@@ -3210,6 +3403,7 @@ function CheckInPopup({ checkIns, content, seenToday, onSeen, onNavigate }) {
   };
 
   const isLast = currentIdx + 1 >= pending.length;
+  const typeLabels = { skill: "Skill", project: "Project", gig: "Guild Gig", ripple: "Contribution", lightroom: "Deep Room", teensguide: "Foundations Guide" };
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.88)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
@@ -3218,11 +3412,11 @@ function CheckInPopup({ checkIns, content, seenToday, onSeen, onNavigate }) {
         border: `2px solid var(--${C})`,
         borderRadius: 20,
         width: "100%",
-        maxWidth: 460,
+        maxWidth: 480,
         boxShadow: "0 32px 80px rgba(0,0,0,0.8)",
         overflow: "hidden",
       }}>
-        {/* Header strip */}
+        {/* Header */}
         <div style={{ background: `var(--${C}-dim)`, borderBottom: `1px solid var(--border)`, padding: "20px 24px", display: "flex", alignItems: "center", gap: 14 }}>
           <div style={{ width: 52, height: 52, borderRadius: 14, background: "var(--bg2)", border: `2px solid var(--${C})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, flexShrink: 0 }}>
             {ci.icon || typeInfo.icon}
@@ -3238,7 +3432,7 @@ function CheckInPopup({ checkIns, content, seenToday, onSeen, onNavigate }) {
 
         <div style={{ padding: "22px 24px" }}>
           {ci.subtitle && (
-            <p style={{ fontSize: 13, color: "var(--muted)", lineHeight: 1.65, marginBottom: 20, fontStyle: "italic" }}>{ci.subtitle}</p>
+            <p style={{ fontSize: 14, color: "var(--muted)", lineHeight: 1.75, marginBottom: 20 }}>{ci.subtitle}</p>
           )}
 
           {!submitted ? (
@@ -3259,7 +3453,7 @@ function CheckInPopup({ checkIns, content, seenToday, onSeen, onNavigate }) {
                       }}>{n}</button>
                     ))}
                   </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "var(--muted)", padding: "0 4px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--muted)", padding: "0 4px" }}>
                     <span>Not great</span><span>Doing great</span>
                   </div>
                 </div>
@@ -3270,11 +3464,11 @@ function CheckInPopup({ checkIns, content, seenToday, onSeen, onNavigate }) {
                 <div style={{ display: "flex", gap: 12, marginBottom: 24 }}>
                   {["yes", "no"].map(opt => (
                     <button key={opt} onClick={() => setAnswer(opt)} style={{
-                      flex: 1, padding: "16px", borderRadius: "var(--r-lg)",
+                      flex: 1, padding: "18px", borderRadius: "var(--r-lg)",
                       border: `2px solid ${answer === opt ? `var(--${C})` : "var(--border)"}`,
                       background: answer === opt ? `var(--${C}-dim)` : "var(--bg3)",
                       color: answer === opt ? `var(--${C})` : "var(--cream-dim)",
-                      fontFamily: "var(--font-body)", fontSize: 15, fontWeight: 700,
+                      fontFamily: "var(--font-body)", fontSize: 16, fontWeight: 700,
                       cursor: "pointer", transition: "all 0.15s",
                     }}>{opt === "yes" ? "👍 Yes" : "👎 No"}</button>
                   ))}
@@ -3283,19 +3477,19 @@ function CheckInPopup({ checkIns, content, seenToday, onSeen, onNavigate }) {
 
               {/* MULTIPLE CHOICE */}
               {ci.answerFormat === "multiple_choice" && (
-                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 24 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 24 }}>
                   {(ci.choices || []).map((choice, i) => (
                     <button key={i} onClick={() => setAnswer(i)} style={{
-                      padding: "13px 16px", borderRadius: "var(--r)",
+                      padding: "14px 16px", borderRadius: "var(--r)",
                       border: `2px solid ${answer === i ? `var(--${C})` : "var(--border)"}`,
                       background: answer === i ? `var(--${C}-dim)` : "var(--bg3)",
                       color: answer === i ? `var(--${C})` : "var(--cream-dim)",
-                      fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 500,
+                      fontFamily: "var(--font-body)", fontSize: 15, fontWeight: 500,
                       cursor: "pointer", transition: "all 0.15s", textAlign: "left",
                       display: "flex", alignItems: "center", gap: 12,
                     }}>
                       <span style={{
-                        width: 20, height: 20, borderRadius: "50%", flexShrink: 0,
+                        width: 22, height: 22, borderRadius: "50%", flexShrink: 0,
                         border: `2px solid ${answer === i ? `var(--${C})` : "var(--border)"}`,
                         background: answer === i ? `var(--${C})` : "transparent",
                         display: "inline-flex", alignItems: "center", justifyContent: "center",
@@ -3313,56 +3507,79 @@ function CheckInPopup({ checkIns, content, seenToday, onSeen, onNavigate }) {
               {ci.answerFormat === "text" && (
                 <div style={{ marginBottom: 24 }}>
                   <textarea className="input textarea" value={textAnswer} onChange={e => setTextAnswer(e.target.value)}
-                    placeholder="Write your answer here…" style={{ minHeight: 110 }} autoFocus />
+                    placeholder="Write your answer here…" style={{ minHeight: 110, fontSize: 15, lineHeight: 1.75 }} autoFocus />
                 </div>
               )}
 
               {/* FACT / NO RESPONSE */}
               {ci.answerFormat === "none" && (
-                <div style={{ padding: "16px 18px", background: "var(--bg3)", border: `1px solid var(--${C})`, borderRadius: "var(--r-lg)", marginBottom: 24, fontSize: 14, color: "var(--cream-dim)", lineHeight: 1.8 }}>
+                <div style={{ padding: "16px 18px", background: "var(--bg3)", border: `1px solid var(--${C})`, borderRadius: "var(--r-lg)", marginBottom: 24, fontSize: 15, color: "var(--cream-dim)", lineHeight: 1.75 }}>
                   {ci.factContent || ci.title}
                 </div>
               )}
 
-              <button className="btn btn-primary" style={{ width: "100%", padding: "13px" }} onClick={handleSubmit} disabled={!canSubmit()}>
-                {ci.answerFormat === "none" ? "Got it! 👋" : "Submit →"}
+              <button className="btn btn-primary" style={{ width: "100%", padding: "14px", fontSize: 15 }} onClick={handleSubmit} disabled={!canSubmit()}>
+                {ci.answerFormat === "none" ? "Got it 👋" : "Submit →"}
               </button>
-              <button className="btn btn-ghost btn-sm" style={{ width: "100%", marginTop: 8 }}
-                onClick={advance}>
+              <button className="btn btn-ghost btn-sm" style={{ width: "100%", marginTop: 8 }} onClick={advance}>
                 Skip for now
               </button>
             </>
           ) : (
             /* POST-SUBMISSION */
             <>
-              <div style={{ textAlign: "center", padding: "4px 0 22px" }}>
-                <div style={{ fontSize: 36, marginBottom: 8 }}>✓</div>
+              <div style={{ textAlign: "center", padding: "4px 0 20px" }}>
+                <div style={{ fontSize: 32, marginBottom: 8 }}>✓</div>
                 <div style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, color: "var(--cream)" }}>
-                  {ci.answerFormat === "none" ? "Noted!" : "Thanks for sharing!"}
+                  {ci.answerFormat === "none" ? "Noted!" : "Got it — thanks for sharing."}
                 </div>
+                {ci.answerFormat !== "none" && (
+                  <div style={{ fontSize: 14, color: "var(--muted)", marginTop: 6 }}>
+                    You said: <span style={{ color: `var(--${C})`, fontWeight: 600 }}>{getAnswerText()}</span>
+                  </div>
+                )}
               </div>
 
-              {/* Routing recommendations */}
+              {/* Routing recommendations with planner button */}
               {matchedRules.filter(r => r.recommendType !== "none" && r.recommendId).map(rule => {
                 const item = getRecommendedItem(rule);
-                const typeLabels = { skill: "Skill", project: "Project", gig: "Gig", ripple: "Contribution", lightroom: "The Deep Room", teensguide: "Foundations Guide" };
                 if (!item) return null;
+                const isAdded = addedToPlanner[rule.id];
                 return (
                   <div key={rule.id} style={{ background: "var(--bg3)", border: `1px solid var(--${C})`, borderRadius: "var(--r-lg)", padding: "16px 18px", marginBottom: 12 }}>
                     {rule.message && (
-                      <p style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.65, marginBottom: 14 }}>{rule.message}</p>
+                      <p style={{ fontSize: 14, color: "var(--cream-dim)", lineHeight: 1.75, marginBottom: 14 }}>{rule.message}</p>
                     )}
-                    <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: "var(--bg2)", borderRadius: "var(--r)", border: "1px solid var(--border)" }}>
-                      <span style={{ fontSize: 22, flexShrink: 0 }}>{item.icon || "◈"}</span>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: 2, color: `var(--${C})`, fontWeight: 700, marginBottom: 2 }}>
-                          {typeLabels[rule.recommendType]}
-                        </div>
-                        <div style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 700, color: "var(--cream)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                          {item.name || item.title}
+                    <div style={{ background: "var(--bg2)", borderRadius: "var(--r)", border: "1px solid var(--border)", overflow: "hidden" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px" }}>
+                        <span style={{ fontSize: 22, flexShrink: 0 }}>{item.icon || "◈"}</span>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: 2, color: `var(--${C})`, fontWeight: 700, marginBottom: 2 }}>
+                            {typeLabels[rule.recommendType]}
+                          </div>
+                          <div style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 700, color: "var(--cream)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {item.name || item.title}
+                          </div>
                         </div>
                       </div>
-                      <button className="btn btn-primary btn-sm" onClick={() => handleNavigate(rule)}>Go →</button>
+                      <div style={{ display: "flex", gap: 8, padding: "10px 14px", borderTop: "1px solid var(--border)", background: "var(--bg3)" }}>
+                        <button
+                          onClick={() => handleAddToPlanner(rule, item)}
+                          disabled={isAdded}
+                          style={{
+                            flex: 1, padding: "9px 12px", borderRadius: "var(--r)",
+                            border: `1px solid ${isAdded ? "var(--sage)" : "var(--border)"}`,
+                            background: isAdded ? "var(--sage-dim)" : "var(--bg2)",
+                            color: isAdded ? "var(--sage)" : "var(--cream-dim)",
+                            fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 600,
+                            cursor: isAdded ? "default" : "pointer", transition: "all 0.15s",
+                          }}>
+                          {isAdded ? "✓ Added to planner" : "📅 Add to my planner"}
+                        </button>
+                        <button className="btn btn-primary btn-sm" onClick={() => handleNavigate(rule)}>
+                          Go now →
+                        </button>
+                      </div>
                     </div>
                   </div>
                 );
@@ -3370,13 +3587,13 @@ function CheckInPopup({ checkIns, content, seenToday, onSeen, onNavigate }) {
 
               {/* Message-only rules */}
               {matchedRules.filter(r => r.message && (r.recommendType === "none" || !r.recommendId)).map(rule => (
-                <div key={rule.id + "_m"} style={{ background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: "var(--r)", padding: "14px 16px", marginBottom: 10, fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.65 }}>
+                <div key={rule.id + "_m"} style={{ background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: "var(--r)", padding: "14px 16px", marginBottom: 10, fontSize: 14, color: "var(--cream-dim)", lineHeight: 1.75 }}>
                   {rule.message}
                 </div>
               ))}
 
               <button className="btn btn-ghost" style={{ width: "100%", marginTop: 4 }} onClick={advance}>
-                {isLast ? "Close" : "Next →"}
+                {isLast ? "Done for now" : "Next question →"}
               </button>
             </>
           )}
@@ -5284,6 +5501,7 @@ function TeacherApp({ content, setContent, studentAccounts, setStudentAccounts, 
       { id: "habits", label: "Rhythms", icon: "🔁" },
       { id: "messages", label: "Messages", icon: "✉️", badge: unreadMsgCount > 0 ? unreadMsgCount : null },
       { id: "students", label: "Progress", icon: "👥" },
+      { id: "answerlog", label: "Answer Log", icon: "🔭" },
       { id: "approvals", label: "Portfolio Witness", icon: "✅", badge: pendingCount > 0 ? pendingCount : null },
     ]},
     { section: "settings", items: [{ id: "settings", label: "Settings", icon: "⚙️" }] }];
@@ -5306,6 +5524,7 @@ function TeacherApp({ content, setContent, studentAccounts, setStudentAccounts, 
       case "accounts": return <TeacherStudentAccounts accounts={studentAccounts} setAccounts={setStudentAccounts} />;
       case "profileqs": return <ProfileQuestionsManager questions={content.profileQuestions || []} setQuestions={setContentKey("profileQuestions")} content={content} />;
       case "students": return <TeacherStudents students={studentAccounts} content={content} />;
+      case "answerlog": return <AnswerLog students={studentAccounts} checkIns={content.checkIns || []} content={content} />;
       case "approvals": return <TeacherApprovals approvals={approvals} setApprovals={setApprovals} />;
       case "settings": return <TeacherSettings teacherPassword={teacherPassword} setTeacherPassword={setTeacherPassword} />;
       default: return null;
@@ -5529,7 +5748,7 @@ function DashboardWorkItem({ item, meta, isDone, onDone, onUncomplete, content }
 
 // ─── STUDENT: DASHBOARD ───────────────────────────────────────────────────────
 
-function StudentDashboard({ student, completed, points, content, weekPlan, grabbedGigs, onNavigate, boards, setBoards, saveToBoard, onDone, onUncomplete, journalEntries, habitDefs, habitLogs, setHabitLogs, goals, messages, taskDefs, taskLogs, setTaskLogs, dailyPlan, completionDates }) {
+function StudentDashboard({ student, completed, points, content, weekPlan, grabbedGigs, onNavigate, boards, setBoards, saveToBoard, onDone, onUncomplete, journalEntries, habitDefs, habitLogs, setHabitLogs, goals, messages, taskDefs, taskLogs, setTaskLogs, dailyPlan, completionDates, checkInAnswers }) {
   const pct = Math.round((points / Math.max(1, content.areas.reduce((a,b)=>a+(b.target||0),0))) * 100);
   const todayDrop = content.dailyDrops.find(d => d.date === todayStr()) || null;
   const myInterests = student.interests || [];
@@ -5607,6 +5826,55 @@ function StudentDashboard({ student, completed, points, content, weekPlan, grabb
             </div>
           )}
         </div>
+
+        {/* ── Today's Thread — persists today's check-in answer and recommendation ── */}
+        {(() => {
+          const todayAnswers = (checkInAnswers || []).filter(a => a.date === todayStr());
+          if (todayAnswers.length === 0) return null;
+          const latest = todayAnswers[0];
+          const hasRec = (latest.matchedRules || []).some(r => r.recommendType && r.recommendType !== "none" && r.recommendId);
+          const firstRec = hasRec ? (latest.matchedRules || []).find(r => r.recommendType && r.recommendType !== "none" && r.recommendId) : null;
+          const recItem = firstRec ? (() => {
+            const map = { skill: content.skills, project: content.projects, gig: content.gigs, ripple: content.ripple, lightroom: content.lightRoom, teensguide: content.teensGuide };
+            return (map[firstRec.recommendType] || []).find(i => i.id === firstRec.recommendId) || null;
+          })() : null;
+          const recNavMap = { skill: "skills", project: "projects", gig: "factions", ripple: "ripple", lightroom: "lightroom", teensguide: "teensguide" };
+          const typeLabel = { skill: "Skill", project: "Project", gig: "Guild Gig", ripple: "Contribution", lightroom: "Deep Room", teensguide: "Foundations" }[firstRec?.recommendType] || "";
+          return (
+            <div className="card mb-20" style={{ borderColor: "rgba(0,229,168,0.3)", background: "rgba(0,229,168,0.04)" }}>
+              <div className="flex-between mb-10">
+                <div className="flex-center gap-8">
+                  <span style={{ fontSize: 16 }}>🔭</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--sage)" }}>Today's Thread</span>
+                </div>
+                <span style={{ fontSize: 12, color: "var(--muted)" }}>From your check-in today</span>
+              </div>
+              <p style={{ fontSize: 15, color: "var(--muted)", lineHeight: 1.65, margin: "0 0 8px" }}>{latest.question}</p>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "var(--sage-dim)", border: "1px solid rgba(0,229,168,0.3)", borderRadius: 20, padding: "5px 14px", marginBottom: recItem ? 14 : 0 }}>
+                <span style={{ fontSize: 14, color: "var(--sage)", fontWeight: 600 }}>You said: {latest.answerText}</span>
+              </div>
+              {firstRec?.message && (
+                <p style={{ fontSize: 14, color: "var(--cream-dim)", lineHeight: 1.75, margin: "10px 0 12px" }}>{firstRec.message}</p>
+              )}
+              {recItem && (
+                <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: "var(--bg3)", borderRadius: "var(--r)", border: "1px solid var(--border)" }}>
+                  <span style={{ fontSize: 22, flexShrink: 0 }}>{recItem.icon || "◈"}</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 10, color: "var(--sage)", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 2 }}>{typeLabel}</div>
+                    <div style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 700, color: "var(--cream)" }}>{recItem.name || recItem.title}</div>
+                    {recItem.desc && <div style={{ fontSize: 13, color: "var(--muted)", marginTop: 2, lineHeight: 1.5, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{String(recItem.desc).substring(0, 80)}…</div>}
+                  </div>
+                  <button className="btn btn-sage btn-sm" onClick={() => onNavigate(recNavMap[firstRec.recommendType] || "skills")}>
+                    Go →
+                  </button>
+                </div>
+              )}
+              {todayAnswers.length > 1 && (
+                <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 10 }}>+{todayAnswers.length - 1} more check-in{todayAnswers.length > 2 ? "s" : ""} today</div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* ── Card 2: One Suggestion ── */}
         <div className="card mb-20" style={{ borderColor: "rgba(0,212,255,0.2)", background: "var(--amber-dim)" }}>
@@ -6156,17 +6424,30 @@ function WeeklyPlanner({ content, completed, weekPlan, setWeekPlan, dailyPlan, s
 
 // ─── STUDENT: SKILL EXPLORER ──────────────────────────────────────────────────
 
-function SkillExplorer({ student, completed, content, onDone, onUncomplete, onSubmitApproval, boards, saveToBoard, submissions, setSubmission }) {
+function SkillExplorer({ student, setStudent, completed, content, onDone, onUncomplete, onSubmitApproval, boards, saveToBoard, submissions, setSubmission }) {
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState(null);
   const [approvalNotes, setApprovalNotes] = useState("");
   const [showApproval, setShowApproval] = useState(false);
-  const [openAreas, setOpenAreas] = useState({});   // area.id → bool, default true
-  const [openSubcats, setOpenSubcats] = useState({}); // "areaId:subcatId" → bool, default true
+  const [openAreas, setOpenAreas] = useState({});
+  const [openSubcats, setOpenSubcats] = useState({});
+  const [quickInterests, setQuickInterests] = useState([]);
+  const [showAllQuick, setShowAllQuick] = useState(false);
 
   const skills = content.skills;
   const myInterests = student.interests || [];
+
+  const setQuickInterest = (id) => {
+    setQuickInterests(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  };
+
+  const saveQuickInterests = () => {
+    if (setStudent && quickInterests.length > 0) {
+      setStudent(prev => ({ ...prev, interests: [...new Set([...(prev.interests || []), ...quickInterests])] }));
+      setQuickInterests([]);
+    }
+  };
 
   const filtered = skills.filter(s => {
     const matchArea = filter === "all" || filter === "interest" && s.interests?.some(i => myInterests.includes(i)) || s.area === filter;
@@ -6291,6 +6572,130 @@ function SkillExplorer({ student, completed, content, onDone, onUncomplete, onSu
         <p className="page-sub">{skills.length} skills · {completed.filter(id => skills.find(s => s.id === id)).length} evidenced so far</p>
       </div>
       <div className="page-content">
+
+        {/* ── FOR YOU section ── */}
+        {(() => {
+          if (myInterests.length === 0) {
+            // No interests set — warm invitation
+            return (
+              <div className="card mb-20" style={{ borderColor: "rgba(0,212,255,0.25)", background: "var(--amber-dim)" }}>
+                <div style={{ fontFamily: "var(--font-display)", fontSize: 17, fontWeight: 700, color: "var(--amber)", marginBottom: 8 }}>
+                  ✦ Make this library yours
+                </div>
+                <p style={{ fontSize: 16, color: "var(--cream-dim)", lineHeight: 1.75, marginBottom: 16, margin: "0 0 16px" }}>
+                  Tell Forge what you're into and we'll put the most relevant skills up front. Takes 30 seconds.
+                </p>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
+                  {INTERESTS.slice(0, 8).map(int => (
+                    <button key={int.id} onClick={() => setQuickInterest(int.id)}
+                      className={`interest-chip ${quickInterests.includes(int.id) ? "selected" : ""}`}>
+                      {int.icon} {int.label}
+                    </button>
+                  ))}
+                  <button onClick={() => setShowAllQuick(p => !p)}
+                    style={{ padding: "9px 15px", borderRadius: 30, border: "1.5px solid var(--border)", background: "var(--bg2)", color: "var(--muted)", cursor: "pointer", fontSize: 13 }}>
+                    {showAllQuick ? "Show less ▲" : "More… ▼"}
+                  </button>
+                </div>
+                {showAllQuick && (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
+                    {INTERESTS.slice(8).map(int => (
+                      <button key={int.id} onClick={() => setQuickInterest(int.id)}
+                        className={`interest-chip ${quickInterests.includes(int.id) ? "selected" : ""}`}>
+                        {int.icon} {int.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {quickInterests.length > 0 && (
+                  <button className="btn btn-primary" onClick={saveQuickInterests}>
+                    Show me what matches ({quickInterests.length} selected) →
+                  </button>
+                )}
+              </div>
+            );
+          }
+
+          // Interests set — show matched skills
+          const matchedSkills = skills.filter(s =>
+            s.interests?.some(i => myInterests.includes(i)) && !completed.includes(s.id)
+          );
+          const completedMatched = skills.filter(s =>
+            s.interests?.some(i => myInterests.includes(i)) && completed.includes(s.id)
+          );
+
+          if (matchedSkills.length === 0 && completedMatched.length === 0) return null;
+
+          // Show up to 6, prioritize ones with multiple interest matches
+          const scored = matchedSkills.map(s => ({
+            ...s,
+            matchCount: (s.interests || []).filter(i => myInterests.includes(i)).length,
+            matchedLabels: (s.interests || []).filter(i => myInterests.includes(i)).map(id => INTERESTS.find(x => x.id === id)).filter(Boolean),
+          })).sort((a, b) => b.matchCount - a.matchCount).slice(0, 6);
+
+          return (
+            <div className="mb-24">
+              <div className="flex-between mb-14">
+                <div>
+                  <div style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, color: "var(--cream)", marginBottom: 4 }}>
+                    ✦ For You
+                  </div>
+                  <div style={{ fontSize: 14, color: "var(--muted)", lineHeight: 1.65 }}>
+                    Skills that connect to your interests
+                    {myInterests.slice(0, 3).map(id => {
+                      const int = INTERESTS.find(x => x.id === id);
+                      return int ? (
+                        <span key={id} className={`tag tag-${int.color}`} style={{ marginLeft: 6, fontSize: 11 }}>{int.icon} {int.label}</span>
+                      ) : null;
+                    })}
+                    {myInterests.length > 3 && <span style={{ fontSize: 12, color: "var(--muted)", marginLeft: 6 }}>+{myInterests.length - 3} more</span>}
+                  </div>
+                </div>
+                <button className="btn btn-ghost btn-xs" onClick={() => setFilter("interest")}>See all matched →</button>
+              </div>
+
+              {scored.length === 0 ? (
+                <div style={{ padding: "20px", background: "var(--bg3)", borderRadius: "var(--r-lg)", border: "1px solid var(--border)", textAlign: "center" }}>
+                  <p style={{ fontSize: 15, color: "var(--muted)", margin: 0 }}>You've evidenced everything matched to your interests — check the full library for more.</p>
+                </div>
+              ) : (
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 12 }}>
+                  {scored.map(skill => (
+                    <div key={skill.id} onClick={() => setSelected(skill)}
+                      style={{ background: "var(--bg2)", border: "1px solid rgba(0,212,255,0.2)", borderRadius: "var(--r-lg)", padding: "16px", cursor: "pointer", transition: "all 0.15s", position: "relative", overflow: "hidden" }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--amber)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(0,212,255,0.2)"; e.currentTarget.style.transform = "translateY(0)"; }}>
+                      {/* Top accent */}
+                      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg, var(--amber), var(--amber-soft))" }} />
+                      <div className="flex-between mb-10" style={{ marginTop: 4 }}>
+                        <span style={{ fontSize: 26 }}>{skill.icon}</span>
+                        <span className="pts-badge" style={{ fontSize: 11 }}>⭐ {skill.pts} pts</span>
+                      </div>
+                      <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, color: "var(--cream)", marginBottom: 6, lineHeight: 1.3 }}>{skill.name}</div>
+                      <p style={{ fontSize: 13, color: "var(--muted)", lineHeight: 1.65, margin: "0 0 10px" }}>{skill.desc?.substring(0, 80)}{skill.desc?.length > 80 ? "…" : ""}</p>
+                      {/* Why this was matched */}
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                        {skill.matchedLabels.slice(0, 3).map(int => (
+                          <span key={int.id} className={`tag tag-${int.color}`} style={{ fontSize: 10 }}>{int.icon} {int.label}</span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {completedMatched.length > 0 && (
+                <div style={{ marginTop: 12, fontSize: 13, color: "var(--muted)" }}>
+                  ✓ You've already evidenced {completedMatched.length} matched skill{completedMatched.length !== 1 ? "s" : ""} — nice work.
+                </div>
+              )}
+
+              <div style={{ height: 1, background: "var(--border)", margin: "24px 0" }} />
+            </div>
+          );
+        })()}
+
+        {/* ── Browse section ── */}
         <div className="flex gap-10 mb-16">
           <div className="search-bar" style={{ flex: 1, marginBottom: 0 }}>
             <span style={{ color: "var(--muted)" }}>🔍</span>
@@ -6300,7 +6705,7 @@ function SkillExplorer({ student, completed, content, onDone, onUncomplete, onSu
 
         {/* Area filter pills */}
         <div className="filter-row">
-          {[{ id: "all", label: "All Skills", icon: "" }, { id: "interest", label: "My Interests ✦", icon: "" }, ...content.areas].map(a => (
+          {[{ id: "all", label: "All Skills", icon: "" }, ...(myInterests.length > 0 ? [{ id: "interest", label: "My Interests ✦", icon: "" }] : []), ...content.areas].map(a => (
             <button key={a.id} className={`filter-btn ${filter === a.id ? "active" : ""}`} onClick={() => setFilter(a.id)}>
               {a.icon && `${a.icon} `}{a.label || a.name}
             </button>
@@ -6325,7 +6730,7 @@ function SkillExplorer({ student, completed, content, onDone, onUncomplete, onSu
                         </div>
                         <div style={{ fontWeight: 600, fontSize: 14, color: "var(--cream)", marginBottom: 4 }}>{skill.name}</div>
                         <div style={{ fontSize: 12, color: "var(--muted)", lineHeight: 1.5 }}>{skill.desc?.substring(0, 70)}…</div>
-                        {isDone && <div style={{ marginTop: 8, color: "var(--sage)", fontSize: 12, fontWeight: 600 }}>✓ Mastered</div>}
+                        {isDone && <div style={{ marginTop: 8, color: "var(--sage)", fontSize: 12, fontWeight: 600 }}>✓ Evidenced</div>}
                       </div>
                     );
                   })}
@@ -6359,20 +6764,16 @@ function SkillExplorer({ student, completed, content, onDone, onUncomplete, onSu
                 const color = `var(${area.color || "--amber"})`;
                 const doneCount = areaSkills.filter(s => completed.includes(s.id)).length;
                 const pct = areaSkills.length > 0 ? Math.round((doneCount / areaSkills.length) * 100) : 0;
-                const isAreaOpen = openAreas[area.id] === true; // default collapsed
+                const isAreaOpen = openAreas[area.id] === true;
                 return (
                   <div key={area.id} style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: "var(--r-lg)", overflow: "hidden" }}>
-                    {/* Area header — click to collapse */}
                     <div onClick={() => setOpenAreas(p => ({ ...p, [area.id]: !isAreaOpen }))}
                       style={{ padding: "14px 20px", cursor: "pointer", display: "flex", alignItems: "center", gap: 12, userSelect: "none", background: isAreaOpen ? "var(--bg3)" : "var(--bg2)", transition: "background 0.15s" }}>
                       <div style={{ width: 36, height: 36, borderRadius: "50%", background: color + "22", border: `2px solid ${color}55`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{area.icon}</div>
                       <div style={{ flex: 1 }}>
                         <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 17, color: "var(--cream)" }}>{area.name}</div>
-                        <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 2 }}>
-                          {areaSkills.length} skill{areaSkills.length !== 1 ? "s" : ""} · {doneCount} mastered
-                        </div>
+                        <div style={{ fontSize: 13, color: "var(--muted)", marginTop: 2 }}>{areaSkills.length} skill{areaSkills.length !== 1 ? "s" : ""} · {doneCount} evidenced</div>
                       </div>
-                      {/* Progress mini bar */}
                       <div style={{ textAlign: "right", minWidth: 80 }}>
                         <div style={{ fontSize: 13, fontWeight: 700, color, fontFamily: "var(--font-display)" }}>{pct}%</div>
                         <div style={{ width: 80, height: 4, background: "var(--border)", borderRadius: 4, marginTop: 4, overflow: "hidden" }}>
@@ -6382,7 +6783,6 @@ function SkillExplorer({ student, completed, content, onDone, onUncomplete, onSu
                       <span style={{ color: "var(--muted)", fontSize: 14, marginLeft: 6 }}>{isAreaOpen ? "▲" : "▼"}</span>
                     </div>
 
-                    {/* Subcategories */}
                     {isAreaOpen && (
                       <div>
                         {(() => {
@@ -6394,7 +6794,6 @@ function SkillExplorer({ student, completed, content, onDone, onUncomplete, onSu
                             const isScOpen = openSubcats[area.id + ":" + sc.id] === true;
                             rows.push(
                               <div key={sc.id} style={{ borderTop: "1px solid var(--border)" }}>
-                                {/* Subcat header */}
                                 <div onClick={() => setOpenSubcats(p => ({ ...p, [area.id + ":" + sc.id]: !isScOpen }))}
                                   style={{ padding: "10px 20px 10px 56px", cursor: "pointer", display: "flex", alignItems: "center", gap: 10, background: "var(--bg3)", userSelect: "none" }}>
                                   <span style={{ fontSize: 10, color, fontWeight: 800 }}>◆</span>
@@ -6402,20 +6801,24 @@ function SkillExplorer({ student, completed, content, onDone, onUncomplete, onSu
                                   <span style={{ fontSize: 11, color: "var(--muted)" }}>{scDone}/{scSkills.length}</span>
                                   <span style={{ color: "var(--muted)", fontSize: 12 }}>{isScOpen ? "▲" : "▼"}</span>
                                 </div>
-                                {/* Skills grid */}
                                 {isScOpen && (
                                   <div style={{ padding: "12px 16px 12px 52px", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 10 }}>
                                     {scSkills.map(skill => {
                                       const isDone = completed.includes(skill.id);
+                                      const isMatched = myInterests.length > 0 && skill.interests?.some(i => myInterests.includes(i));
                                       return (
-                                        <div key={skill.id} className={`skill-card ${isDone ? "done" : ""}`} onClick={() => setSelected(skill)}>
+                                        <div key={skill.id} className={`skill-card ${isDone ? "done" : ""}`} onClick={() => setSelected(skill)}
+                                          style={isMatched ? { borderColor: "rgba(0,212,255,0.35)" } : {}}>
                                           <div className="flex-between mb-6">
                                             <span style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 700, color }}>{skill.pts}</span>
-                                            <span style={{ fontSize: 20 }}>{skill.icon}</span>
+                                            <div className="flex-center gap-4">
+                                              {isMatched && <span style={{ fontSize: 10, color: "var(--amber)", fontWeight: 700 }}>✦</span>}
+                                              <span style={{ fontSize: 20 }}>{skill.icon}</span>
+                                            </div>
                                           </div>
                                           <div style={{ fontWeight: 600, fontSize: 13, color: "var(--cream)", marginBottom: 4 }}>{skill.name}</div>
                                           <div style={{ fontSize: 11, color: "var(--muted)", lineHeight: 1.5 }}>{skill.desc?.substring(0, 65)}…</div>
-                                          {isDone && <div style={{ marginTop: 8, color: "var(--sage)", fontSize: 11, fontWeight: 600 }}>✓ Mastered</div>}
+                                          {isDone && <div style={{ marginTop: 8, color: "var(--sage)", fontSize: 11, fontWeight: 600 }}>✓ Evidenced</div>}
                                         </div>
                                       );
                                     })}
@@ -6424,7 +6827,6 @@ function SkillExplorer({ student, completed, content, onDone, onUncomplete, onSu
                               </div>
                             );
                           });
-                          // Uncategorized
                           const uncatSkills = subcatMap["__none__"] || [];
                           if (uncatSkills.length > 0) {
                             const isScOpen = openSubcats[area.id + ":__none__"] === true;
@@ -6432,8 +6834,8 @@ function SkillExplorer({ student, completed, content, onDone, onUncomplete, onSu
                               <div key="__none__" style={{ borderTop: "1px solid var(--border)" }}>
                                 <div onClick={() => setOpenSubcats(p => ({ ...p, [area.id + ":__none__"]: !isScOpen }))}
                                   style={{ padding: "10px 20px 10px 56px", cursor: "pointer", display: "flex", alignItems: "center", gap: 10, background: "var(--bg3)", userSelect: "none" }}>
-                                  <span style={{ fontSize: 10, color: "var(--muted)", fontWeight: 800 }}>◆</span>
-                                  <span style={{ flex: 1, fontSize: 13, fontWeight: 600, color: "var(--muted)", textTransform: "uppercase", letterSpacing: 1 }}>General</span>
+                                  <span style={{ fontSize: 10, color, fontWeight: 800 }}>◆</span>
+                                  <span style={{ flex: 1, fontSize: 13, fontWeight: 600, color: "var(--cream-dim)", textTransform: "uppercase", letterSpacing: 1 }}>General</span>
                                   <span style={{ fontSize: 11, color: "var(--muted)" }}>{uncatSkills.filter(s => completed.includes(s.id)).length}/{uncatSkills.length}</span>
                                   <span style={{ color: "var(--muted)", fontSize: 12 }}>{isScOpen ? "▲" : "▼"}</span>
                                 </div>
@@ -6441,15 +6843,20 @@ function SkillExplorer({ student, completed, content, onDone, onUncomplete, onSu
                                   <div style={{ padding: "12px 16px 12px 52px", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 10 }}>
                                     {uncatSkills.map(skill => {
                                       const isDone = completed.includes(skill.id);
+                                      const isMatched = myInterests.length > 0 && skill.interests?.some(i => myInterests.includes(i));
                                       return (
-                                        <div key={skill.id} className={`skill-card ${isDone ? "done" : ""}`} onClick={() => setSelected(skill)}>
+                                        <div key={skill.id} className={`skill-card ${isDone ? "done" : ""}`} onClick={() => setSelected(skill)}
+                                          style={isMatched ? { borderColor: "rgba(0,212,255,0.35)" } : {}}>
                                           <div className="flex-between mb-6">
-                                            <span style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 700, color: areaColor(skill.area, content.areas) }}>{skill.pts}</span>
-                                            <span style={{ fontSize: 20 }}>{skill.icon}</span>
+                                            <span style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 700, color }}>{skill.pts}</span>
+                                            <div className="flex-center gap-4">
+                                              {isMatched && <span style={{ fontSize: 10, color: "var(--amber)", fontWeight: 700 }}>✦</span>}
+                                              <span style={{ fontSize: 20 }}>{skill.icon}</span>
+                                            </div>
                                           </div>
                                           <div style={{ fontWeight: 600, fontSize: 13, color: "var(--cream)", marginBottom: 4 }}>{skill.name}</div>
                                           <div style={{ fontSize: 11, color: "var(--muted)", lineHeight: 1.5 }}>{skill.desc?.substring(0, 65)}…</div>
-                                          {isDone && <div style={{ marginTop: 8, color: "var(--sage)", fontSize: 11, fontWeight: 600 }}>✓ Mastered</div>}
+                                          {isDone && <div style={{ marginTop: 8, color: "var(--sage)", fontSize: 11, fontWeight: 600 }}>✓ Evidenced</div>}
                                         </div>
                                       );
                                     })}
@@ -8177,8 +8584,9 @@ function MyProfile({ student, setStudent, content }) {
     setAnswers(p => ({ ...p, pq_strengths: cur.includes(s) ? cur.filter(x => x !== s) : [...cur, s] }));
   };
 
+  const [unlockedSkills, setUnlockedSkills] = useState([]);
+
   const handleSave = () => {
-    // Collect routing recommendations
     const recs = [];
     questions.forEach(q => {
       const ans = answers[q.id];
@@ -8197,9 +8605,19 @@ function MyProfile({ student, setStudent, content }) {
       });
     });
 
-    // Update student: merge interests/strengths from dedicated question types
+    const prevInterests = student.interests || [];
     const interestAns = answers["pq_interests"] ?? student.interests ?? [];
     const strengthAns = answers["pq_strengths"] ?? student.strengths ?? [];
+
+    // Compute newly unlocked skills — matched to newly added interests
+    const newInterests = interestAns.filter(i => !prevInterests.includes(i));
+    const newly = newInterests.length > 0
+      ? content.skills.filter(s =>
+          s.interests?.some(i => newInterests.includes(i)) &&
+          !(student.completed || []).includes(s.id)
+        ).slice(0, 4)
+      : [];
+
     setStudent(prev => ({
       ...prev,
       profileAnswers: answers,
@@ -8207,6 +8625,7 @@ function MyProfile({ student, setStudent, content }) {
       strengths: strengthAns,
     }));
     setRecommendations(recs);
+    setUnlockedSkills(newly);
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   };
@@ -8241,9 +8660,45 @@ function MyProfile({ student, setStudent, content }) {
           </div>
           <div>
             <div style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 700, color: "var(--cream)" }}>{student.name}</div>
-            <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 2 }}>@{student.username} · {(student.completed || []).length} items completed · {student.points || 0} pts</div>
+            <div style={{ fontSize: 13, color: "var(--muted)", marginTop: 2 }}>@{student.username} · {(student.completed || []).length} items logged · {student.points || 0} pts</div>
           </div>
         </div>
+
+        {/* What just unlocked — appears after saving new interests */}
+        {unlockedSkills.length > 0 && (
+          <div className="card mb-20" style={{ borderColor: "rgba(0,229,168,0.4)", background: "rgba(0,229,168,0.04)" }}>
+            <div className="flex-center gap-8 mb-12">
+              <span style={{ fontSize: 20 }}>✦</span>
+              <div style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, color: "var(--sage)" }}>
+                Here's what just opened up for you
+              </div>
+            </div>
+            <p style={{ fontSize: 15, color: "var(--cream-dim)", lineHeight: 1.75, marginBottom: 16 }}>
+              These skills match your interests — they're now in your "For You" section in the Skill Library.
+            </p>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 10 }}>
+              {unlockedSkills.map(skill => {
+                const matchedLabels = (skill.interests || [])
+                  .filter(i => (answers["pq_interests"] || student.interests || []).includes(i))
+                  .map(id => INTERESTS.find(x => x.id === id)).filter(Boolean);
+                return (
+                  <div key={skill.id} style={{ background: "var(--bg3)", border: "1px solid rgba(0,229,168,0.25)", borderRadius: "var(--r)", padding: "14px 16px" }}>
+                    <div className="flex-center gap-10 mb-8">
+                      <span style={{ fontSize: 22 }}>{skill.icon}</span>
+                      <div style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 700, color: "var(--cream)", lineHeight: 1.3 }}>{skill.name}</div>
+                    </div>
+                    <p style={{ fontSize: 13, color: "var(--muted)", lineHeight: 1.65, margin: "0 0 8px" }}>{skill.desc?.substring(0, 70)}…</p>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                      {matchedLabels.slice(0, 2).map(int => (
+                        <span key={int.id} className={`tag tag-${int.color}`} style={{ fontSize: 10 }}>{int.icon} {int.label}</span>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Profile questions */}
         {questions.length === 0 ? (
@@ -8521,6 +8976,7 @@ function StudentApp({ student, setStudent, content, messages, setMessages, onSwi
   const [habitLogs, setHabitLogs] = useState(student.habitLogs || {});
   const [taskLogs, setTaskLogs] = useState(student.taskLogs || {});
   const [goals, setGoals] = useState(student.goals || []);
+  const [checkInAnswers, setCheckInAnswers] = useState(student.checkInAnswers || []);
   const [savedToast, setSavedToast] = useState(false);
 
   // Auto-save all student state to Firebase whenever it changes
@@ -8533,7 +8989,7 @@ function StudentApp({ student, setStudent, content, messages, setMessages, onSwi
         ...prev,
         completed, points, completionDates, weekPlan, dailyPlan, roadmap, studentFaction,
         grabbedGigs, boards, submissions, portfolioFeatured,
-        journalEntries, habitLogs, taskLogs, goals,
+        journalEntries, habitLogs, taskLogs, goals, checkInAnswers,
       }));
       // Show "Saved!" toast
       setSavedToast(true);
@@ -8543,7 +8999,7 @@ function StudentApp({ student, setStudent, content, messages, setMessages, onSwi
     return () => clearTimeout(saveRef.current);
   }, [completed, points, completionDates, weekPlan, dailyPlan, roadmap, studentFaction,
       grabbedGigs, boards, submissions, portfolioFeatured,
-      journalEntries, habitLogs, taskLogs, goals]);
+      journalEntries, habitLogs, taskLogs, goals, checkInAnswers]);
 
   const saveJournalEntry = useCallback((dropId, entry) => {
     setJournalEntries(prev => ({ ...prev, [dropId]: entry }));
@@ -8551,6 +9007,35 @@ function StudentApp({ student, setStudent, content, messages, setMessages, onSwi
 
   const markCheckInSeen = useCallback((id) => {
     setSeenCheckIns(prev => prev.includes(id) ? prev : [...prev, id]);
+  }, []);
+
+  // Log a check-in answer to student record
+  const logCheckInAnswer = useCallback((checkInId, question, answerText, answerIndex, matchedRules) => {
+    const entry = {
+      id: "ca_" + Date.now(),
+      checkInId,
+      question,
+      answerText,
+      answerIndex,
+      date: todayStr(),
+      matchedRules: matchedRules.map(r => ({ message: r.message, recommendType: r.recommendType, recommendId: r.recommendId })),
+    };
+    setCheckInAnswers(prev => [entry, ...prev].slice(0, 200));
+  }, []);
+
+  // Add a content item to tomorrow's planner slot (or next open weekday)
+  const addToPlanner = useCallback((item, rhythmKey) => {
+    const DAYS = ["Mon","Tue","Wed","Thu","Fri"];
+    const todayIdx = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].indexOf(["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date().getDay()]);
+    const todayDay = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date().getDay()];
+    // Find tomorrow or next weekday
+    const todayPosInWeek = DAYS.indexOf(todayDay);
+    const targetDay = todayPosInWeek >= 0 && todayPosInWeek < 4 ? DAYS[todayPosInWeek + 1] : DAYS[0];
+    setDailyPlan(prev => {
+      const existing = prev[targetDay] || [];
+      if (existing.some(e => e.id === item.id)) return prev;
+      return { ...prev, [targetDay]: [...existing, { id: item.id, rhythmKey }] };
+    });
   }, []);
 
   const setSubmission = useCallback((itemId, updater) => {
@@ -8612,13 +9097,13 @@ function StudentApp({ student, setStudent, content, messages, setMessages, onSwi
 
   const renderView = () => {
     switch (view) {
-      case "dashboard": return <StudentDashboard student={student} completed={completed} points={points} content={content} weekPlan={weekPlan} grabbedGigs={grabbedGigs} onNavigate={setView} boards={boards} setBoards={setBoards} saveToBoard={saveToBoard} onComplete={complete} onUncomplete={uncomplete} journalEntries={journalEntries} habitDefs={content.habitDefs || []} habitLogs={habitLogs} setHabitLogs={setHabitLogs} goals={goals} messages={messages} taskDefs={content.taskDefs || []} taskLogs={taskLogs} setTaskLogs={setTaskLogs} dailyPlan={dailyPlan} completionDates={completionDates} />;
+      case "dashboard": return <StudentDashboard student={student} completed={completed} points={points} content={content} weekPlan={weekPlan} grabbedGigs={grabbedGigs} onNavigate={setView} boards={boards} setBoards={setBoards} saveToBoard={saveToBoard} onComplete={complete} onUncomplete={uncomplete} journalEntries={journalEntries} habitDefs={content.habitDefs || []} habitLogs={habitLogs} setHabitLogs={setHabitLogs} goals={goals} messages={messages} taskDefs={content.taskDefs || []} taskLogs={taskLogs} setTaskLogs={setTaskLogs} dailyPlan={dailyPlan} completionDates={completionDates} checkInAnswers={checkInAnswers} />;
       case "tasks": return <StudentTasksPage taskDefs={content.taskDefs || []} taskLogs={taskLogs} setTaskLogs={setTaskLogs} student={student} onComplete={complete} />;
       case "habits": return <StudentHabitsPage habitDefs={content.habitDefs || []} habitLogs={habitLogs} setHabitLogs={setHabitLogs} student={student} onComplete={complete} />;
       case "goals": return <StudentGoalsPage goals={goals} setGoals={setGoals} />;
       case "messages": return <StudentMessagesPage messages={messages} setMessages={setMessages} studentId={student.id} />;
       case "planner": return <WeeklyPlanner content={content} completed={completed} weekPlan={weekPlan} setWeekPlan={setWeekPlan} onComplete={complete} onUncomplete={uncomplete} dailyPlan={dailyPlan} setDailyPlan={setDailyPlan} />;
-      case "skills": return <SkillExplorer student={student} completed={completed} content={content} onComplete={complete} onUncomplete={uncomplete} onSubmitApproval={submitApproval} boards={boards} saveToBoard={saveToBoard} submissions={submissions} setSubmission={setSubmission} />;
+      case "skills": return <SkillExplorer student={student} setStudent={handleSetStudent} completed={completed} content={content} onComplete={complete} onUncomplete={uncomplete} onSubmitApproval={submitApproval} boards={boards} saveToBoard={saveToBoard} submissions={submissions} setSubmission={setSubmission} />;
       case "projects": return <ProjectLab student={student} completed={completed} content={content} onComplete={complete} onUncomplete={uncomplete} boards={boards} saveToBoard={saveToBoard} submissions={submissions} setSubmission={setSubmission} portfolioFeatured={portfolioFeatured} setPortfolioFeatured={setPortfolioFeatured} />;
       case "factions": return <GuildsView completed={completed} content={content} studentFaction={studentFaction} setStudentFaction={setStudentFaction} grabbed={grabbedGigs} setGrabbed={setGrabbedGigs} onComplete={complete} onUncomplete={uncomplete} boards={boards} saveToBoard={saveToBoard} submissions={submissions} setSubmission={setSubmission} portfolioFeatured={portfolioFeatured} setPortfolioFeatured={setPortfolioFeatured} />;
       case "ripple": return <ContributionMissions completed={completed} content={content} onComplete={complete} onUncomplete={uncomplete} boards={boards} saveToBoard={saveToBoard} />;
@@ -8645,6 +9130,8 @@ function StudentApp({ student, setStudent, content, messages, setMessages, onSwi
         seenToday={seenCheckIns}
         onSeen={markCheckInSeen}
         onNavigate={setView}
+        onLogAnswer={logCheckInAnswer}
+        onAddToPlanner={addToPlanner}
       />
       <nav className="sidebar">
         <div className="sidebar-logo">
