@@ -34,10 +34,26 @@ const GlobalStyles = () => (
       --font-body: 'DM Sans', system-ui, sans-serif;
       --r: 10px; --r-lg: 16px;
     }
-    body { background: var(--bg); color: var(--cream); font-family: var(--font-body); }
+    body { background: var(--bg); color: var(--cream); font-family: var(--font-body); font-size: 16px; line-height: 1.75; }
+    .prose { max-width: 65ch; line-height: 1.75; font-size: 16px; }
+    p, li, .desc-text { font-size: 16px; line-height: 1.75; }
+    .openDyslexic * { font-family: 'OpenDyslexic', var(--font-body) !important; }
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    /* ADHD/Dyslexia design system */
+    .page-sub { font-size: 16px; line-height: 1.75; }
+    .nav-item { font-size: 14px; }
+    .stat-label { font-size: 13px; line-height: 1.6; }
+    .tag { font-size: 12px; }
+    .saved-toast { position: fixed; bottom: 24px; right: 24px; background: var(--sage); color: #0c0c16; padding: 10px 18px; border-radius: var(--r); font-weight: 700; font-size: 14px; z-index: 999; box-shadow: 0 4px 20px rgba(0,229,168,0.35); animation: toastIn 0.2s ease; }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .focus-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: var(--r); background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(0,212,255,0.35); font-weight: 700; font-size: 14px; cursor: pointer; font-family: var(--font-body); transition: all 0.15s; }
+    .focus-btn:hover { background: var(--amber); color: #0c0c16; }
+    .domain-tag { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .day-type-anchor { background: rgba(0,212,255,0.12); color: var(--amber); border: 1px solid rgba(0,212,255,0.3); }
+    .day-type-open { background: rgba(0,229,168,0.10); color: var(--sage); border: 1px solid rgba(0,229,168,0.3); }
+    .day-type-world { background: rgba(176,96,255,0.10); color: var(--lavender); border: 1px solid rgba(176,96,255,0.3); }
     .app-wrap { display: flex; height: 100vh; overflow: hidden; }
     .sidebar { width: 228px; min-width: 228px; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px 0; overflow-y: auto; }
     .sidebar-logo { padding: 0 20px 20px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
@@ -59,7 +75,7 @@ const GlobalStyles = () => (
     .main { flex: 1; overflow-y: auto; background: var(--bg); }
     .page-header { padding: 28px 36px 18px; border-bottom: 1px solid var(--border); }
     .page-title { font-family: var(--font-display); font-size: 30px; font-weight: 700; color: var(--cream); letter-spacing: -0.8px; }
-    .page-sub { font-size: 13px; color: var(--muted); margin-top: 3px; }
+    .page-sub { font-size: 16px; color: var(--muted); margin-top: 4px; line-height: 1.75; }
     .page-content { padding: 24px 36px; }
     .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 20px; }
     .card-sm { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r); padding: 14px; }
@@ -164,9 +180,9 @@ const GlobalStyles = () => (
     .role-selector { min-height: 100vh; background: var(--bg); display: flex; align-items: center; justify-content: center; padding: 40px; }
     .role-card { background: var(--bg2); border: 2px solid var(--border); border-radius: 20px; padding: 32px; cursor: pointer; transition: all 0.2s; text-align: center; width: 260px; }
     .role-card:hover { border-color: var(--amber); transform: translateY(-4px); box-shadow: 0 20px 60px rgba(0,212,255,0.15); }
-    .faction-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 20px; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
-    .faction-card:hover { transform: translateY(-3px); border-color: var(--border2); }
-    .faction-card.selected { border-color: var(--amber) !important; background: var(--amber-dim); }
+    .Guild-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 20px; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
+    .Guild-card:hover { transform: translateY(-3px); border-color: var(--border2); }
+    .Guild-card.selected { border-color: var(--amber) !important; background: var(--amber-dim); }
     .gig-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r); padding: 14px; transition: all 0.15s; }
     .gig-card:hover { border-color: var(--border2); }
     .gig-card.done { border-color: var(--sage); background: rgba(0,229,168,0.08); }
@@ -329,23 +345,23 @@ const AREAS = [
 
 const SKILLS = [
   { id: "s1", area: "comm", subcat: "writing", name: "Narrative Writing", icon: "📖", pts: 15, interests: ["writing", "film"], desc: "Write compelling stories with structure, voice, and authentic characters.", how: ["Write 3 short stories across different genres", "Get feedback and revise one story twice", "Study a published author's technique"] },
-  { id: "s2", area: "comm", subcat: "writing", name: "Research & Synthesis", icon: "🔍", pts: 15, interests: ["philosophy", "history", "science"], desc: "Find, evaluate, and weave information from multiple sources into clear arguments.", how: ["Complete a research project on a topic you care about", "Use at least 5 different source types", "Write a 1,500+ word synthesis piece"] },
+  { id: "s2", area: "comm", subcat: "writing", name: "Research & Synthesis", icon: "🔍", pts: 15, interests: ["philosophy", "history", "science"], desc: "Find, evaluate, and weave information from multiple sources into clear arguments.", how: ["Done a research project on a topic you care about", "Use at least 5 different source types", "Write a 1,500+ word synthesis piece"] },
   { id: "s3", area: "comm", subcat: "speaking", name: "Persuasive Communication", icon: "🎤", pts: 15, interests: ["people", "business", "philosophy"], desc: "Make compelling cases through writing and speaking.", how: ["Write and deliver a 5-min persuasive speech", "Write a persuasive essay on a real issue", "Debate a topic with someone who disagrees"] },
   { id: "s4", area: "comm", subcat: "writing", name: "Journalism & Reporting", icon: "📰", pts: 20, interests: ["writing", "people", "history"], desc: "Interview people, investigate a story, and write factually with clarity.", how: ["Interview 3 people and write an article", "Research and fact-check a local issue", "Publish something in any format"] },
   { id: "s5", area: "comm", subcat: "speaking", name: "Public Speaking", icon: "🎙️", pts: 10, interests: ["people", "philosophy", "business"], desc: "Structure your thoughts, manage nerves, and speak so people remember.", how: ["Give 3 presentations to real audiences", "Record yourself and review", "Facilitate a group discussion"] },
-  { id: "s6", area: "comm", subcat: "languages", name: "World Language Foundations", icon: "🌐", pts: 20, interests: ["history", "people"], desc: "Build functional fluency in a language other than English.", how: ["Complete 100 hrs of study", "Have a 10-minute conversation with a native speaker", "Read one piece in that language"] },
+  { id: "s6", area: "comm", subcat: "languages", name: "World Language Foundations", icon: "🌐", pts: 20, interests: ["history", "people"], desc: "Build functional fluency in a language other than English.", how: ["Done 100 hrs of study", "Have a 10-minute conversation with a native speaker", "Read one piece in that language"] },
   { id: "s7", area: "comm", subcat: "writing", name: "Poetry & Lyric Writing", icon: "🌸", pts: 10, interests: ["writing", "music", "art"], desc: "Use language as art — rhythm, imagery, compression, and truth.", how: ["Write 12 poems in different styles", "Study 5 poets you love", "Perform or share your work publicly"] },
   { id: "s8", area: "comm", subcat: "digital_media", name: "Content Creation & Media Literacy", icon: "📱", pts: 15, interests: ["social", "film", "business"], desc: "Create content intentionally and understand how media shapes culture.", how: ["Create 10 pieces on a consistent theme", "Study the algorithms of one platform", "Analyze 5 pieces of media critically"] },
   { id: "m1", area: "math", subcat: "applied_math", name: "Practical Math & Financial Literacy", icon: "💰", pts: 20, interests: ["business", "people"], desc: "Real numbers for real life — budgets, taxes, interest, and how money works.", how: ["Build a personal monthly budget", "Calculate compound interest scenarios", "Research and plan a major purchase"] },
-  { id: "m2", area: "math", subcat: "algebra", name: "Algebra & Pattern Thinking", icon: "🔢", pts: 15, interests: ["math", "tech", "science"], desc: "Variables, functions, equations — the grammar of mathematical thinking.", how: ["Complete 50 varied algebra problems", "Use algebra to solve a real problem", "Explain a concept to someone else"] },
-  { id: "m3", area: "math", subcat: "geometry", name: "Geometry & Spatial Reasoning", icon: "📐", pts: 15, interests: ["art", "making", "math"], desc: "Shapes, space, proportion, and proof — the math behind everything you can see.", how: ["Complete 40 geometry problems including proofs", "Apply geometry to a design project", "Create geometric art"] },
+  { id: "m2", area: "math", subcat: "algebra", name: "Algebra & Pattern Thinking", icon: "🔢", pts: 15, interests: ["math", "tech", "science"], desc: "Variables, functions, equations — the grammar of mathematical thinking.", how: ["Done 50 varied algebra problems", "Use algebra to solve a real problem", "Explain a concept to someone else"] },
+  { id: "m3", area: "math", subcat: "geometry", name: "Geometry & Spatial Reasoning", icon: "📐", pts: 15, interests: ["art", "making", "math"], desc: "Shapes, space, proportion, and proof — the math behind everything you can see.", how: ["Done 40 geometry problems including proofs", "Apply geometry to a design project", "Create geometric art"] },
   { id: "m4", area: "math", subcat: "stats", name: "Statistics & Data Literacy", icon: "📊", pts: 20, interests: ["science", "business", "tech"], desc: "Understand data, spot misleading statistics, and draw honest conclusions.", how: ["Collect and analyze a real dataset", "Create visualizations from data", "Debunk a misleading statistic"] },
-  { id: "m5", area: "math", subcat: "logic", name: "Logic & Critical Reasoning", icon: "🧩", pts: 15, interests: ["philosophy", "math", "tech"], desc: "Formal and informal logic — how to actually think through arguments.", how: ["Study logical fallacies and identify them in real debates", "Complete formal logic puzzles", "Construct a formal argument"] },
-  { id: "m6", area: "math", subcat: "calculus", name: "Calculus Concepts", icon: "∞", pts: 20, interests: ["math", "science", "tech"], desc: "Change, rates, and the math behind motion — conceptual and applied.", how: ["Study limits, derivatives, and integrals conceptually", "Apply calculus to a real problem", "Complete 30 calculus problems"] },
+  { id: "m5", area: "math", subcat: "logic", name: "Logic & Critical Reasoning", icon: "🧩", pts: 15, interests: ["philosophy", "math", "tech"], desc: "Formal and informal logic — how to actually think through arguments.", how: ["Study logical fallacies and identify them in real debates", "Done formal logic puzzles", "Construct a formal argument"] },
+  { id: "m6", area: "math", subcat: "calculus", name: "Calculus Concepts", icon: "∞", pts: 20, interests: ["math", "science", "tech"], desc: "Change, rates, and the math behind motion — conceptual and applied.", how: ["Study limits, derivatives, and integrals conceptually", "Apply calculus to a real problem", "Done 30 calculus problems"] },
   { id: "sc1", area: "science", subcat: "life_sciences", name: "Ecology & Living Systems", icon: "🌿", pts: 20, interests: ["nature", "animals", "science"], desc: "How living things relate to each other and their environment.", how: ["Do a field study in a local ecosystem", "Map a food web in your area", "Track environmental changes over 30 days"] },
   { id: "sc2", area: "science", subcat: "life_sciences", name: "Human Biology & Health Science", icon: "🫀", pts: 15, interests: ["science", "health", "movement"], desc: "How your body works — from cells to systems to peak performance.", how: ["Study all major body systems", "Run an experiment on your own health metric", "Research one health topic you care about"] },
-  { id: "sc3", area: "science", subcat: "chemistry", name: "Chemistry Fundamentals", icon: "⚗️", pts: 15, interests: ["science", "food", "making"], desc: "Atoms, reactions, and why matter does what it does.", how: ["Complete 15 foundational chemistry concepts", "Do 5 hands-on experiments", "Connect chemistry to something you love"] },
-  { id: "sc4", area: "science", subcat: "physics", name: "Physics & Forces", icon: "⚡", pts: 15, interests: ["science", "making", "movement"], desc: "Motion, energy, electricity — the rules everything in the universe obeys.", how: ["Build a simple machine demonstrating a physics principle", "Study Newton's laws through real-world examples", "Complete 20 physics problems"] },
+  { id: "sc3", area: "science", subcat: "chemistry", name: "Chemistry Fundamentals", icon: "⚗️", pts: 15, interests: ["science", "food", "making"], desc: "Atoms, reactions, and why matter does what it does.", how: ["Done 15 foundational chemistry concepts", "Do 5 hands-on experiments", "Connect chemistry to something you love"] },
+  { id: "sc4", area: "science", subcat: "physics", name: "Physics & Forces", icon: "⚡", pts: 15, interests: ["science", "making", "movement"], desc: "Motion, energy, electricity — the rules everything in the universe obeys.", how: ["Build a simple machine demonstrating a physics principle", "Study Newton's laws through real-world examples", "Done 20 physics problems"] },
   { id: "sc5", area: "science", subcat: "earth_space", name: "Astronomy & Space Science", icon: "🌙", pts: 15, interests: ["space", "science", "philosophy"], desc: "The universe, our place in it, and the science behind it all.", how: ["Observe and document 10 celestial events", "Study the lifecycle of stars", "Research current space exploration missions"] },
   { id: "sc6", area: "science", subcat: "sci_method", name: "Scientific Method & Experimentation", icon: "🔬", pts: 15, interests: ["science", "philosophy", "math"], desc: "How to actually do science — hypothesize, test, observe, and question.", how: ["Design and conduct 3 original experiments", "Write results in proper format", "Peer-review someone else's experiment"] },
   { id: "sc7", area: "science", subcat: "social_sci", name: "Psychology & Human Behavior", icon: "🧬", pts: 15, interests: ["people", "philosophy", "science"], desc: "Why people think, feel, and act the way they do — including you.", how: ["Study 5 major psychological concepts", "Read one psychology book", "Apply concepts to understand a real situation"] },
@@ -355,15 +371,15 @@ const SKILLS = [
   { id: "h4", area: "history", subcat: "civics", name: "Civics & Power Structures", icon: "⚖️", pts: 15, interests: ["history", "people", "philosophy"], desc: "How governments work and how to participate meaningfully.", how: ["Study how local, state, and federal government functions", "Attend a city council meeting", "Take a position on a civic issue and research all sides"] },
   { id: "h5", area: "history", subcat: "anthropology", name: "Cultural Anthropology", icon: "🌍", pts: 15, interests: ["people", "history", "art"], desc: "How different cultures build meaning, community, and ways of life.", how: ["Study 3 cultures different from your own", "Interview someone from a different background", "Create a comparative cultural analysis"] },
   { id: "h6", area: "history", subcat: "social_movements", name: "Social Movements & Change", icon: "✊", pts: 15, interests: ["history", "people", "philosophy"], desc: "How ordinary people change the world — the mechanics of collective action.", how: ["Study 3 social movements in depth", "Understand tactics, leadership, and outcomes", "Connect to a current issue you care about"] },
-  { id: "a1", area: "arts", subcat: "visual_art", name: "Visual Art & Design Fundamentals", icon: "🎨", pts: 15, interests: ["art", "making", "fashion"], desc: "The principles that make things beautiful and communicate without words.", how: ["Study color theory, composition, and typography", "Complete 20 hours of deliberate practice", "Create a series of 5 cohesive pieces"] },
+  { id: "a1", area: "arts", subcat: "visual_art", name: "Visual Art & Design Fundamentals", icon: "🎨", pts: 15, interests: ["art", "making", "fashion"], desc: "The principles that make things beautiful and communicate without words.", how: ["Study color theory, composition, and typography", "Done 20 hours of deliberate practice", "Create a series of 5 cohesive pieces"] },
   { id: "a2", area: "arts", subcat: "music", name: "Music Theory & Practice", icon: "🎵", pts: 20, interests: ["music", "math"], desc: "The language of music — from reading notation to composing your own.", how: ["Learn an instrument to intermediate level", "Study music theory fundamentals", "Compose or arrange an original piece"] },
   { id: "a3", area: "arts", subcat: "film_photo", name: "Film, Photography & Visual Storytelling", icon: "🎬", pts: 20, interests: ["film", "art", "writing"], desc: "Use the camera as a storytelling tool.", how: ["Shoot and edit 3 short films or photo series", "Study a director or photographer you admire", "Create one polished portfolio piece"] },
-  { id: "a4", area: "arts", subcat: "creative_writing", name: "Creative Writing as Craft", icon: "✍️", pts: 15, interests: ["writing", "philosophy", "art"], desc: "Go deep on the craft — character, structure, voice, revision.", how: ["Complete a 5,000+ word project", "Study craft through a writing book", "Workshop your writing with real readers"] },
+  { id: "a4", area: "arts", subcat: "creative_writing", name: "Creative Writing as Craft", icon: "✍️", pts: 15, interests: ["writing", "philosophy", "art"], desc: "Go deep on the craft — character, structure, voice, revision.", how: ["Done a 5,000+ word project", "Study craft through a writing book", "Workshop your writing with real readers"] },
   { id: "a5", area: "arts", subcat: "theater", name: "Theater & Performance", icon: "🎭", pts: 15, interests: ["people", "writing", "art"], desc: "Embody a character, tell stories through the body, develop presence.", how: ["Perform in or produce a short play", "Study acting techniques or improv", "Direct or stage manage a production"] },
-  { id: "a6", area: "arts", subcat: "design", name: "Design Thinking & UX", icon: "✏️", pts: 15, interests: ["art", "tech", "business", "people"], desc: "Human-centered design — solve problems beautifully.", how: ["Complete a full design thinking project", "Build and test a prototype with real users", "Create a case study for your portfolio"] },
+  { id: "a6", area: "arts", subcat: "design", name: "Design Thinking & UX", icon: "✏️", pts: 15, interests: ["art", "tech", "business", "people"], desc: "Human-centered design — solve problems beautifully.", how: ["Done a full design thinking project", "Build and test a prototype with real users", "Create a case study for your portfolio"] },
   { id: "t1", area: "tech", subcat: "coding", name: "Programming Fundamentals", icon: "💻", pts: 20, interests: ["tech", "gaming", "math"], desc: "Learn to think like a computer and build things that work.", how: ["Build 3 working programs solving real problems", "Learn one language thoroughly", "Contribute to or document an open-source project"] },
   { id: "t2", area: "tech", subcat: "web", name: "Web Development", icon: "🌐", pts: 20, interests: ["tech", "art", "business"], desc: "HTML, CSS, JavaScript — the building blocks of the web.", how: ["Build 3 complete websites", "Learn a framework or library", "Deploy a live project"] },
-  { id: "t3", area: "tech", subcat: "making", name: "Fabrication & Making", icon: "🔧", pts: 20, interests: ["making", "art", "tech"], desc: "Turn ideas into physical things — 3D printing, electronics, woodworking.", how: ["Complete 3 hands-on build projects", "Document your process thoroughly", "Teach someone a technique you've mastered"] },
+  { id: "t3", area: "tech", subcat: "making", name: "Fabrication & Making", icon: "🔧", pts: 20, interests: ["making", "art", "tech"], desc: "Turn ideas into physical things — 3D printing, electronics, woodworking.", how: ["Done 3 hands-on build projects", "Document your process thoroughly", "Teach someone a technique you've mastered"] },
   { id: "t4", area: "tech", subcat: "game_design", name: "Game Design", icon: "🎮", pts: 20, interests: ["gaming", "tech", "art", "writing"], desc: "Design experiences people love — systems, rules, narrative, and play.", how: ["Design and playtest 2 original games", "Study the design of 3 games you love", "Build a digital or physical prototype"] },
   { id: "t5", area: "tech", subcat: "ai_ml", name: "AI & Machine Learning Concepts", icon: "🤖", pts: 15, interests: ["tech", "math", "philosophy"], desc: "Understand how AI works and how to use it thoughtfully.", how: ["Study how ML models are trained", "Build a simple ML project", "Research the ethics and implications of AI"] },
   { id: "t6", area: "tech", subcat: "electronics", name: "Electronics & Robotics", icon: "⚡", pts: 20, interests: ["making", "tech", "science"], desc: "Make things move, sense, and respond — circuits to microcontrollers.", how: ["Build 3 electronics projects", "Learn to read circuit diagrams", "Create something using sensors or automation"] },
@@ -378,9 +394,9 @@ const SKILLS = [
   { id: "ls2", area: "life", subcat: "finance", name: "Personal Finance & Investing", icon: "📈", pts: 20, interests: ["business", "math"], desc: "Make money work for you — savings, investing, and long-term thinking.", how: ["Learn the basics of investing", "Open a savings or investing account", "Build a 5-year financial plan"] },
   { id: "ls3", area: "life", subcat: "organization", name: "Project Management", icon: "📋", pts: 15, interests: ["business", "making", "tech"], desc: "Get things done — plan, execute, adapt, and ship.", how: ["Manage a complex personal project from start to finish", "Use a project management system for 60 days", "Lead a group project or collaboration"] },
   { id: "ls4", area: "life", subcat: "homemaking", name: "Cooking & Culinary Arts", icon: "🍳", pts: 15, interests: ["food", "science", "art"], desc: "Feed yourself and others well — techniques, flavor, creativity, hospitality.", how: ["Cook 30 different dishes", "Host a dinner for people you care about", "Learn the science behind 5 cooking techniques"] },
-  { id: "ls5", area: "life", subcat: "community", name: "Civic Engagement & Volunteering", icon: "🤲", pts: 20, interests: ["people", "history", "philosophy"], desc: "Show up in your community — contribute time and skills.", how: ["Complete 40 hours of meaningful volunteer work", "Know an organization you serve deeply", "Reflect on what you learned about community"] },
+  { id: "ls5", area: "life", subcat: "community", name: "Civic Engagement & Volunteering", icon: "🤲", pts: 20, interests: ["people", "history", "philosophy"], desc: "Show up in your community — contribute time and skills.", how: ["Done 40 hours of meaningful volunteer work", "Know an organization you serve deeply", "Reflect on what you learned about community"] },
   { id: "ls6", area: "life", subcat: "homemaking", name: "Homesteading & Self-Sufficiency", icon: "🌱", pts: 20, interests: ["nature", "food", "making"], desc: "Grow food, fix things, reduce dependence — practical life skills.", how: ["Grow something edible successfully", "Fix or build something in your home", "Learn one preservation skill"] },
-  { id: "ls7", area: "life", subcat: "exploration", name: "Photography & Visual Documentation", icon: "📷", pts: 15, interests: ["film", "art", "nature"], desc: "Document your life and work with intention.", how: ["Complete a 30-day photo project with a theme", "Study the work of 3 photographers", "Create a photo book"] },
+  { id: "ls7", area: "life", subcat: "exploration", name: "Photography & Visual Documentation", icon: "📷", pts: 15, interests: ["film", "art", "nature"], desc: "Document your life and work with intention.", how: ["Done a 30-day photo project with a theme", "Study the work of 3 photographers", "Create a photo book"] },
   { id: "ls8", area: "life", subcat: "exploration", name: "Independent Travel & Navigation", icon: "🗺️", pts: 15, interests: ["nature", "history", "people"], desc: "Navigate the physical world — map reading, trip planning, exploration.", how: ["Plan and execute a solo trip", "Learn to navigate by map and compass", "Travel somewhere unfamiliar and document what you learn"] },
 ];
 
@@ -400,7 +416,7 @@ const PROJECTS = [
   { id: "p12", title: "Teach a Workshop or Class", color: "amber", interests: ["people", "art", "making", "tech"], skills: ["s5", "ct4", "a6"], pts: 25, duration: "4-6 weeks", desc: "Take something you know and teach it to others. Get real feedback.", output: "Curriculum document, workshop materials, participant feedback", steps: ["Choose a skill you've already built", "Design a 2-4 hour workshop", "Create all materials", "Teach it to at least 5 people", "Gather written feedback", "Reflect and revise"] },
   { id: "p13", title: "Research & Write a Deep Dive Essay", color: "sky", interests: ["writing", "philosophy", "history", "science"], skills: ["s2", "ct1", "ct2"], pts: 20, duration: "3-4 weeks", desc: "Choose a question you don't know the answer to. Research it deeply and write.", output: "2,000-4,000 word essay with citations", steps: ["Choose a compelling question", "Research at least 8 different sources", "Build an outline", "Write a full draft", "Revise twice", "Share and get serious feedback"] },
   { id: "p14", title: "Create a Visual Art Portfolio Series", color: "lavender", interests: ["art", "film", "fashion"], skills: ["a1", "a3", "ls7"], pts: 25, duration: "2-3 months", desc: "Create a cohesive series of 8-12 pieces around a theme. Intentionality over quantity.", output: "Portfolio series, artist statement, digital exhibition", steps: ["Define your theme and concept", "Experiment with different approaches", "Create 8-12 cohesive pieces", "Edit down to your best", "Write an artist statement", "Share in an online gallery"] },
-  { id: "p15", title: "Produce a Short Film", color: "lavender", interests: ["film", "writing", "art", "music"], skills: ["a3", "s1", "a2"], pts: 35, duration: "6-10 weeks", desc: "Write, direct, shoot, and edit a short film. 5-15 minutes. Show it to real people.", output: "Completed short film, director's statement, screening", steps: ["Write a complete script", "Create a shot list and production plan", "Gather cast and crew", "Shoot", "Edit: cut, audio, color", "Show to an audience"] },
+  { id: "p15", title: "Produce a Short Film", color: "lavender", interests: ["film", "writing", "art", "music"], skills: ["a3", "s1", "a2"], pts: 35, duration: "6-10 weeks", desc: "Write, direct, shoot, and edit a short film. 5-15 minutes. Show it to real people.", output: "Doned short film, director's statement, screening", steps: ["Write a complete script", "Create a shot list and production plan", "Gather cast and crew", "Shoot", "Edit: cut, audio, color", "Show to an audience"] },
   { id: "p16", title: "Build a Personal Finance System", color: "amber", interests: ["business", "math"], skills: ["ls2", "m1", "ct3"], pts: 20, duration: "3-4 weeks", desc: "Build the financial life you want. Track money, understand investing, make a real plan.", output: "Budget spreadsheet, investment plan, 5-year roadmap", steps: ["Track all money in and out for 30 days", "Build a realistic monthly budget", "Research and open an investment account", "Create a 5-year savings goal", "Research tax basics", "Write a financial philosophy"] },
   { id: "p17", title: "Host a Community Event", color: "clay", interests: ["people", "business", "art", "music", "food"], skills: ["ls3", "s5", "ls5"], pts: 25, duration: "4-6 weeks", desc: "Organize and run a real event — a show, gathering, workshop, or market.", output: "Event recap, photos, lessons learned", steps: ["Define your vision and audience", "Choose a venue and date", "Create a promotion plan", "Organize logistics", "Run the event", "Write a retrospective"] },
   { id: "p18", title: "Restore, Repair, or Upcycle Something", color: "clay", interests: ["making", "nature", "art", "fashion"], skills: ["t3", "sc3", "a1"], pts: 20, duration: "2-5 weeks", desc: "Take something broken or discarded and make it better. Resist the throwaway culture.", output: "Restored item, process documentation, reflection", steps: ["Find something broken worth fixing", "Research what's needed", "Gather materials and tools", "Do the work", "Document before and after", "Reflect on what you learned"] },
@@ -418,41 +434,41 @@ const FACTIONS = [
 
 const SANDBOX_GIGS_DEFAULT = [
   // The Forge
-  { id: "g1", faction: "f1", title: "Design and Build a Shelf From Scrap Materials", pts: 15, difficulty: "Beginner", time: "4-6 hrs", deliverable: "Photos of finished shelf + materials list", area: "tech" },
-  { id: "g2", faction: "f1", title: "Repair Something That's Broken in Your Home", pts: 10, difficulty: "Beginner", time: "2-4 hrs", deliverable: "Before/after photos + one-page reflection", area: "life" },
-  { id: "g3", faction: "f1", title: "Create a Tool or Jig That Solves a Specific Problem", pts: 20, difficulty: "Intermediate", time: "6-8 hrs", deliverable: "Documentation + demo video", area: "tech" },
-  { id: "g4", faction: "f1", title: "Build a Birdhouse or Pollinator Box From Scratch", pts: 15, difficulty: "Beginner", time: "4-6 hrs", deliverable: "Finished product + build journal", area: "science" },
-  { id: "g5", faction: "f1", title: "Design a Piece of Furniture and Build a Scale Model", pts: 25, difficulty: "Advanced", time: "8-12 hrs", deliverable: "Design drawings + scale model + reflection", area: "arts" },
+  { id: "g1", Guild: "f1", title: "Design and Build a Shelf From Scrap Materials", pts: 15, difficulty: "Beginner", time: "4-6 hrs", deliverable: "Photos of finished shelf + materials list", area: "tech" },
+  { id: "g2", Guild: "f1", title: "Repair Something That's Broken in Your Home", pts: 10, difficulty: "Beginner", time: "2-4 hrs", deliverable: "Before/after photos + one-page reflection", area: "life" },
+  { id: "g3", Guild: "f1", title: "Create a Tool or Jig That Solves a Specific Problem", pts: 20, difficulty: "Intermediate", time: "6-8 hrs", deliverable: "Documentation + demo video", area: "tech" },
+  { id: "g4", Guild: "f1", title: "Build a Birdhouse or Pollinator Box From Scratch", pts: 15, difficulty: "Beginner", time: "4-6 hrs", deliverable: "Finished product + build journal", area: "science" },
+  { id: "g5", Guild: "f1", title: "Design a Piece of Furniture and Build a Scale Model", pts: 25, difficulty: "Advanced", time: "8-12 hrs", deliverable: "Design drawings + scale model + reflection", area: "arts" },
   // The Signal
-  { id: "g6", faction: "f2", title: "Interview Someone Doing Work You Admire", pts: 15, difficulty: "Beginner", time: "3-5 hrs", deliverable: "Interview transcript or recording + 300-word summary", area: "comm" },
-  { id: "g7", faction: "f2", title: "Write and Publish a 500-Word Essay on Something You Disagree With", pts: 10, difficulty: "Beginner", time: "2-3 hrs", deliverable: "Published essay (blog, newsletter, or social post)", area: "comm" },
-  { id: "g8", faction: "f2", title: "Create a 3-Episode Podcast Mini-Series", pts: 30, difficulty: "Advanced", time: "12-15 hrs", deliverable: "3 published episodes with show notes", area: "comm" },
-  { id: "g9", faction: "f2", title: "Produce a 2-3 Minute Explainer Video", pts: 20, difficulty: "Intermediate", time: "6-10 hrs", deliverable: "Finished video published anywhere online", area: "comm" },
-  { id: "g10", faction: "f2", title: "Document Your Town: A 10-Photo Essay", pts: 15, difficulty: "Beginner", time: "4-6 hrs", deliverable: "10 edited photos + caption for each", area: "arts" },
+  { id: "g6", Guild: "f2", title: "Interview Someone Doing Work You Admire", pts: 15, difficulty: "Beginner", time: "3-5 hrs", deliverable: "Interview transcript or recording + 300-word summary", area: "comm" },
+  { id: "g7", Guild: "f2", title: "Write and Publish a 500-Word Essay on Something You Disagree With", pts: 10, difficulty: "Beginner", time: "2-3 hrs", deliverable: "Published essay (blog, newsletter, or social post)", area: "comm" },
+  { id: "g8", Guild: "f2", title: "Create a 3-Episode Podcast Mini-Series", pts: 30, difficulty: "Advanced", time: "12-15 hrs", deliverable: "3 published episodes with show notes", area: "comm" },
+  { id: "g9", Guild: "f2", title: "Produce a 2-3 Minute Explainer Video", pts: 20, difficulty: "Intermediate", time: "6-10 hrs", deliverable: "Finished video published anywhere online", area: "comm" },
+  { id: "g10", Guild: "f2", title: "Document Your Town: A 10-Photo Essay", pts: 15, difficulty: "Beginner", time: "4-6 hrs", deliverable: "10 edited photos + caption for each", area: "arts" },
   // The Root
-  { id: "g11", faction: "f3", title: "Start and Maintain a Compost System for 30 Days", pts: 15, difficulty: "Beginner", time: "Ongoing", deliverable: "Log + before/after photos + reflection", area: "science" },
-  { id: "g12", faction: "f3", title: "Identify 20 Plants, Insects, or Birds in Your Area", pts: 20, difficulty: "Beginner", time: "6-10 hrs", deliverable: "Documented field notes with photos", area: "science" },
-  { id: "g13", faction: "f3", title: "Cook a Full Week of Meals Using Only Whole Ingredients", pts: 20, difficulty: "Intermediate", time: "Ongoing", deliverable: "Meal log + notes on what you learned", area: "life" },
-  { id: "g14", faction: "f3", title: "Grow Something From Seed to Harvest", pts: 25, difficulty: "Intermediate", time: "Ongoing", deliverable: "Growth journal with photos + harvest record", area: "science" },
-  { id: "g15", faction: "f3", title: "Research and Map Your Local Watershed", pts: 20, difficulty: "Intermediate", time: "5-8 hrs", deliverable: "Annotated map + 500-word write-up", area: "science" },
+  { id: "g11", Guild: "f3", title: "Start and Maintain a Compost System for 30 Days", pts: 15, difficulty: "Beginner", time: "Ongoing", deliverable: "Log + before/after photos + reflection", area: "science" },
+  { id: "g12", Guild: "f3", title: "Identify 20 Plants, Insects, or Birds in Your Area", pts: 20, difficulty: "Beginner", time: "6-10 hrs", deliverable: "Documented field notes with photos", area: "science" },
+  { id: "g13", Guild: "f3", title: "Cook a Full Week of Meals Using Only Whole Ingredients", pts: 20, difficulty: "Intermediate", time: "Ongoing", deliverable: "Meal log + notes on what you learned", area: "life" },
+  { id: "g14", Guild: "f3", title: "Grow Something From Seed to Harvest", pts: 25, difficulty: "Intermediate", time: "Ongoing", deliverable: "Growth journal with photos + harvest record", area: "science" },
+  { id: "g15", Guild: "f3", title: "Research and Map Your Local Watershed", pts: 20, difficulty: "Intermediate", time: "5-8 hrs", deliverable: "Annotated map + 500-word write-up", area: "science" },
   // The Circuit
-  { id: "g16", faction: "f4", title: "Build a Calculator App Without Tutorials", pts: 15, difficulty: "Beginner", time: "4-6 hrs", deliverable: "Working app + code on GitHub", area: "tech" },
-  { id: "g17", faction: "f4", title: "Automate Something Annoying in Your Life", pts: 20, difficulty: "Intermediate", time: "5-8 hrs", deliverable: "Working script or automation + documentation", area: "tech" },
-  { id: "g18", faction: "f4", title: "Build a Simple Game With a Physics Engine", pts: 25, difficulty: "Intermediate", time: "8-12 hrs", deliverable: "Playable game + reflection on what you learned", area: "tech" },
-  { id: "g19", faction: "f4", title: "Set Up a Raspberry Pi for a Specific Purpose", pts: 20, difficulty: "Intermediate", time: "5-8 hrs", deliverable: "Working device + setup guide", area: "tech" },
-  { id: "g20", faction: "f4", title: "Analyze a Dataset and Create 3 Visualizations", pts: 20, difficulty: "Beginner", time: "4-6 hrs", deliverable: "3 charts + a 300-word interpretation", area: "math" },
+  { id: "g16", Guild: "f4", title: "Build a Calculator App Without Tutorials", pts: 15, difficulty: "Beginner", time: "4-6 hrs", deliverable: "Working app + code on GitHub", area: "tech" },
+  { id: "g17", Guild: "f4", title: "Automate Something Annoying in Your Life", pts: 20, difficulty: "Intermediate", time: "5-8 hrs", deliverable: "Working script or automation + documentation", area: "tech" },
+  { id: "g18", Guild: "f4", title: "Build a Simple Game With a Physics Engine", pts: 25, difficulty: "Intermediate", time: "8-12 hrs", deliverable: "Playable game + reflection on what you learned", area: "tech" },
+  { id: "g19", Guild: "f4", title: "Set Up a Raspberry Pi for a Specific Purpose", pts: 20, difficulty: "Intermediate", time: "5-8 hrs", deliverable: "Working device + setup guide", area: "tech" },
+  { id: "g20", Guild: "f4", title: "Analyze a Dataset and Create 3 Visualizations", pts: 20, difficulty: "Beginner", time: "4-6 hrs", deliverable: "3 charts + a 300-word interpretation", area: "math" },
   // The Commons
-  { id: "g21", faction: "f5", title: "Organize a Neighborhood Cleanup or Beautification Project", pts: 20, difficulty: "Intermediate", time: "8-12 hrs", deliverable: "Before/after photos + participant count + reflection", area: "life" },
-  { id: "g22", faction: "f5", title: "Facilitate a Community Discussion on a Local Issue", pts: 20, difficulty: "Intermediate", time: "6-8 hrs", deliverable: "Discussion notes + summary of perspectives + reflection", area: "comm" },
-  { id: "g23", faction: "f5", title: "Start or Participate in a Buy-Nothing or Mutual Aid Group", pts: 15, difficulty: "Beginner", time: "Ongoing", deliverable: "Log of exchanges + 300-word reflection", area: "life" },
-  { id: "g24", faction: "f5", title: "Research and Present a Solution to a Local Problem", pts: 25, difficulty: "Advanced", time: "10-14 hrs", deliverable: "Written proposal + presentation to at least 5 people", area: "comm" },
-  { id: "g25", faction: "f5", title: "Mentor or Tutor Someone Younger in a Skill You Have", pts: 20, difficulty: "Beginner", time: "5-8 hrs", deliverable: "4+ session log + reflection on teaching", area: "life" },
+  { id: "g21", Guild: "f5", title: "Organize a Neighborhood Cleanup or Beautification Project", pts: 20, difficulty: "Intermediate", time: "8-12 hrs", deliverable: "Before/after photos + participant count + reflection", area: "life" },
+  { id: "g22", Guild: "f5", title: "Facilitate a Community Discussion on a Local Issue", pts: 20, difficulty: "Intermediate", time: "6-8 hrs", deliverable: "Discussion notes + summary of perspectives + reflection", area: "comm" },
+  { id: "g23", Guild: "f5", title: "Start or Participate in a Buy-Nothing or Mutual Aid Group", pts: 15, difficulty: "Beginner", time: "Ongoing", deliverable: "Log of exchanges + 300-word reflection", area: "life" },
+  { id: "g24", Guild: "f5", title: "Research and Present a Solution to a Local Problem", pts: 25, difficulty: "Advanced", time: "10-14 hrs", deliverable: "Written proposal + presentation to at least 5 people", area: "comm" },
+  { id: "g25", Guild: "f5", title: "Mentor or Tutor Someone Younger in a Skill You Have", pts: 20, difficulty: "Beginner", time: "5-8 hrs", deliverable: "4+ session log + reflection on teaching", area: "life" },
   // The Studio
-  { id: "g26", faction: "f6", title: "Create a Series of 5 Pieces Around a Single Theme", pts: 20, difficulty: "Beginner", time: "6-10 hrs", deliverable: "5 finished pieces + artist statement (100 words)", area: "arts" },
-  { id: "g27", faction: "f6", title: "Design and Print a Zine on a Topic You Care About", pts: 15, difficulty: "Beginner", time: "5-8 hrs", deliverable: "Printed or PDF zine + distribution to 10+ people", area: "arts" },
-  { id: "g28", faction: "f6", title: "Compose and Record an Original Instrumental Track", pts: 20, difficulty: "Intermediate", time: "5-8 hrs", deliverable: "Finished track (any format) + production notes", area: "arts" },
-  { id: "g29", faction: "f6", title: "Design a Complete Brand Identity From Scratch", pts: 25, difficulty: "Intermediate", time: "8-12 hrs", deliverable: "Logo, palette, typography, and usage guide", area: "arts" },
-  { id: "g30", faction: "f6", title: "Perform Something Live (Music, Comedy, Poetry, Theater)", pts: 25, difficulty: "Intermediate", time: "10-15 hrs", deliverable: "Video of performance + reflection", area: "arts" },
+  { id: "g26", Guild: "f6", title: "Create a Series of 5 Pieces Around a Single Theme", pts: 20, difficulty: "Beginner", time: "6-10 hrs", deliverable: "5 finished pieces + artist statement (100 words)", area: "arts" },
+  { id: "g27", Guild: "f6", title: "Design and Print a Zine on a Topic You Care About", pts: 15, difficulty: "Beginner", time: "5-8 hrs", deliverable: "Printed or PDF zine + distribution to 10+ people", area: "arts" },
+  { id: "g28", Guild: "f6", title: "Compose and Record an Original Instrumental Track", pts: 20, difficulty: "Intermediate", time: "5-8 hrs", deliverable: "Finished track (any format) + production notes", area: "arts" },
+  { id: "g29", Guild: "f6", title: "Design a Done Brand Identity From Scratch", pts: 25, difficulty: "Intermediate", time: "8-12 hrs", deliverable: "Logo, palette, typography, and usage guide", area: "arts" },
+  { id: "g30", Guild: "f6", title: "Perform Something Live (Music, Comedy, Poetry, Theater)", pts: 25, difficulty: "Intermediate", time: "10-15 hrs", deliverable: "Video of performance + reflection", area: "arts" },
 ];
 
 const RIPPLE_MISSIONS_DEFAULT = [
@@ -514,7 +530,7 @@ const DAILY_DROPS_DEFAULT = [
     id: "drop_2026-03-22",
     date: "2026-03-22",
     video: { url: "https://www.youtube.com/watch?v=bM7SZ5SBzyY", title: "What Makes a Life Well-Lived?", description: "Watch the first 8 minutes. Come back ready to talk about what surprised you." },
-    journal: { title: "Morning Check-In", prompt: "What are you most looking forward to this week? What's one thing you've been quietly dreading — and why? Take 5 minutes to write honestly." },
+    journal: { title: "Morning Mentor Touch-Point", prompt: "What are you most looking forward to this week? What's one thing you've been quietly dreading — and why? Take 5 minutes to write honestly." },
     careerSpotlights: [
       { id: "cs1", targetStudent: "all", name: "Ira Glass", role: "Radio Producer & Storyteller", bio: "Creator of This American Life, one of the most downloaded podcasts in the world. Started in public radio at 19 with no connections.", insight: "\"The most important thing you can do is a lot of work. Put yourself on a deadline so that every week you finish one story. It is only by going through a volume of work that you will close the gap.\"" }
     ],
@@ -543,26 +559,26 @@ const defaultRoadmap = {
   name: "My 4-Year Learning Journey",
   years: [
     { label: "Year 1", subtitle: "Exploration & Foundation", theme: "Try everything. Find out what you love. Build base skills.", quarters: [
-      { label: "Q1 (Sept–Nov)", focus: "Interest exploration & self-assessment", items: ["Complete interest inventory", "Start 2-3 skill areas", "Begin learning journal"] },
-      { label: "Q2 (Dec–Feb)", focus: "First projects & skill building", items: ["Complete first project", "Identify strongest interests", "Build daily learning habit"] },
-      { label: "Q3 (Mar–May)", focus: "Going deeper in 2-3 areas", items: ["Complete 2 skill masteries", "Start portfolio documentation", "Begin a longer project"] },
-      { label: "Q4 (June–Aug)", focus: "Year reflection & planning", items: ["Reflect on what worked", "Plan Year 2 focus areas", "Complete summer project"] },
+      { label: "Q1 (Sept–Nov)", focus: "Interest exploration & self-assessment", items: ["Done interest inventory", "Start 2-3 skill areas", "Begin learning journal"] },
+      { label: "Q2 (Dec–Feb)", focus: "First projects & skill building", items: ["Done first project", "Identify strongest interests", "Build daily learning habit"] },
+      { label: "Q3 (Mar–May)", focus: "Going deeper in 2-3 areas", items: ["Done 2 skill masteries", "Start portfolio documentation", "Begin a longer project"] },
+      { label: "Q4 (June–Aug)", focus: "Year reflection & planning", items: ["Reflect on what worked", "Plan Year 2 focus areas", "Done summer project"] },
     ]},
     { label: "Year 2", subtitle: "Depth & Direction", theme: "Go deep on what matters. Start building real things.", quarters: [
       { label: "Q1 (Sept–Nov)", focus: "Deep dive into 2-3 passions", items: ["Start a major skill area", "Begin a portfolio project", "Find mentors or communities"] },
-      { label: "Q2 (Dec–Feb)", focus: "Building & creating", items: ["Complete a major project", "Present work to real audience", "Explore monetization ideas"] },
+      { label: "Q2 (Dec–Feb)", focus: "Building & creating", items: ["Done a major project", "Present work to real audience", "Explore monetization ideas"] },
       { label: "Q3 (Mar–May)", focus: "Collaboration & community", items: ["Work with others on a project", "Teach something you know", "Start a long-term project"] },
       { label: "Q4 (June–Aug)", focus: "Mid-journey check-in", items: ["Evaluate transcript progress", "Update 4-year plan", "Document all portfolio pieces"] },
     ]},
     { label: "Year 3", subtitle: "Mastery & Real-World Application", theme: "Get really good. Test your skills in the real world.", quarters: [
       { label: "Q1 (Sept–Nov)", focus: "Apprenticeship or real work experience", items: ["Shadow or work with a professional", "Apply skills to a real problem", "Build something used by others"] },
-      { label: "Q2 (Dec–Feb)", focus: "Advanced projects", items: ["Complete a capstone-level project", "Publish or present significant work", "Build professional relationships"] },
+      { label: "Q2 (Dec–Feb)", focus: "Advanced projects", items: ["Done a capstone-level project", "Publish or present significant work", "Build professional relationships"] },
       { label: "Q3 (Mar–May)", focus: "Testing & entrepreneurship", items: ["Launch something in the world", "Get real feedback and iterate", "Document case studies"] },
       { label: "Q4 (June–Aug)", focus: "Preparing for independence", items: ["Review financial literacy skills", "Plan post-high school path", "Build professional portfolio"] },
     ]},
     { label: "Year 4", subtitle: "Launch & Legacy", theme: "Finish strong. Know who you are. Launch into what's next.", quarters: [
       { label: "Q1 (Sept–Nov)", focus: "Capstone project begins", items: ["Define your senior capstone", "Identify gaps to fill", "Build connections for your future"] },
-      { label: "Q2 (Dec–Feb)", focus: "Final skill certifications", items: ["Complete all transcript requirements", "Finish major portfolio pieces", "Get recommendation letters"] },
+      { label: "Q2 (Dec–Feb)", focus: "Final skill certifications", items: ["Done all transcript requirements", "Finish major portfolio pieces", "Get recommendation letters"] },
       { label: "Q3 (Mar–May)", focus: "Capstone presentation", items: ["Present capstone to a real audience", "Document your learning journey", "Celebrate and reflect"] },
       { label: "Q4 (June–Aug)", focus: "Transition & launch", items: ["Create your transition plan", "Launch what's next", "Maintain your portfolio and connections"] },
     ]},
@@ -724,14 +740,14 @@ function PinBoards({ boards, setBoards, content, onNavigate }) {
 
   // Map type → nav route
   const typeNavMap = {
-    skill: "skills", project: "projects", gig: "factions",
+    skill: "skills", project: "projects", gig: "Guilds",
     ripple: "ripple", guide: "teensguide", lightroom: "lightroom",
     drop: "drops", career: "drops", item: null,
   };
 
   const typeLabel = {
-    skill: "Skill", project: "Project", gig: "Sandbox Gig",
-    ripple: "Ripple Mission", guide: "Teen's Guide", lightroom: "Light Room",
+    skill: "Skill", project: "Project", gig: "Guild Gig",
+    ripple: "Contribution", guide: "Foundations Guide", lightroom: "The Deep Room",
     drop: "Daily Drop", career: "Career Spotlight", item: "Saved Item",
   };
 
@@ -807,10 +823,10 @@ function PinBoards({ boards, setBoards, content, onNavigate }) {
           </div>
         )}
 
-        {/* Ripple / Gig: steps */}
+        {/* Contribution / Gig: steps */}
         {(detailItem.type === "ripple" || detailItem.type === "gig") && full?.steps?.length > 0 && (
           <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 2, color: "var(--muted)", fontWeight: 700, marginBottom: 10 }}>How to Complete It</div>
+            <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 2, color: "var(--muted)", fontWeight: 700, marginBottom: 10 }}>How to Done It</div>
             {full.steps.map((step, i) => (
               <div key={i} style={{ display: "flex", gap: 10, padding: "7px 0", borderBottom: "1px solid var(--border)", fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.5 }}>
                 <span style={{ color: itemColor, flexShrink: 0 }}>→</span><span>{step}</span>
@@ -1788,8 +1804,8 @@ function TeacherOverview({ content, students, approvals, onNavigate }) {
           {[
             { num: students.length, label: "Students", color: "var(--amber)", icon: "👥", nav: "students" },
             { num: totalContent, label: "Content Items", color: "var(--sky)", icon: "📚", nav: "skills" },
-            { num: pendingApprovals, label: "Pending Approvals", color: pendingApprovals > 0 ? "var(--clay)" : "var(--sage)", icon: "✅", nav: "approvals" },
-            { num: content.dailyDrops.length, label: "Daily Drops Set", color: "var(--lavender)", icon: "⚡", nav: "drops" },
+            { num: pendingApprovals, label: "Awaiting Reviews", color: pendingApprovals > 0 ? "var(--clay)" : "var(--sage)", icon: "✅", nav: "approvals" },
+            { num: content.dailyDrops.length, label: "Sparks Set", color: "var(--lavender)", icon: "⚡", nav: "drops" },
           ].map((s, i) => (
             <div key={i} className="stat-card" style={{ cursor: "pointer" }} onClick={() => onNavigate(s.nav)}>
               <div style={{ fontSize: 24, marginBottom: 6 }}>{s.icon}</div>
@@ -1805,11 +1821,11 @@ function TeacherOverview({ content, students, approvals, onNavigate }) {
             {[
               { key: "skills", label: "Skills", icon: "◈", count: content.skills.length, nav: "skills" },
               { key: "projects", label: "Projects", icon: "⬟", count: content.projects.length, nav: "projects" },
-              { key: "gigs", label: "Sandbox Gigs", icon: "⚡", count: content.gigs.length, nav: "gigs" },
-              { key: "ripple", label: "Ripple Missions", icon: "🌊", count: content.ripple.length, nav: "ripple" },
-              { key: "teensGuide", label: "Teen's Guide", icon: "📖", count: content.teensGuide.length, nav: "teensguide" },
-              { key: "lightRoom", label: "Light Room", icon: "💡", count: content.lightRoom.length, nav: "lightroom" },
-              { key: "dailyDrops", label: "Daily Drops", icon: "🌤️", count: content.dailyDrops.length, nav: "drops" },
+              { key: "gigs", label: "Guild Gigs", icon: "⚡", count: content.gigs.length, nav: "gigs" },
+              { key: "ripple", label: "Contributions", icon: "🌊", count: content.ripple.length, nav: "ripple" },
+              { key: "teensGuide", label: "Foundations Guide", icon: "📖", count: content.teensGuide.length, nav: "teensguide" },
+              { key: "lightRoom", label: "The Deep Room", icon: "💡", count: content.lightRoom.length, nav: "lightroom" },
+              { key: "dailyDrops", label: "Sparks", icon: "🌤️", count: content.dailyDrops.length, nav: "drops" },
             ].map(item => (
               <div key={item.key} className="student-row" onClick={() => onNavigate(item.nav)} style={{ borderRadius: "var(--r)", marginBottom: 2 }}>
                 <span style={{ fontSize: 18, width: 28 }}>{item.icon}</span>
@@ -1976,7 +1992,7 @@ function TeacherApprovals({ approvals, setApprovals }) {
     <div>
       <div className="page-header">
         <h1 className="page-title">✅ Mastery Approvals</h1>
-        <p className="page-sub">{pending.length} pending · {reviewed.length} reviewed</p>
+        <p className="page-sub">{pending.length} pending · {reviewed.length} acknowledged</p>
       </div>
       <div className="page-content">
         {pending.length === 0 && reviewed.length === 0 ? (
@@ -2132,10 +2148,10 @@ function TeacherDropCalendar({ drops, setDrops, students }) {
       <div className="page-header">
         <div className="flex-between">
           <div>
-            <h1 className="page-title">🌤️ Daily Drop Calendar</h1>
-            <p className="page-sub">{drops.length} drops scheduled · Click any date to add or edit content</p>
+            <h1 className="page-title">✨ Sparks Calendar</h1>
+            <p className="page-sub">{drops.length} Sparks scheduled · Click any date to add or edit content</p>
           </div>
-          <button className="btn btn-primary" onClick={() => openEdit(new Date().getDate())}>+ Add Today's Drop</button>
+          <button className="btn btn-primary" onClick={() => openEdit(new Date().getDate())}>+ Add Today's Spark</button>
         </div>
       </div>
 
@@ -2233,7 +2249,7 @@ function TeacherDropCalendar({ drops, setDrops, students }) {
                         {formatDisplayDate(drop.date)}{drop.date === today ? " · Today" : ""}
                       </div>
                       <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 2 }}>
-                        {[drop.video && "📹 Video", drop.journal && "📓 Journal", drop.careerSpotlights?.length > 0 && "💼 Career", drop.kindnessChallenge && "💛 Kindness"].filter(Boolean).join(" · ")}
+                        {[drop.video && "📹 Video", drop.journal && "📓 Learning Log", drop.careerSpotlights?.length > 0 && "💼 Career", drop.kindnessChallenge && "💛 Kindness"].filter(Boolean).join(" · ")}
                       </div>
                     </div>
                     <span style={{ fontSize: 11, color: "var(--muted)" }}>Edit →</span>
@@ -2632,7 +2648,7 @@ function TeacherCategories({ areas, setAreas, skills }) {
         <div className="card" style={{ background: "var(--bg3)" }}>
           <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 2, color: "var(--muted)", marginBottom: 8 }}>How categories & subcategories work</div>
           <p style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.7 }}>
-            Each <strong style={{ color: "var(--cream)" }}>category</strong> (e.g. Mathematics) has a points target for transcript completion. 
+            Each <strong style={{ color: "var(--cream)" }}>category</strong> (e.g. Mathematics) has a points target for transcript evidence. 
             <strong style={{ color: "var(--cream)" }}> Subcategories</strong> (e.g. Statistics, Algebra) organize skills within each area — they appear as accordion sections in the Skill Explorer for both teachers and students. Add, rename, reorder, or remove subcategories any time; skills will follow their assigned subcategory automatically.
           </p>
         </div>
@@ -2883,10 +2899,10 @@ function CheckInManager({ checkIns, setCheckIns, content }) {
       <div className="page-header">
         <div className="flex-between">
           <div>
-            <h1 className="page-title">💬 Check-Ins</h1>
-            <p className="page-sub">{checkIns.length} check-in{checkIns.length !== 1 ? "s" : ""} · Scheduled pop-ups shown to students on specific days</p>
+            <h1 className="page-title">💬 Mentor Touch-Points</h1>
+            <p className="page-sub">{checkIns.length} touch-point{checkIns.length !== 1 ? "s" : ""} · Pop-ups shown to students on specific days</p>
           </div>
-          <button className="btn btn-primary" onClick={openNew}>+ New Check-In</button>
+          <button className="btn btn-primary" onClick={openNew}>+ New Mentor Touch-Point</button>
         </div>
       </div>
 
@@ -2895,9 +2911,9 @@ function CheckInManager({ checkIns, setCheckIns, content }) {
           <div>
             <EmptyState icon="💬" title="No check-ins yet" sub="Create your first check-in to start getting insights from students on scheduled days." />
             <div className="card mt-16" style={{ background: "var(--bg3)", maxWidth: 620 }}>
-              <div style={{ fontWeight: 700, color: "var(--amber)", marginBottom: 8, fontSize: 14 }}>What are Check-Ins?</div>
+              <div style={{ fontWeight: 700, color: "var(--amber)", marginBottom: 8, fontSize: 14 }}>What are Mentor Touch-Points?</div>
               <p style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.8 }}>
-                Check-ins are small pop-up cards that greet students on scheduled days. They can be a mood check, a skill self-assessment, a fun fact, or an open question.
+                Touch-Points are small pop-up cards that greet students on scheduled days. They can be a mood check, a skill self-assessment, a fun fact, or an open question.
                 Based on the student's answer, you can automatically route them to a specific skill, project, gig, or resource — or keep it simple with no routing at all.
               </p>
             </div>
@@ -2939,12 +2955,12 @@ function CheckInManager({ checkIns, setCheckIns, content }) {
       </div>
 
       <Modal open={showForm} onClose={() => setShowForm(false)}
-        title={editingId ? "Edit Check-In" : "New Check-In"}
+        title={editingId ? "Edit Mentor Touch-Point" : "New Mentor Touch-Point"}
         size="modal-lg"
         footer={
           <>
             <button className="btn btn-ghost" onClick={() => setShowForm(false)}>Cancel</button>
-            <button className="btn btn-primary" onClick={save} disabled={!form.title?.trim()}>Save Check-In</button>
+            <button className="btn btn-primary" onClick={save} disabled={!form.title?.trim()}>Save Mentor Touch-Point</button>
           </>
         }>
 
@@ -3107,9 +3123,9 @@ function CheckInManager({ checkIns, setCheckIns, content }) {
                             { value: "skill", label: "Skill" },
                             { value: "project", label: "Project" },
                             { value: "gig", label: "Gig" },
-                            { value: "ripple", label: "Ripple Mission" },
-                            { value: "lightroom", label: "Light Room entry" },
-                            { value: "teensguide", label: "Teen's Guide entry" },
+                            { value: "ripple", label: "Contribution" },
+                            { value: "lightroom", label: "The Deep Room entry" },
+                            { value: "teensguide", label: "Foundations Guide entry" },
                           ].map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                         </select>
                       </div>
@@ -3174,7 +3190,7 @@ function CheckInPopup({ checkIns, content, seenToday, onSeen, onNavigate }) {
   };
 
   const handleNavigate = (rule) => {
-    const viewMap = { skill: "skills", project: "projects", gig: "factions", ripple: "ripple", lightroom: "lightroom", teensguide: "teensguide" };
+    const viewMap = { skill: "skills", project: "projects", gig: "Guilds", ripple: "ripple", lightroom: "lightroom", teensguide: "teensguide" };
     if (rule.recommendType && rule.recommendType !== "none" && viewMap[rule.recommendType]) {
       onNavigate(viewMap[rule.recommendType]);
     }
@@ -3329,7 +3345,7 @@ function CheckInPopup({ checkIns, content, seenToday, onSeen, onNavigate }) {
               {/* Routing recommendations */}
               {matchedRules.filter(r => r.recommendType !== "none" && r.recommendId).map(rule => {
                 const item = getRecommendedItem(rule);
-                const typeLabels = { skill: "Skill", project: "Project", gig: "Gig", ripple: "Ripple Mission", lightroom: "Light Room", teensguide: "Teen's Guide" };
+                const typeLabels = { skill: "Skill", project: "Project", gig: "Gig", ripple: "Contribution", lightroom: "The Deep Room", teensguide: "Foundations Guide" };
                 if (!item) return null;
                 return (
                   <div key={rule.id} style={{ background: "var(--bg3)", border: `1px solid var(--${C})`, borderRadius: "var(--r-lg)", padding: "16px 18px", marginBottom: 12 }}>
@@ -3784,9 +3800,9 @@ function ProfileQuestionsManager({ questions = [], setQuestions, content }) {
                         { value: "skill", label: "Skill" },
                         { value: "project", label: "Project" },
                         { value: "gig", label: "Gig" },
-                        { value: "ripple", label: "Ripple Mission" },
-                        { value: "lightroom", label: "Light Room entry" },
-                        { value: "teensguide", label: "Teen's Guide entry" },
+                        { value: "ripple", label: "Contribution" },
+                        { value: "lightroom", label: "The Deep Room entry" },
+                        { value: "teensguide", label: "Foundations Guide entry" },
                       ].map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                     </select>
                   </div>
@@ -3845,15 +3861,15 @@ function TeacherHabitsManager({ habitDefs = [], setHabitDefs, studentAccounts = 
       <div className="page-header">
         <div className="flex-between">
           <div>
-            <h1 className="page-title">✅ Habits & Chores</h1>
-            <p className="page-sub">{habitDefs.length} defined · Students check these off daily from their dashboard</p>
+            <h1 className="page-title">🔁 Rhythms</h1>
+            <p className="page-sub">{habitDefs.length} defined · Students log these from their dashboard</p>
           </div>
           <button className="btn btn-primary" onClick={openNew}>+ Add New</button>
         </div>
       </div>
       <div className="page-content">
         {habitDefs.length === 0 ? (
-          <EmptyState icon="✅" title="No habits or chores yet"
+          <EmptyState icon="✅" title="No rhythms or chores yet"
             sub="Create chores to assign to students, or habits to encourage. Both show up on the student dashboard as daily check-ins."
             action={<button className="btn btn-primary btn-sm" onClick={openNew}>+ Add First Item</button>} />
         ) : (
@@ -3984,7 +4000,7 @@ function TeacherHabitsManager({ habitDefs = [], setHabitDefs, studentAccounts = 
           </select>
         </div>
         <div className="form-row">
-          <label className="label">Points per completion</label>
+          <label className="label">Points per evidence</label>
           <input className="input" type="number" min="0" max="20" value={form.points ?? 1} onChange={e => setForm(p => ({ ...p, points: parseInt(e.target.value) || 0 }))} />
         </div>
         {form.type === "habit" && (
@@ -4157,7 +4173,7 @@ function TeacherMessaging({ messages = {}, setMessages, studentAccounts = [], co
           <div>
             <label className="label">Link to (optional)</label>
             <select className="input" value={newThreadForm.linkedType} onChange={e => setNewThreadForm(p => ({ ...p, linkedType: e.target.value, linkedId: "" }))}>
-              {[["none","— None —"],["skill","Skill"],["project","Project"],["gig","Gig"],["ripple","Ripple Mission"]].map(([v,l]) => <option key={v} value={v}>{l}</option>)}
+              {[["none","— None —"],["skill","Skill"],["project","Project"],["gig","Gig"],["ripple","Contribution"]].map(([v,l]) => <option key={v} value={v}>{l}</option>)}
             </select>
           </div>
           {newThreadForm.linkedType !== "none" && (
@@ -4181,7 +4197,7 @@ function TeacherMessaging({ messages = {}, setMessages, studentAccounts = [], co
 
 // ─── STUDENT: HABITS WIDGET ───────────────────────────────────────────────────
 
-function HabitsWidget({ habitDefs, habitLogs, setHabitLogs, student, onComplete, onNavigate }) {
+function HabitsWidget({ habitDefs, habitLogs, setHabitLogs, student, onDone, onNavigate }) {
   const today = todayStr();
   const dayOfWeek = new Date().getDay();
 
@@ -4201,7 +4217,7 @@ function HabitsWidget({ habitDefs, habitLogs, setHabitLogs, student, onComplete,
     const log = habitLogs[h.id] || [];
     const wasDone = log.includes(today);
     setHabitLogs(prev => ({ ...prev, [h.id]: wasDone ? log.filter(d => d !== today) : [...log, today] }));
-    if (!wasDone && h.points > 0) onComplete("habit_" + h.id + "_" + today, h.points);
+    if (!wasDone && h.points > 0) onDone("habit_" + h.id + "_" + today, h.points);
   };
 
   const doneCount = mine.filter(h => isDone(h.id)).length;
@@ -4324,7 +4340,7 @@ function MessagesWidget({ messages, studentId, onNavigate }) {
 
 // ─── STUDENT: HABITS FULL PAGE ────────────────────────────────────────────────
 
-function StudentHabitsPage({ habitDefs, habitLogs, setHabitLogs, student, onComplete }) {
+function StudentHabitsPage({ habitDefs, habitLogs, setHabitLogs, student, onDone }) {
   const today = todayStr();
   const dayOfWeek = new Date().getDay();
   const [showHistory, setShowHistory] = useState({});
@@ -4344,7 +4360,7 @@ function StudentHabitsPage({ habitDefs, habitLogs, setHabitLogs, student, onComp
     const log = habitLogs[h.id] || [];
     const wasDone = log.includes(today);
     setHabitLogs(prev => ({ ...prev, [h.id]: wasDone ? log.filter(d => d !== today) : [...log, today] }));
-    if (!wasDone && h.points > 0) onComplete("habit_" + h.id + "_" + today, h.points);
+    if (!wasDone && h.points > 0) onDone("habit_" + h.id + "_" + today, h.points);
   };
 
   // Streak = consecutive scheduled days that were completed
@@ -4388,8 +4404,8 @@ function StudentHabitsPage({ habitDefs, habitLogs, setHabitLogs, student, onComp
       <div className="page-header">
         <div className="flex-between">
           <div>
-            <h1 className="page-title">✅ Habits & Chores</h1>
-            <p className="page-sub">Today: {doneToday}/{todayItems.length} due · {todayItems.length === 0 ? "Nothing scheduled today" : "Keep the streak alive"}</p>
+            <h1 className="page-title">🔁 Rhythms</h1>
+            <p className="page-sub">Today: {doneToday}/{todayItems.length} logged · {todayItems.length === 0 ? "Nothing due today" : "Mark them off as you go"}</p>
           </div>
         </div>
       </div>
@@ -4524,15 +4540,15 @@ function StudentGoalsPage({ goals, setGoals }) {
       <div className="page-header">
         <div className="flex-between">
           <div>
-            <h1 className="page-title">🎯 Goals</h1>
-            <p className="page-sub">{active.length} active · {done.length} completed</p>
+            <h1 className="page-title">🌅 Horizons</h1>
+            <p className="page-sub">{active.length} active · {done.length} done</p>
           </div>
           <button className="btn btn-primary" onClick={() => { setShowForm(true); setForm({ title: "", targetDate: "", milestones: [] }); setMilestoneText(""); }}>+ New Goal</button>
         </div>
       </div>
       <div className="page-content">
         {(goals || []).length === 0 ? (
-          <EmptyState icon="🎯" title="No goals yet" sub="Goals are different from projects — they're personal intentions. Something you want to be, do, or figure out."
+          <EmptyState icon="🎯" title="No horizons set yet" sub="Goals are different from projects — they're personal intentions. Something you want to be, do, or figure out."
             action={<button className="btn btn-primary btn-sm" onClick={() => setShowForm(true)}>+ Set a Goal</button>} />
         ) : (
           <>
@@ -4588,7 +4604,7 @@ function StudentGoalsPage({ goals, setGoals }) {
             )}
             {done.length > 0 && (
               <div>
-                <div style={{ fontFamily: "var(--font-display)", fontSize: 17, fontWeight: 700, color: "var(--muted)", marginBottom: 14 }}>Completed</div>
+                <div style={{ fontFamily: "var(--font-display)", fontSize: 17, fontWeight: 700, color: "var(--muted)", marginBottom: 14 }}>Doned</div>
                 {done.map(g => (
                   <div key={g.id} style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: "var(--r-lg)", padding: "14px 18px", marginBottom: 8, opacity: 0.7 }}>
                     <div style={{ fontWeight: 600, color: "var(--sage)", fontSize: 14, marginBottom: g.reflection ? 6 : 0 }}>✓ {g.title}</div>
@@ -4629,8 +4645,8 @@ function StudentGoalsPage({ goals, setGoals }) {
       </Modal>
 
       {/* Reflection Modal */}
-      <Modal open={!!reflectId} onClose={() => setReflectId(null)} title="🎉 Mark Goal Complete"
-        footer={<><button className="btn btn-ghost" onClick={() => setReflectId(null)}>Not Yet</button><button className="btn btn-sage" onClick={() => completeGoal(reflectId, reflectText)}>Complete It ✓</button></>}>
+      <Modal open={!!reflectId} onClose={() => setReflectId(null)} title="🎉 Mark Goal Done"
+        footer={<><button className="btn btn-ghost" onClick={() => setReflectId(null)}>Not Yet</button><button className="btn btn-sage" onClick={() => completeGoal(reflectId, reflectText)}>Done It ✓</button></>}>
         <p style={{ fontSize: 14, color: "var(--cream-dim)", lineHeight: 1.75, marginBottom: 16 }}>
           Nice work. Before you mark it done — what did you learn, or what changed?
         </p>
@@ -4810,7 +4826,7 @@ function TeacherTaskManager({ taskDefs, setTaskDefs, studentAccounts }) {
       <div className="page-header">
         <div className="flex-between">
           <div>
-            <h1 className="page-title">📋 Tasks</h1>
+            <h1 className="page-title">🎯 Today's Focus</h1>
             <p className="page-sub">{taskDefs.length} task{taskDefs.length !== 1 ? "s" : ""} · Scheduled lessons and activities for students</p>
           </div>
           <button className="btn btn-primary" onClick={openNew}>+ Add Task</button>
@@ -4818,7 +4834,7 @@ function TeacherTaskManager({ taskDefs, setTaskDefs, studentAccounts }) {
       </div>
       <div className="page-content">
         {taskDefs.length === 0 ? (
-          <EmptyState icon="📋" title="No tasks yet"
+          <EmptyState icon="📋" title="Nothing in Today's Focus yet"
             sub="Add tasks like 'Watch World Watch', 'Do today's Wordle', or 'Read this article'. Students see them as a checklist on their dashboard on the days you schedule."
             action={<button className="btn btn-primary btn-sm" onClick={openNew}>+ Add First Task</button>} />
         ) : (
@@ -4944,7 +4960,7 @@ function TeacherTaskManager({ taskDefs, setTaskDefs, studentAccounts }) {
             </select>
           </div>
           <div>
-            <label className="label">Points per completion</label>
+            <label className="label">Points per evidence</label>
             <input className="input" type="number" min="0" max="20" value={form.points ?? 2} onChange={e => setForm(p => ({ ...p, points: parseInt(e.target.value) || 0 }))} />
           </div>
         </div>
@@ -4955,7 +4971,7 @@ function TeacherTaskManager({ taskDefs, setTaskDefs, studentAccounts }) {
 
 // ─── STUDENT: TASKS WIDGET ────────────────────────────────────────────────────
 
-function TasksWidget({ taskDefs, taskLogs, setTaskLogs, student, onComplete, onNavigate }) {
+function TasksWidget({ taskDefs, taskLogs, setTaskLogs, student, onDone, onNavigate }) {
   const today = todayStr();
   const mine = (taskDefs || []).filter(t =>
     (t.assignedTo === "all" || t.assignedTo === student?.id) && isTaskScheduledToday(t)
@@ -4967,7 +4983,7 @@ function TasksWidget({ taskDefs, taskLogs, setTaskLogs, student, onComplete, onN
     const log = taskLogs[t.id] || [];
     const wasDone = log.includes(today);
     setTaskLogs(prev => ({ ...prev, [t.id]: wasDone ? log.filter(d => d !== today) : [...log, today] }));
-    if (!wasDone && t.points > 0) onComplete("task_" + t.id + "_" + today, t.points);
+    if (!wasDone && t.points > 0) onDone("task_" + t.id + "_" + today, t.points);
   };
 
   if (mine.length === 0) return null;
@@ -5037,7 +5053,7 @@ function TaskRow({ task, done, onToggle, compact }) {
 
 // ─── STUDENT: TASKS FULL PAGE ─────────────────────────────────────────────────
 
-function StudentTasksPage({ taskDefs, taskLogs, setTaskLogs, student, onComplete }) {
+function StudentTasksPage({ taskDefs, taskLogs, setTaskLogs, student, onDone }) {
   const today = todayStr();
 
   const mine = (taskDefs || []).filter(t => t.assignedTo === "all" || t.assignedTo === student?.id);
@@ -5051,7 +5067,7 @@ function StudentTasksPage({ taskDefs, taskLogs, setTaskLogs, student, onComplete
     const log = taskLogs[t.id] || [];
     const wasDone = log.includes(today);
     setTaskLogs(prev => ({ ...prev, [t.id]: wasDone ? log.filter(d => d !== today) : [...log, today] }));
-    if (!wasDone && t.points > 0) onComplete("task_" + t.id + "_" + today, t.points);
+    if (!wasDone && t.points > 0) onDone("task_" + t.id + "_" + today, t.points);
   };
 
   const last7 = Array.from({ length: 7 }, (_, i) => {
@@ -5073,12 +5089,12 @@ function StudentTasksPage({ taskDefs, taskLogs, setTaskLogs, student, onComplete
   return (
     <div>
       <div className="page-header">
-        <h1 className="page-title">📋 Tasks</h1>
-        <p className="page-sub">Today: {doneToday}/{todayTasks.length} done · {todayTasks.length === 0 ? "Nothing scheduled today" : "Click any task to open it"}</p>
+        <h1 className="page-title">🎯 Today's Focus</h1>
+        <p className="page-sub">Today: {doneToday}/{todayTasks.length} done · {todayTasks.length === 0 ? "Nothing on your list today" : "Click any item to open it"}</p>
       </div>
       <div className="page-content">
         {mine.length === 0 ? (
-          <EmptyState icon="📋" title="No tasks yet" sub="Your teacher will add tasks here soon." />
+          <EmptyState icon="📋" title="Nothing in Today's Focus yet" sub="Your teacher will add tasks here soon." />
         ) : (
           <>
             {todayTasks.length > 0 && (
@@ -5111,7 +5127,7 @@ function StudentTasksPage({ taskDefs, taskLogs, setTaskLogs, student, onComplete
               </div>
             )}
 
-            {/* 7-day completion history */}
+            {/* 7-day evidence history */}
             {mine.length > 0 && (
               <div className="mt-24">
                 <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--muted)", marginBottom: 14 }}>Last 7 Days</div>
@@ -5161,7 +5177,7 @@ class ErrorBoundary extends React.Component {
     if (this.state.error) return (
       <div style={{ padding: 40, maxWidth: 700 }}>
         <div style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, color: "var(--clay)", marginBottom: 12 }}>
-          Something went wrong
+          Something went wrong — try again?
         </div>
         <div style={{ background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: "var(--r)", padding: 16, fontFamily: "monospace", fontSize: 12, color: "var(--cream-dim)", lineHeight: 1.7, whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
           {this.state.error?.message || String(this.state.error)}
@@ -5198,7 +5214,7 @@ function TeacherApp({ content, setContent, studentAccounts, setStudentAccounts, 
 
   const GIG_FIELDS = [
     { key: "title", label: "Gig Title", placeholder: "e.g. Design a T-Shirt for a Local Brand" },
-    { key: "faction", label: "Faction", type: "select", options: FACTIONS.map(f => ({ value: f.id, label: `${f.icon} ${f.name}` })) },
+    { key: "faction", label: "Guild", type: "select", options: FACTIONS.map(f => ({ value: f.id, label: `${f.icon} ${f.name}` })) },
     { key: "difficulty", label: "Difficulty", type: "select", options: ["Beginner","Intermediate","Advanced"].map(d => ({ value: d, label: d })) },
     { key: "time", label: "Time Estimate", placeholder: "e.g. 2–3 hrs" },
     { key: "relatedCareer", label: "Related Career", placeholder: "e.g. Graphic Designer" },
@@ -5251,24 +5267,24 @@ function TeacherApp({ content, setContent, studentAccounts, setStudentAccounts, 
   const NAV = [
     { section: "overview", items: [{ id: "overview", label: "Overview", icon: "⬡" }] },
     { section: "content", items: [
-      { id: "skills", label: "Skills", icon: "◈" },
-      { id: "projects", label: "Projects", icon: "⬟" },
-      { id: "gigs", label: "Sandbox Gigs", icon: "⚡" },
-      { id: "ripple", label: "Ripple Missions", icon: "🌊" },
-      { id: "teensguide", label: "Teen's Guide", icon: "📖" },
-      { id: "lightroom", label: "Light Room", icon: "💡" },
-      { id: "drops", label: "Daily Drops", icon: "🌤️" },
-      { id: "tasks", label: "Tasks", icon: "📋" },
-      { id: "checkins", label: "Check-Ins", icon: "💬" },
+      { id: "skills", label: "Skill Library", icon: "◈" },
+      { id: "projects", label: "Project Lab", icon: "⬟" },
+      { id: "gigs", label: "Skill Forge Gigs", icon: "⚡" },
+      { id: "ripple", label: "Contribution Lab", icon: "🌊" },
+      { id: "teensguide", label: "Foundations Guide", icon: "📖" },
+      { id: "lightroom", label: "The Deep Room", icon: "💡" },
+      { id: "drops", label: "Sparks", icon: "✨" },
+      { id: "tasks", label: "Today's Focus", icon: "🎯" },
+      { id: "checkins", label: "Mentor Touch-Points", icon: "💬" },
       { id: "categories", label: "Transcript Categories", icon: "📋" },
     ]},
     { section: "students", items: [
       { id: "accounts", label: "Student Accounts", icon: "🔑" },
       { id: "profileqs", label: "Profile Questions", icon: "📝" },
-      { id: "habits", label: "Habits & Chores", icon: "✅" },
+      { id: "habits", label: "Rhythms", icon: "🔁" },
       { id: "messages", label: "Messages", icon: "✉️", badge: unreadMsgCount > 0 ? unreadMsgCount : null },
       { id: "students", label: "Progress", icon: "👥" },
-      { id: "approvals", label: "Approvals", icon: "✅", badge: pendingCount > 0 ? pendingCount : null },
+      { id: "approvals", label: "Portfolio Witness", icon: "✅", badge: pendingCount > 0 ? pendingCount : null },
     ]},
     { section: "settings", items: [{ id: "settings", label: "Settings", icon: "⚙️" }] }];
 
@@ -5277,10 +5293,10 @@ function TeacherApp({ content, setContent, studentAccounts, setStudentAccounts, 
       case "overview": return <TeacherOverview content={content} students={studentAccounts} approvals={approvals} onNavigate={setView} />;
       case "skills": return <SkillsManager items={content.skills} setItems={setContentKey("skills")} areas={content.areas} />;
       case "projects": return <ContentManager title="Projects" icon="⬟" items={content.projects} setItems={setContentKey("projects")} fields={PROJECT_FIELDS} />;
-      case "gigs": return <ContentManager title="Sandbox Gigs" icon="⚡" items={content.gigs} setItems={setContentKey("gigs")} fields={GIG_FIELDS} />;
-      case "ripple": return <ContentManager title="Ripple Missions" icon="🌊" items={content.ripple} setItems={setContentKey("ripple")} fields={RIPPLE_FIELDS} />;
-      case "teensguide": return <ContentManager title="Teen's Guide" icon="📖" items={content.teensGuide} setItems={setContentKey("teensGuide")} fields={GUIDE_FIELDS} />;
-      case "lightroom": return <ContentManager title="Light Room" icon="💡" items={content.lightRoom} setItems={setContentKey("lightRoom")} fields={LIGHT_FIELDS} />;
+      case "gigs": return <ContentManager title="Skill Forge Gigs" icon="⚡" items={content.gigs} setItems={setContentKey("gigs")} fields={GIG_FIELDS} />;
+      case "ripple": return <ContentManager title="Contribution Lab" icon="🌊" items={content.ripple} setItems={setContentKey("ripple")} fields={RIPPLE_FIELDS} />;
+      case "teensguide": return <ContentManager title="Foundations Guide" icon="📖" items={content.teensGuide} setItems={setContentKey("teensGuide")} fields={GUIDE_FIELDS} />;
+      case "lightroom": return <ContentManager title="The Deep Room" icon="💡" items={content.lightRoom} setItems={setContentKey("lightRoom")} fields={LIGHT_FIELDS} />;
       case "drops": return <TeacherDropCalendar drops={content.dailyDrops} setDrops={setContentKey("dailyDrops")} students={studentAccounts} />;
       case "tasks": return <TeacherTaskManager taskDefs={content.taskDefs || []} setTaskDefs={setContentKey("taskDefs")} studentAccounts={studentAccounts} />;
       case "checkins": return <CheckInManager checkIns={content.checkIns || []} setCheckIns={setContentKey("checkIns")} content={content} />;
@@ -5301,7 +5317,7 @@ function TeacherApp({ content, setContent, studentAccounts, setStudentAccounts, 
       <nav className="sidebar">
         <div className="sidebar-logo">
           <div className="logo-title">Forge</div>
-          <div className="logo-badge">Teacher</div>
+          <div className="logo-badge">Mentor</div>
           <div className="logo-role">Platform Manager</div>
         </div>
         {NAV.map(({ section, items }) => (
@@ -5327,7 +5343,7 @@ function TeacherApp({ content, setContent, studentAccounts, setStudentAccounts, 
 
 // ─── STUDENT: ONBOARDING ──────────────────────────────────────────────────────
 
-function Onboarding({ onComplete }) {
+function Onboarding({ onDone }) {
   const [step, setStep] = useState(0);
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
@@ -5427,7 +5443,7 @@ function Onboarding({ onComplete }) {
         {steps[step].content}
         <div className="flex-between mt-24">
           <button className="btn btn-ghost" onClick={() => setStep(p => p - 1)} style={{ visibility: step === 0 ? "hidden" : "visible" }}>← Back</button>
-          <button className="btn btn-primary" onClick={() => step < steps.length - 1 ? setStep(p => p + 1) : onComplete({ name, age, interests: selectedInterests, strengths: selectedStrengths, learningStyle, goals })} disabled={!canProceed()} style={{ opacity: canProceed() ? 1 : 0.4 }}>
+          <button className="btn btn-primary" onClick={() => step < steps.length - 1 ? setStep(p => p + 1) : onDone({ name, age, interests: selectedInterests, strengths: selectedStrengths, learningStyle, goals })} disabled={!canProceed()} style={{ opacity: canProceed() ? 1 : 0.4 }}>
             {step === steps.length - 1 ? "Build My Dashboard →" : "Continue →"}
           </button>
         </div>
@@ -5440,7 +5456,7 @@ function Onboarding({ onComplete }) {
 
 // ─── DASHBOARD WORK ITEM ─────────────────────────────────────────────────────
 
-function DashboardWorkItem({ item, meta, isDone, onComplete, onUncomplete, content }) {
+function DashboardWorkItem({ item, meta, isDone, onDone, onUncomplete, content }) {
   const [expanded, setExpanded] = useState(false);
 
   const accentColor = meta.color || "var(--amber)";
@@ -5480,8 +5496,8 @@ function DashboardWorkItem({ item, meta, isDone, onComplete, onUncomplete, conte
               <button className="btn btn-ghost btn-xs" onClick={() => { onUncomplete(item.id, item.pts || 0); setExpanded(false); }}>↩ Undo</button>
             </div>
           ) : (
-            <button className="btn btn-sage btn-sm" onClick={() => { onComplete(item.id, item.pts || 0); setExpanded(false); }}>
-              Mark Complete ✓ {item.pts ? `+${item.pts} pts` : ""}
+            <button className="btn btn-sage btn-sm" onClick={() => { onDone(item.id, item.pts || 0); setExpanded(false); }}>
+              Add Evidence ✓ {item.pts ? `+${item.pts} pts` : ""}
             </button>
           )}
         </div>
@@ -5513,272 +5529,179 @@ function DashboardWorkItem({ item, meta, isDone, onComplete, onUncomplete, conte
 
 // ─── STUDENT: DASHBOARD ───────────────────────────────────────────────────────
 
-function StudentDashboard({ student, completed, points, content, weekPlan, grabbedGigs, onNavigate, boards, setBoards, saveToBoard, onComplete, onUncomplete, journalEntries, habitDefs, habitLogs, setHabitLogs, goals, messages, taskDefs, taskLogs, setTaskLogs, dailyPlan, completionDates }) {
-  const pct = Math.round((points / content.areas.reduce((a,b)=>a+(b.target||0),0)) * 100);
+function StudentDashboard({ student, completed, points, content, weekPlan, grabbedGigs, onNavigate, boards, setBoards, saveToBoard, onDone, onUncomplete, journalEntries, habitDefs, habitLogs, setHabitLogs, goals, messages, taskDefs, taskLogs, setTaskLogs, dailyPlan, completionDates }) {
+  const pct = Math.round((points / Math.max(1, content.areas.reduce((a,b)=>a+(b.target||0),0))) * 100);
   const todayDrop = content.dailyDrops.find(d => d.date === todayStr()) || null;
   const myInterests = student.interests || [];
   const suggestedSkills = content.skills.filter(s => s.interests?.some(i => myInterests.includes(i)) && !completed.includes(s.id)).slice(0, 3);
-  const recentCompleted = completed.slice(-6).reverse();
+  const recentDoned = completed.slice(-6).reverse();
   const activeGigs = content.gigs.filter(g => grabbedGigs?.[g.id] && !completed.includes(g.id));
+  const dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const todayKey = dayNames[new Date().getDay()];
+  const loggedThisWeek = completed.length; // simplified momentum count
+
+  // Day type determination (reads from student data or defaults)
+  const DAY_TYPES = { Mon: "anchor", Tue: "open", Wed: "anchor", Thu: "world", Fri: "open" };
+  const dayTypeConfig = {
+    anchor: { label: "Anchor Day", color: "var(--amber)", badge: "day-type-anchor", desc: "Your deep work day. Go all in on something that matters." },
+    open:   { label: "Open Day",   color: "var(--sage)",  badge: "day-type-open",   desc: "Fully self-directed. Follow what pulls you." },
+    world:  { label: "World Day",  color: "var(--lavender)", badge: "day-type-world", desc: "Get out, connect, contribute. The world is your classroom." },
+  };
+  const currentDayType = DAY_TYPES[todayKey] || "open";
+  const dayType = dayTypeConfig[currentDayType];
+
+  // Weekly intention from weekPlan or student data
+  const weeklyIntention = student.weeklyIntention || weekPlan?.intention || null;
+
+  // One suggested action
+  const getSuggestedAction = () => {
+    if (activeGigs.length > 0) return { label: "Continue your active gig", nav: "Guilds", icon: "⚡" };
+    const todayItems = dailyPlan?.[todayKey] || [];
+    const unfinishedToday = todayItems.find(e => !completed.includes(e.id));
+    if (unfinishedToday) return { label: `Work on: ${unfinishedToday.name || unfinishedToday.title}`, nav: "planner", icon: "📅" };
+    if (suggestedSkills.length > 0) return { label: `Explore a new skill: ${suggestedSkills[0].name}`, nav: "skills", icon: "◈" };
+    if (todayDrop) return { label: "Check today's Spark", nav: "drops", icon: "✨" };
+    return { label: "Open your Rhythm Planner", nav: "planner", icon: "📅" };
+  };
+  const suggestion = getSuggestedAction();
 
   return (
     <div>
+      {/* ── Header: 3 things only ── */}
       <div className="page-header">
-        <div className="flex-between">
-          <div>
-            <p style={{ fontSize: 11, color: "var(--muted)", textTransform: "uppercase", letterSpacing: 2, marginBottom: 4 }}>Welcome back</p>
-            <h1 className="page-title">{student.name} 👋</h1>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 20, flexWrap: "wrap" }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p style={{ fontSize: 13, color: "var(--muted)", textTransform: "uppercase", letterSpacing: 2, marginBottom: 6 }}>Welcome back</p>
+            <h1 className="page-title">{student.name}</h1>
           </div>
-          <div style={{ textAlign: "right" }}>
-            <div style={{ fontFamily: "var(--font-display)", fontSize: 38, fontWeight: 700, color: "var(--amber)", lineHeight: 1 }}>{points}</div>
-            <div style={{ fontSize: 11, color: "var(--muted)" }}>of {content.areas.reduce((a,b)=>a+(b.target||0),0)} pts · {pct}%</div>
+          {/* Day type badge */}
+          <div style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: "var(--r-lg)", padding: "14px 20px", minWidth: 200 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--muted)", marginBottom: 6 }}>Today is</div>
+            <div className={`domain-tag ${dayType.badge}`} style={{ fontSize: 14, padding: "5px 12px", marginBottom: 8 }}>{dayType.label}</div>
+            <p style={{ fontSize: 14, color: "var(--muted)", lineHeight: 1.65, margin: 0 }}>{dayType.desc}</p>
           </div>
-        </div>
-        <div style={{ marginTop: 14, height: 5, background: "var(--border)", borderRadius: 5, overflow: "hidden" }}>
-          <div style={{ height: "100%", width: `${pct}%`, background: "linear-gradient(90deg, var(--amber), var(--amber-soft))", borderRadius: 5, transition: "width 0.8s ease" }} />
         </div>
       </div>
 
-      <div className="page-content">
-        <div className="grid-4 mb-20">
-          {[
-            { num: completed.filter(id => content.skills.find(s => s.id === id)).length, label: "Skills Mastered", color: "var(--sage)" },
-            { num: completed.filter(id => content.projects.find(p => p.id === id)).length, label: "Projects Done", color: "var(--amber)" },
-            { num: completed.filter(id => content.gigs.find(g => g.id === id)).length, label: "Gigs Completed", color: "var(--sky)" },
-            { num: (() => { const dk = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date().getDay()]; const t = (dailyPlan?.[dk]||[]); return t.length ? `${t.filter(e=>completed.includes(e.id)).length}/${t.length}` : "—"; })(), label: "Today's Work", color: "var(--lavender)" },
-          ].map((s, i) => (
-            <div key={i} className="stat-card">
-              <div className="stat-num" style={{ color: s.color }}>{s.num}</div>
-              <div className="stat-label">{s.label}</div>
+      <div className="page-content" style={{ maxWidth: 900 }}>
+
+        {/* ── Card 1: Weekly Intention ── */}
+        <div className="card mb-20" style={{ borderColor: weeklyIntention ? "rgba(0,212,255,0.3)" : "var(--border)" }}>
+          <div className="flex-between mb-10">
+            <div className="flex-center gap-8">
+              <span style={{ fontSize: 16 }}>🧭</span>
+              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--muted)" }}>Your Intention This Week</span>
             </div>
-          ))}
+            <button className="btn btn-ghost btn-xs" onClick={() => onNavigate("planner")}>Rhythm Planner →</button>
+          </div>
+          {weeklyIntention ? (
+            <p style={{ fontSize: 18, color: "var(--cream)", lineHeight: 1.75, fontFamily: "var(--font-display)", fontStyle: "italic", margin: 0 }}>
+              "{weeklyIntention}"
+            </p>
+          ) : (
+            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+              <p style={{ fontSize: 16, color: "var(--muted)", lineHeight: 1.75, margin: 0, flex: 1 }}>
+                What's one thing you want to have made, figured out, or moved forward by the end of this week?
+              </p>
+              <button className="btn btn-primary btn-sm" onClick={() => onNavigate("planner")}>Set it →</button>
+            </div>
+          )}
         </div>
 
-        {/* Monthly Progress Tracker */}
-        {(() => {
-          const now = new Date();
-          const monthStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
-          const monthName = now.toLocaleString("default", { month: "long" });
-
-          const MONTHLY_TARGETS = [
-            { key: "projects",  label: "Projects",       icon: "🎯", color: "var(--clay)",     pool: content.projects, target: 1 },
-            { key: "gigs",      label: "Sandbox Gigs",   icon: "⚡", color: "var(--sky)",      pool: content.gigs,     target: 2 },
-            { key: "ripple",    label: "Ripple Missions", icon: "🌊", color: "var(--sage)",     pool: content.ripple,   target: 2 },
-            { key: "guide",     label: "Teen's Guide",   icon: "📖", color: "var(--lavender)", pool: content.teensGuide, target: 2 },
-            { key: "lightroom", label: "Light Room",     icon: "💡", color: "var(--sky)",      pool: content.lightRoom, target: 2 },
-          ];
-
-          const countThisMonth = (pool) => pool.filter(item =>
-            completed.includes(item.id) &&
-            (completionDates?.[item.id] || "").startsWith(monthStr)
-          ).length;
-
-          const totDone = MONTHLY_TARGETS.reduce((a, t) => a + Math.min(countThisMonth(t.pool), t.target), 0);
-          const totTarget = MONTHLY_TARGETS.reduce((a, t) => a + t.target, 0);
-          const allDone = totDone === totTarget;
-
-          return (
-            <div className="card mb-20" style={{ borderColor: allDone ? "rgba(0,229,168,0.4)" : "rgba(0,212,255,0.15)" }}>
-              <div className="flex-between mb-14">
-                <div className="flex-center gap-8">
-                  <span style={{ fontSize: 16 }}>📆</span>
-                  <h3 style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, color: allDone ? "var(--sage)" : "var(--cream)" }}>
-                    {monthName} Goals
-                  </h3>
-                  <span style={{ fontSize: 12, color: allDone ? "var(--sage)" : "var(--muted)", fontWeight: 600 }}>
-                    {totDone}/{totTarget}
-                  </span>
-                </div>
-                {allDone && <span style={{ fontSize: 12, color: "var(--sage)", fontWeight: 700 }}>🎉 Month complete!</span>}
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 10 }}>
-                {MONTHLY_TARGETS.map(t => {
-                  const done = countThisMonth(t.pool);
-                  const pct = Math.min((done / t.target) * 100, 100);
-                  const complete = done >= t.target;
-                  return (
-                    <div key={t.key} style={{ textAlign: "center", padding: "12px 8px", background: complete ? "rgba(0,229,168,0.07)" : "var(--bg3)", borderRadius: "var(--r)", border: `1px solid ${complete ? "rgba(0,229,168,0.3)" : "var(--border)"}`, transition: "all 0.3s" }}>
-                      <div style={{ fontSize: 20, marginBottom: 6 }}>{t.icon}</div>
-                      <div style={{ fontSize: 10, fontWeight: 700, color: complete ? "var(--sage)" : "var(--muted)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8, lineHeight: 1.3 }}>{t.label}</div>
-                      <div style={{ height: 4, background: "var(--border)", borderRadius: 4, overflow: "hidden", marginBottom: 6 }}>
-                        <div style={{ width: `${pct}%`, height: "100%", background: complete ? "var(--sage)" : t.color, borderRadius: 4, transition: "width 0.5s ease" }} />
-                      </div>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: complete ? "var(--sage)" : "var(--cream)" }}>
-                        {done}<span style={{ fontSize: 10, color: "var(--muted)", fontWeight: 400 }}>/{t.target}</span>
-                      </div>
-                      {complete && <div style={{ fontSize: 10, color: "var(--sage)", marginTop: 3 }}>✓ Done</div>}
-                    </div>
-                  );
-                })}
-              </div>
+        {/* ── Card 2: One Suggestion ── */}
+        <div className="card mb-20" style={{ borderColor: "rgba(0,212,255,0.2)", background: "var(--amber-dim)" }}>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--muted)", marginBottom: 10 }}>What should I do right now?</div>
+          <div className="flex-between">
+            <div className="flex-center gap-12">
+              <span style={{ fontSize: 24 }}>{suggestion.icon}</span>
+              <p style={{ fontSize: 16, color: "var(--cream)", lineHeight: 1.65, margin: 0 }}>{suggestion.label}</p>
             </div>
-          );
-        })()}
+            <button className="focus-btn" onClick={() => onNavigate(suggestion.nav)}>
+              Go →
+            </button>
+          </div>
+        </div>
 
-        <div className="grid-2" style={{ gap: 20 }}>
+        {/* ── Two-column ── */}
+        <div className="grid-2" style={{ gap: 20, alignItems: "start" }}>
           <div>
-            {/* Tasks Widget */}
-            <TasksWidget taskDefs={taskDefs || []} taskLogs={taskLogs} setTaskLogs={setTaskLogs} student={student} onComplete={onComplete} onNavigate={onNavigate} />
+            {/* Tasks / Today's Focus widget */}
+            <TasksWidget taskDefs={taskDefs || []} taskLogs={taskLogs} setTaskLogs={setTaskLogs} student={student} onDone={onDone} onNavigate={onNavigate} />
 
-            {/* Today's Drop */}
+            {/* Today's Spark */}
             {todayDrop && (todayDrop.video || todayDrop.journal || todayDrop.kindnessChallenge || todayDrop.careerSpotlights?.length > 0) && (
-              <div className="drop-card mb-16" style={{ background: "var(--amber-dim)", borderColor: "rgba(0,212,255,0.35)" }}>
+              <div className="card mb-16" style={{ borderColor: "rgba(0,212,255,0.25)" }}>
                 <div className="flex-between mb-8">
-                  <span style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 2, color: "var(--amber)", fontWeight: 700 }}>Today's Drop · {formatDisplayDate(todayStr())}</span>
+                  <div className="flex-center gap-8">
+                    <span style={{ fontSize: 16 }}>✨</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--amber)" }}>Today's Spark</span>
+                  </div>
+                  <span style={{ fontSize: 11, color: "var(--muted)" }}>{formatDisplayDate(todayStr())}</span>
                 </div>
-                <div className="flex gap-8 mb-10 flex-wrap">
+                <div className="flex gap-8 mb-12 flex-wrap">
                   {todayDrop.video && <span className="tag tag-sky">📹 Video</span>}
-                  {todayDrop.journal && <span className="tag tag-amber">📓 Journal</span>}
-                  {todayDrop.careerSpotlights?.length > 0 && <span className="tag tag-lavender">💼 Career</span>}
-                  {todayDrop.kindnessChallenge && <span className="tag tag-sage">💛 Kindness</span>}
+                  {todayDrop.journal && <span className="tag tag-amber">📓 Reflect</span>}
+                  {todayDrop.careerSpotlights?.length > 0 && <span className="tag tag-lavender">💼 Spotlight</span>}
+                  {todayDrop.kindnessChallenge && <span className="tag tag-sage">💛 Challenge</span>}
                 </div>
-                <button className="btn btn-ghost btn-sm" onClick={() => onNavigate("drops")}>Open Today's Drop →</button>
+                <button className="btn btn-ghost btn-sm" style={{ width: "100%" }} onClick={() => onNavigate("drops")}>Open this Spark →</button>
               </div>
             )}
 
-            {/* Today's Work — from daily plan */}
+            {/* Today's planner items */}
             {(() => {
-              const DAY_KEYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-              const todayKey = DAY_KEYS[new Date().getDay()];
-              const todayItems = (dailyPlan?.[todayKey] || []);
-              const RHYTHM_META = {
-                skills:    { label: "Skill",         icon: "◈",  color: "var(--amber)",   pool: content.skills },
-                mission:   { label: "Project",        icon: "🎯", color: "var(--clay)",    pool: content.projects },
-                gig:       { label: "Sandbox Gig",    icon: "⚡", color: "var(--sky)",     pool: content.gigs },
-                ripple:    { label: "Ripple Mission",  icon: "🌊", color: "var(--sage)",    pool: content.ripple },
-                guide:     { label: "Teen's Guide",   icon: "📖", color: "var(--lavender)",pool: content.teensGuide },
-                lightroom: { label: "Light Room",     icon: "💡", color: "var(--sky)",     pool: content.lightRoom },
-              };
-
-              const doneCount = todayItems.filter(entry => completed.includes(entry.id)).length;
-
+              const todayItems = dailyPlan?.[todayKey] || [];
+              if (todayItems.length === 0) return null;
+              const allPool = [...content.skills, ...content.projects, ...content.gigs, ...content.ripple, ...content.teensGuide, ...content.lightRoom];
               return (
-                <div className="card mb-16" style={{ borderColor: doneCount === todayItems.length && todayItems.length > 0 ? "rgba(0,229,168,0.4)" : "var(--border)" }}>
+                <div className="card mb-16">
                   <div className="flex-between mb-12">
                     <div className="flex-center gap-8">
-                      <span style={{ fontSize: 16 }}>📅</span>
-                      <h3 style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, color: doneCount === todayItems.length && todayItems.length > 0 ? "var(--sage)" : "var(--cream)" }}>
-                        Today's Work
-                      </h3>
-                      {todayItems.length > 0 && (
-                        <span style={{ fontSize: 12, color: doneCount === todayItems.length ? "var(--sage)" : "var(--muted)", fontWeight: 600 }}>
-                          {doneCount}/{todayItems.length}
-                        </span>
-                      )}
+                      <span style={{ fontSize: 14 }}>📅</span>
+                      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--muted)" }}>On your planner today</span>
                     </div>
-                    <button className="btn btn-ghost btn-xs" onClick={() => onNavigate("planner")}>Edit Plan →</button>
+                    <button className="btn btn-ghost btn-xs" onClick={() => onNavigate("planner")}>Full Planner →</button>
                   </div>
-                  {todayItems.length === 0 ? (
-                    <div style={{ textAlign: "center", padding: "16px 0", color: "var(--muted)", fontSize: 13 }}>
-                      Nothing planned for today.{" "}
-                      <span style={{ color: "var(--amber)", cursor: "pointer", textDecoration: "underline" }} onClick={() => onNavigate("planner")}>
-                        Open planner →
-                      </span>
-                    </div>
-                  ) : (
-                    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                      {todayItems.map((entry, i) => {
-                        const meta = RHYTHM_META[entry.rhythmKey] || {};
-                        const item = (meta.pool || []).find(x => x.id === entry.id);
-                        if (!item) return null;
-                        const isDone = completed.includes(entry.id);
-                        return (
-                          <DashboardWorkItem
-                            key={entry.id + i}
-                            item={item}
-                            meta={meta}
-                            isDone={isDone}
-                            onComplete={onComplete}
-                            onUncomplete={onUncomplete}
-                            content={content}
-                          />
-                        );
-                      })}
-                      {doneCount === todayItems.length && todayItems.length > 0 && (
-                        <div style={{ textAlign: "center", marginTop: 6, fontSize: 13, color: "var(--sage)", fontWeight: 600 }}>🎉 All done for today!</div>
-                      )}
-                    </div>
-                  )}
+                  {todayItems.slice(0, 4).map(entry => {
+                    const item = allPool.find(x => x.id === entry.id) || entry;
+                    const isDone = completed.includes(entry.id);
+                    return (
+                      <div key={entry.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 0", borderBottom: "1px solid var(--border)" }}>
+                        <div style={{ width: 20, height: 20, borderRadius: 4, border: `2px solid ${isDone ? "var(--sage)" : "var(--border)"}`, background: isDone ? "var(--sage)" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                          {isDone && <span style={{ color: "#0c0c16", fontSize: 10, fontWeight: 900 }}>✓</span>}
+                        </div>
+                        <span style={{ fontSize: 14, color: isDone ? "var(--muted)" : "var(--cream-dim)", lineHeight: 1.5, flex: 1, textDecoration: isDone ? "line-through" : "none" }}>{item.name || item.title}</span>
+                        {item.pts && <span className="pts-badge" style={{ fontSize: 10, flexShrink: 0 }}>{item.pts}pts</span>}
+                      </div>
+                    );
+                  })}
                 </div>
               );
             })()}
           </div>
 
           <div>
-            {/* Goals Widget */}
-            <GoalsWidget goals={goals} onNavigate={onNavigate} />
-
-            {/* Messages Widget */}
-            <MessagesWidget messages={messages} studentId={student.id} onNavigate={onNavigate} />
-
-            {/* Habits & Chores Widget */}
-            <HabitsWidget habitDefs={habitDefs || []} habitLogs={habitLogs} setHabitLogs={setHabitLogs} student={student} onComplete={onComplete} onNavigate={onNavigate} />
-
-            {/* Weekly Progress Summary */}
-            {(() => {
-              const DAYS = ["Mon","Tue","Wed","Thu","Fri"];
-              const hasAny = DAYS.some(d => (dailyPlan?.[d] || []).length > 0);
-              if (!hasAny) return null;
-              return (
-                <div className="card mb-16" style={{ borderColor: "var(--border)" }}>
-                  <div className="flex-between mb-12">
-                    <div className="flex-center gap-8">
-                      <span style={{ fontSize: 16 }}>📊</span>
-                      <h3 style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 700, color: "var(--cream)" }}>This Week</h3>
-                    </div>
-                    <button className="btn btn-ghost btn-xs" onClick={() => onNavigate("planner")}>Edit →</button>
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                    {DAYS.map(day => {
-                      const items = dailyPlan?.[day] || [];
-                      const done = items.filter(e => completed.includes(e.id)).length;
-                      const isToday = day === ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date().getDay()];
-                      const isCoOp = day === "Thu";
-                      const pct = items.length > 0 ? Math.round((done / items.length) * 100) : 0;
-                      return (
-                        <div key={day} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                          <div style={{ width: 32, fontSize: 11, fontWeight: isToday ? 700 : 500, color: isCoOp ? "var(--lavender)" : isToday ? "var(--amber)" : "var(--muted)", flexShrink: 0 }}>{day}</div>
-                          {items.length === 0 ? (
-                            <div style={{ flex: 1, height: 6, background: "var(--bg4)", borderRadius: 4, opacity: 0.4 }} />
-                          ) : (
-                            <div style={{ flex: 1, height: 6, background: "var(--border)", borderRadius: 4, overflow: "hidden" }}>
-                              <div style={{ width: `${pct}%`, height: "100%", background: pct === 100 ? "var(--sage)" : isToday ? "var(--amber)" : "var(--sky)", borderRadius: 4, transition: "width 0.4s" }} />
-                            </div>
-                          )}
-                          <div style={{ width: 36, fontSize: 11, color: done === items.length && items.length > 0 ? "var(--sage)" : "var(--muted)", textAlign: "right", flexShrink: 0 }}>
-                            {items.length === 0 ? (isCoOp ? "co-op" : "—") : `${done}/${items.length}`}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })()}
-
-            {/* Active Gigs */}
+            {/* Active gigs */}
             {activeGigs.length > 0 && (
-              <div className="card mb-16" style={{ borderColor: "rgba(96,144,184,0.4)", background: "rgba(77,143,255,0.05)" }}>
+              <div className="card mb-16" style={{ borderColor: "rgba(77,143,255,0.3)" }}>
                 <div className="flex-between mb-12">
                   <div className="flex-center gap-8">
                     <span style={{ fontSize: 16 }}>⚡</span>
-                    <h3 style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, color: "var(--sky)" }}>Active Gigs</h3>
+                    <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--sky)" }}>Gigs in Progress</span>
                   </div>
-                  <button className="btn btn-ghost btn-xs" onClick={() => onNavigate("factions")}>View All →</button>
+                  <button className="btn btn-ghost btn-xs" onClick={() => onNavigate("Guilds")}>View All →</button>
                 </div>
                 {activeGigs.map(gig => {
                   const faction = FACTIONS.find(f => f.id === gig.faction);
                   return (
-                    <div key={gig.id} onClick={() => onNavigate("factions")}
+                    <div key={gig.id} onClick={() => onNavigate("Guilds")}
                       style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", borderRadius: "var(--r)", background: "var(--bg3)", border: "1px solid var(--border)", marginBottom: 8, cursor: "pointer", transition: "all 0.15s" }}
                       onMouseEnter={e => e.currentTarget.style.borderColor = "var(--sky)"}
                       onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
                       <span style={{ fontSize: 18, flexShrink: 0 }}>{faction?.icon || "⚡"}</span>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--cream)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{gig.title}</div>
-                        <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 2 }}>
-                          {faction?.name}{gig.time ? ` · ${gig.time}` : ""}
-                        </div>
+                        <div style={{ fontSize: 14, fontWeight: 600, color: "var(--cream)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{gig.title}</div>
+                        <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 2 }}>{faction?.name}{gig.time ? ` · ${gig.time}` : ""}</div>
                       </div>
                       <span className="pts-badge" style={{ flexShrink: 0 }}>{gig.pts || 0} pts</span>
                     </div>
@@ -5787,40 +5710,69 @@ function StudentDashboard({ student, completed, points, content, weekPlan, grabb
               </div>
             )}
 
-            {/* Right column end */}
+            {/* Momentum summary */}
+            <div className="card mb-16">
+              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--muted)", marginBottom: 14 }}>This Week's Momentum</div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                {[
+                  { num: completed.filter(id => content.skills.find(s => s.id === id)).length, label: "Skills evidenced", color: "var(--amber)" },
+                  { num: completed.filter(id => content.projects.find(p => p.id === id)).length, label: "Projects done", color: "var(--sky)" },
+                  { num: completed.filter(id => content.gigs.find(g => g.id === id)).length, label: "Gigs completed", color: "var(--sage)" },
+                  { num: completed.filter(id => content.ripple.find(r => r.id === id)).length, label: "Contributions", color: "var(--clay)" },
+                ].map((s, i) => (
+                  <div key={i} style={{ background: "var(--bg3)", borderRadius: "var(--r)", padding: "12px 14px", border: "1px solid var(--border)" }}>
+                    <div style={{ fontFamily: "var(--font-display)", fontSize: 28, fontWeight: 700, color: s.color, lineHeight: 1 }}>{s.num}</div>
+                    <div style={{ fontSize: 13, color: "var(--muted)", marginTop: 4, lineHeight: 1.4 }}>{s.label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-            {/* Recently Completed */}
-            {recentCompleted.length > 0 && (
-              <>
-                <h3 style={{ fontFamily: "var(--font-display)", fontSize: 17, fontWeight: 600, color: "var(--cream)", marginBottom: 12, marginTop: 20 }}>Recently Completed</h3>
-                {recentCompleted.map(id => {
-                  const item = [...content.skills, ...content.projects, ...content.gigs, ...content.ripple].find(x => x.id === id);
-                  return item ? (
-                    <div key={id} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, padding: "8px 10px", background: "var(--bg3)", borderRadius: "var(--r)", border: "1px solid var(--border)" }}>
-                      <span style={{ color: "var(--sage)", fontSize: 14 }}>✓</span>
-                      <span style={{ fontSize: 13, color: "var(--cream-dim)", flex: 1 }}>{item.name || item.title}</span>
-                      <span className="pts-badge" style={{ fontSize: 10 }}>{item.pts}pts</span>
-                      <button className="btn btn-ghost btn-xs" style={{ fontSize: 10 }}
-                        onClick={() => onUncomplete(id, item.pts || 0)} title="Mark as not done">Undo</button>
+            {/* Recent Learning Log entries */}
+            {(() => {
+              const entries = Object.entries(journalEntries || {})
+                .filter(([, e]) => e?.text?.trim())
+                .sort((a, b) => (b[1].dropDate || "").localeCompare(a[1].dropDate || ""))
+                .slice(0, 2);
+              if (!entries.length) return null;
+              return (
+                <div className="card mb-16">
+                  <div className="flex-between mb-12">
+                    <div className="flex-center gap-8">
+                      <span style={{ fontSize: 14 }}>📓</span>
+                      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--muted)" }}>Recent Log Entries</span>
                     </div>
-                  ) : null;
-                })}
-              </>
-            )}
+                    <button className="btn btn-ghost btn-xs" onClick={() => onNavigate("journal")}>All entries →</button>
+                  </div>
+                  {entries.map(([id, entry]) => (
+                    <div key={id} onClick={() => onNavigate("journal")}
+                      style={{ padding: "10px 0", borderBottom: "1px solid var(--border)", cursor: "pointer" }}
+                      onMouseEnter={e => e.currentTarget.style.opacity = "0.8"}
+                      onMouseLeave={e => e.currentTarget.style.opacity = "1"}>
+                      <div style={{ fontSize: 12, color: "var(--amber)", fontWeight: 600, marginBottom: 4 }}>{entry.title || "Log Entry"} {entry.dropDate ? `· ${formatDisplayDate(entry.dropDate)}` : ""}</div>
+                      <p style={{ fontSize: 14, color: "var(--cream-dim)", lineHeight: 1.65, margin: 0 }}>{entry.text.length > 110 ? entry.text.substring(0, 110) + "…" : entry.text}</p>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
         </div>
 
         {/* Suggested skills */}
         {suggestedSkills.length > 0 && (
           <div className="mt-20">
-            <h3 style={{ fontFamily: "var(--font-display)", fontSize: 17, fontWeight: 600, color: "var(--cream)", marginBottom: 12 }}>Suggested for You</h3>
+            <div className="flex-between mb-12">
+              <h3 style={{ fontFamily: "var(--font-display)", fontSize: 17, fontWeight: 600, color: "var(--cream)" }}>Skills that might interest you</h3>
+              <button className="btn btn-ghost btn-xs" onClick={() => onNavigate("skills")}>Browse all →</button>
+            </div>
             <div className="grid-3" style={{ gap: 10 }}>
               {suggestedSkills.map(skill => (
                 <div key={skill.id} className="card-sm flex-center gap-12" style={{ cursor: "pointer" }} onClick={() => onNavigate("skills")}>
                   <span style={{ fontSize: 22 }}>{skill.icon}</span>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: "var(--cream)" }}>{skill.name}</div>
-                    <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 2 }}>{skill.desc?.substring(0, 55)}…</div>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: "var(--cream)" }}>{skill.name}</div>
+                    <div style={{ fontSize: 13, color: "var(--muted)", marginTop: 2, lineHeight: 1.5 }}>{skill.desc?.substring(0, 55)}…</div>
                   </div>
                   <div className="flex-center gap-6">
                     <span className="pts-badge">{skill.pts}pts</span>
@@ -5832,40 +5784,6 @@ function StudentDashboard({ student, completed, points, content, weekPlan, grabb
           </div>
         )}
 
-        {/* Recent Journal Entries */}
-        {(() => {
-          const entries = Object.entries(journalEntries || {})
-            .filter(([, e]) => e?.text?.trim())
-            .sort((a, b) => (b[1].dropDate || "").localeCompare(a[1].dropDate || ""))
-            .slice(0, 3);
-          if (entries.length === 0) return null;
-          return (
-            <div className="mt-20">
-              <div className="flex-between mb-12">
-                <h3 style={{ fontFamily: "var(--font-display)", fontSize: 17, fontWeight: 600, color: "var(--cream)" }}>Recent Journal Entries</h3>
-                <button className="btn btn-ghost btn-xs" onClick={() => onNavigate("journal")}>View All →</button>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {entries.map(([dropId, entry]) => (
-                  <div key={dropId} onClick={() => onNavigate("journal")}
-                    style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: "var(--r-lg)", padding: "14px 18px", cursor: "pointer", borderLeft: "3px solid var(--amber)", transition: "border-color 0.15s" }}
-                    onMouseEnter={e => e.currentTarget.style.borderColor = "var(--amber)"}
-                    onMouseLeave={e => e.currentTarget.style.borderLeft = "3px solid var(--amber)"}>
-                    <div className="flex-between mb-6">
-                      <span style={{ fontSize: 11, fontWeight: 700, color: "var(--amber)", textTransform: "uppercase", letterSpacing: 1.5 }}>
-                        📓 {entry.title || "Journal"} · {entry.dropDate ? formatDisplayDate(entry.dropDate) : ""}
-                      </span>
-                    </div>
-                    <p style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.65, margin: 0 }}>
-                      {entry.text.length > 140 ? entry.text.substring(0, 140) + "…" : entry.text}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })()}
-
         {/* Pin Boards */}
         <PinBoards boards={boards} setBoards={setBoards} content={content} onNavigate={onNavigate} />
       </div>
@@ -5873,7 +5791,8 @@ function StudentDashboard({ student, completed, points, content, weekPlan, grabb
   );
 }
 
-function WeeklyPlanner({ content, completed, weekPlan, setWeekPlan, dailyPlan, setDailyPlan, onComplete, onUncomplete }) {
+
+function WeeklyPlanner({ content, completed, weekPlan, setWeekPlan, dailyPlan, setDailyPlan, onDone, onUncomplete }) {
   const DAYS = ["Mon","Tue","Wed","Thu","Fri"];
   const DAY_LABELS = { Mon: "Monday", Tue: "Tuesday", Wed: "Wednesday", Thu: "Thursday", Fri: "Friday" };
   const DAY_NUM = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
@@ -5885,12 +5804,12 @@ function WeeklyPlanner({ content, completed, weekPlan, setWeekPlan, dailyPlan, s
   const [openPickerAreas, setOpenPickerAreas] = useState({});
 
   const RHYTHM = [
-    { key: "skills",    label: "Skill",          icon: "◈",  color: "var(--amber)",    pool: content.skills },
-    { key: "mission",   label: "Project",         icon: "🎯", color: "var(--clay)",     pool: content.projects },
-    { key: "gig",       label: "Sandbox Gig",     icon: "⚡", color: "var(--sky)",      pool: content.gigs },
-    { key: "ripple",    label: "Ripple Mission",   icon: "🌊", color: "var(--sage)",     pool: content.ripple },
-    { key: "guide",     label: "Teen's Guide",    icon: "📖", color: "var(--lavender)", pool: content.teensGuide },
-    { key: "lightroom", label: "Light Room",      icon: "💡", color: "var(--sky)",      pool: content.lightRoom },
+    { key: "skills",    label: "Skill Library",      icon: "◈",  color: "var(--amber)",    pool: content.skills },
+    { key: "mission",   label: "Project Lab",         icon: "🎯", color: "var(--clay)",     pool: content.projects },
+    { key: "gig",       label: "Guild Gig",           icon: "⚡", color: "var(--sky)",      pool: content.gigs },
+    { key: "ripple",    label: "Contribution",        icon: "🌊", color: "var(--sage)",     pool: content.ripple },
+    { key: "guide",     label: "Foundations Guide",   icon: "📖", color: "var(--lavender)", pool: content.teensGuide },
+    { key: "lightroom", label: "The Deep Room",       icon: "💡", color: "var(--sky)",      pool: content.lightRoom },
   ];
 
   const dayItems = dailyPlan[activeDay] || [];
@@ -5965,7 +5884,7 @@ function WeeklyPlanner({ content, completed, weekPlan, setWeekPlan, dailyPlan, s
         const deliverables = parseLines(item.deliverable);
         return (
           <>
-            {faction && <div className="flex-center gap-8 mb-12"><span>{faction.icon}</span><span style={{ fontSize: 12, fontWeight: 700, color: `var(--${faction.color})` }}>{faction.name}</span>{item.time && <span className="tag tag-muted">⏱ {item.time}</span>}</div>}
+            {Guild && <div className="flex-center gap-8 mb-12"><span>{faction.icon}</span><span style={{ fontSize: 12, fontWeight: 700, color: `var(--${faction.color})` }}>{faction.name}</span>{item.time && <span className="tag tag-muted">⏱ {item.time}</span>}</div>}
             {item.problem && <p style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.75, marginBottom: 14 }}>{item.problem}</p>}
             {deliverables.length > 0 && <div className="card" style={{ marginBottom: 14 }}><h3 style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 600, color: "var(--cream)", marginBottom: 8 }}>Deliverables</h3>{deliverables.map((d, i) => <div key={i} style={{ display: "flex", gap: 8, padding: "5px 0", borderBottom: "1px solid var(--border)", fontSize: 13, color: "var(--cream-dim)" }}><span style={{ color: "var(--amber)" }}>→</span>{d}</div>)}</div>}
           </>
@@ -5994,8 +5913,8 @@ function WeeklyPlanner({ content, completed, weekPlan, setWeekPlan, dailyPlan, s
                 <button className="btn btn-ghost btn-sm" onClick={() => { onUncomplete(item.id, item.pts || 0); setViewItem(null); }}>↩ Undo</button>
               </div>
             ) : (
-              <button className="btn btn-sage" onClick={() => { onComplete(item.id, item.pts || 0); setViewItem(null); }}>
-                Mark Complete ✓ {item.pts ? `+${item.pts} pts` : ""}
+              <button className="btn btn-sage" onClick={() => { onDone(item.id, item.pts || 0); setViewItem(null); }}>
+                Add Evidence ✓ {item.pts ? `+${item.pts} pts` : ""}
               </button>
             )}
           </div>
@@ -6023,62 +5942,38 @@ function WeeklyPlanner({ content, completed, weekPlan, setWeekPlan, dailyPlan, s
       <div className="page-header">
         <div className="flex-between">
           <div>
-            <h1 className="page-title">📅 Weekly Planner</h1>
-            <p className="page-sub">Schedule your work day by day. Items show up on your dashboard on the day they're planned.</p>
+            <h1 className="page-title">📅 Rhythm Planner</h1>
+            <p className="page-sub">Add things to each day — then mark them done when you do them. No time slots. No pressure.</p>
           </div>
           <div style={{ textAlign: "right" }}>
             <div style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, color: "var(--amber)" }}>{allDone}/{allPlanned.length}</div>
-            <div style={{ fontSize: 11, color: "var(--muted)" }}>done this week</div>
+            <div style={{ fontSize: 13, color: "var(--muted)" }}>logged this week</div>
           </div>
         </div>
       </div>
 
       <div className="page-content">
 
-        {/* Weekly Rhythm Guide */}
+        {/* Day-Type Guide */}
         <div className="card mb-20" style={{ background: "var(--bg3)", borderColor: "rgba(0,212,255,0.2)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
             <span style={{ fontSize: 18 }}>🗓</span>
-            <div style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, color: "var(--cream)" }}>Your Weekly Rhythm</div>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, color: "var(--cream)" }}>Three kinds of days</div>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
-            <div style={{ padding: "12px 14px", background: "var(--bg2)", borderRadius: "var(--r)", border: "1px solid var(--border)" }}>
-              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--amber)", marginBottom: 8 }}>Every Week</div>
-              <div style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.8 }}>
-                <div>◈ <strong style={{ color: "var(--cream)" }}>10 skills</strong> — spread across Mon, Tue, Wed, Fri</div>
-                <div style={{ fontSize: 11, color: "var(--muted)", marginLeft: 16, marginBottom: 4 }}>~2–3 skills per day · focus on 4–5 subjects</div>
-              </div>
-            </div>
-            <div style={{ padding: "12px 14px", background: "var(--bg2)", borderRadius: "var(--r)", border: "1px solid var(--border)" }}>
-              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--lavender)", marginBottom: 8 }}>Every Month (2×)</div>
-              <div style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.9 }}>
-                <div>🎯 Project · ⚡ Sandbox Gig</div>
-                <div>🌊 Ripple Mission · 📖 Teen's Guide</div>
-                <div>💡 Light Room</div>
-              </div>
-            </div>
-          </div>
-          <div style={{ padding: "12px 14px", background: "rgba(0,212,255,0.05)", borderRadius: "var(--r)", border: "1px solid rgba(0,212,255,0.15)" }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--amber)", marginBottom: 8 }}>Example Week</div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 8 }}>
-              {[
-                { day: "Mon", items: ["Math skill", "Writing skill", "History skill"] },
-                { day: "Tue", items: ["Science skill", "Coding skill", "Art skill"] },
-                { day: "Wed", items: ["Math skill", "Logic skill", "Reading skill"] },
-                { day: "Thu", items: ["Co-op", "(optional work)"], note: true },
-                { day: "Fri", items: ["Writing skill", "Project", "Ripple Mission"] },
-              ].map(({ day, items, note }) => (
-                <div key={day} style={{ padding: "8px 10px", background: "var(--bg2)", borderRadius: "var(--r)", border: note ? "1px solid rgba(176,96,255,0.3)" : "1px solid var(--border)" }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: note ? "var(--lavender)" : "var(--amber)", marginBottom: 6 }}>{day}</div>
-                  {items.map((item, i) => (
-                    <div key={i} style={{ fontSize: 11, color: note ? "var(--muted)" : "var(--cream-dim)", lineHeight: 1.7, fontStyle: note ? "italic" : "normal" }}>{item}</div>
-                  ))}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 4 }}>
+            {[
+              { badge: "day-type-anchor", label: "Anchor Day", icon: "⚓", desc: "Deep work. Go all-in on your main project or skill focus. Protected time.", days: "Mon · Wed" },
+              { badge: "day-type-open",   label: "Open Day",   icon: "🌿", desc: "Fully self-directed. Follow what pulls you. Log if you want — no pressure.", days: "Tue · Fri" },
+              { badge: "day-type-world",  label: "World Day",  icon: "🌍", desc: "Get out, connect, contribute. Co-op, apprenticeship, community, or anything physical.", days: "Thu" },
+            ].map(t => (
+              <div key={t.label} style={{ padding: "12px 14px", background: "var(--bg2)", borderRadius: "var(--r)", border: "1px solid var(--border)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                  <span className={`domain-tag ${t.badge}`}>{t.icon} {t.label}</span>
+                  <span style={{ fontSize: 11, color: "var(--muted)", marginLeft: "auto" }}>{t.days}</span>
                 </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 10, fontStyle: "italic" }}>
-              Thursday is your co-op day — you can still add work if co-op is out, but it's kept light by default.
-            </div>
+                <p style={{ fontSize: 14, color: "var(--cream-dim)", lineHeight: 1.65, margin: 0 }}>{t.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -6089,19 +5984,24 @@ function WeeklyPlanner({ content, completed, weekPlan, setWeekPlan, dailyPlan, s
             const done = items.filter(e => completed.includes(e.id)).length;
             const isToday = day === todayKey;
             const isActive = activeDay === day;
-            const isCoOp = day === "Thu";
+            const DAY_TYPES = { Mon: "anchor", Tue: "open", Wed: "anchor", Thu: "world", Fri: "open" };
+            const dayType = DAY_TYPES[day] || "open";
+            const typeColor = { anchor: "var(--amber)", open: "var(--sage)", world: "var(--lavender)" }[dayType];
             return (
               <button key={day} onClick={() => setActiveDay(day)} style={{
                 flex: 1, padding: "12px 8px", borderRadius: "var(--r-lg)",
-                border: `2px solid ${isActive ? (isCoOp ? "var(--lavender)" : "var(--amber)") : isCoOp ? "rgba(176,96,255,0.3)" : isToday ? "rgba(0,212,255,0.3)" : "var(--border)"}`,
-                background: isActive ? (isCoOp ? "rgba(176,96,255,0.1)" : "var(--amber-dim)") : isCoOp ? "rgba(176,96,255,0.04)" : isToday ? "rgba(0,212,255,0.05)" : "var(--bg2)",
+                border: `2px solid ${isActive ? typeColor : isToday ? typeColor + "55" : "var(--border)"}`,
+                background: isActive ? typeColor + "18" : isToday ? typeColor + "08" : "var(--bg2)",
                 cursor: "pointer", fontFamily: "var(--font-body)", transition: "all 0.15s", textAlign: "center",
               }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: isActive ? (isCoOp ? "var(--lavender)" : "var(--amber)") : isCoOp ? "var(--lavender)" : isToday ? "var(--amber)" : "var(--cream)", marginBottom: 2 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: isActive ? typeColor : isToday ? typeColor : "var(--cream)", marginBottom: 2 }}>
                   {day}
                 </div>
-                <div style={{ fontSize: 9, color: isCoOp ? "var(--lavender)" : "var(--muted)", fontStyle: isCoOp ? "italic" : "normal" }}>
-                  {isCoOp ? "co-op" : items.length === 0 ? "empty" : `${done}/${items.length}`}
+                <div style={{ fontSize: 9, color: typeColor, opacity: 0.7 }}>
+                  {dayType}
+                </div>
+                <div style={{ fontSize: 9, color: "var(--muted)", marginTop: 1 }}>
+                  {items.length === 0 ? "empty" : `${done}/${items.length}`}
                 </div>
               </button>
             );
@@ -6127,10 +6027,10 @@ function WeeklyPlanner({ content, completed, weekPlan, setWeekPlan, dailyPlan, s
 
         {/* Day items */}
         {dayItems.length === 0 ? (
-          <div className="card" style={{ textAlign: "center", padding: 32, color: "var(--muted)", borderStyle: "dashed" }}>
-            <div style={{ fontSize: 28, marginBottom: 8 }}>📋</div>
-            <div style={{ fontSize: 14, marginBottom: 6 }}>Nothing planned for {DAY_LABELS[activeDay]} yet</div>
-            <div style={{ fontSize: 12 }}>Use the buttons above to add skills, projects, gigs, and more</div>
+          <div className="card" style={{ textAlign: "center", padding: 36, color: "var(--muted)", borderStyle: "dashed" }}>
+            <div style={{ fontSize: 28, marginBottom: 10 }}>📅</div>
+            <div style={{ fontSize: 16, marginBottom: 6, color: "var(--cream)" }}>Nothing added for {DAY_LABELS[activeDay]} yet</div>
+            <div style={{ fontSize: 14, lineHeight: 1.75 }}>Use the buttons above to add something to this day. You'll mark it done when you actually do it.</div>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -6256,7 +6156,7 @@ function WeeklyPlanner({ content, completed, weekPlan, setWeekPlan, dailyPlan, s
 
 // ─── STUDENT: SKILL EXPLORER ──────────────────────────────────────────────────
 
-function SkillExplorer({ student, completed, content, onComplete, onUncomplete, onSubmitApproval, boards, saveToBoard, submissions, setSubmission }) {
+function SkillExplorer({ student, completed, content, onDone, onUncomplete, onSubmitApproval, boards, saveToBoard, submissions, setSubmission }) {
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState(null);
@@ -6376,7 +6276,7 @@ function SkillExplorer({ student, completed, content, onComplete, onUncomplete, 
           </div>
         </div>
         <Modal open={showApproval} onClose={() => setShowApproval(false)} title="Submit Mastery Check"
-          footer={<><button className="btn btn-ghost" onClick={() => setShowApproval(false)}>Cancel</button><button className="btn btn-primary" onClick={() => { onSubmitApproval({ skillId: selected.id, skillName: selected.name, pts: selected.pts, notes: approvalNotes }); setShowApproval(false); onComplete(selected.id, selected.pts); }}>Submit →</button></>}>
+          footer={<><button className="btn btn-ghost" onClick={() => setShowApproval(false)}>Cancel</button><button className="btn btn-primary" onClick={() => { onSubmitApproval({ skillId: selected.id, skillName: selected.name, pts: selected.pts, notes: approvalNotes }); setShowApproval(false); onDone(selected.id, selected.pts); }}>Submit →</button></>}>
           <p style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.7, marginBottom: 16 }}>Tell your teacher what you did to master this skill. Include evidence — what you made, wrote, built, or documented.</p>
           <textarea className="input textarea" style={{ minHeight: 100 }} value={approvalNotes} onChange={e => setApprovalNotes(e.target.value)} placeholder="Describe your evidence for mastery. What did you create or accomplish? How do you know you've mastered this?" />
         </Modal>
@@ -6387,8 +6287,8 @@ function SkillExplorer({ student, completed, content, onComplete, onUncomplete, 
   return (
     <div>
       <div className="page-header">
-        <h1 className="page-title">◈ Skill Explorer</h1>
-        <p className="page-sub">{skills.length} skills · {completed.filter(id => skills.find(s => s.id === id)).length} mastered</p>
+        <h1 className="page-title">◈ Skill Library</h1>
+        <p className="page-sub">{skills.length} skills · {completed.filter(id => skills.find(s => s.id === id)).length} evidenced so far</p>
       </div>
       <div className="page-content">
         <div className="flex gap-10 mb-16">
@@ -6796,7 +6696,7 @@ function SubmissionBuilder({ submission, onChange, itemTitle }) {
 
 // ─── STUDENT: PROJECT LAB ─────────────────────────────────────────────────────
 
-function ProjectLab({ student, completed, content, onComplete, onUncomplete, boards, saveToBoard, submissions, setSubmission, portfolioFeatured, setPortfolioFeatured }) {
+function ProjectLab({ student, completed, content, onDone, onUncomplete, boards, saveToBoard, submissions, setSubmission, portfolioFeatured, setPortfolioFeatured }) {
   const [filter, setFilter] = useState("all");
   const [selected, setSelected] = useState(null);
 
@@ -6854,10 +6754,10 @@ function ProjectLab({ student, completed, content, onComplete, onUncomplete, boa
                         onChange={e => setPortfolioFeatured(p => ({ ...p, [selected.id]: e.target.checked }))} />
                       <span style={{ fontSize: 13, color: "var(--cream-dim)" }}>Feature in Portfolio</span>
                     </label>
-                    <button className="btn btn-ghost btn-sm" style={{ width: "100%", marginBottom: 8 }} onClick={() => onUncomplete(selected.id, selected.pts)}>↩ Mark as Incomplete</button>
+                    <button className="btn btn-ghost btn-sm" style={{ width: "100%", marginBottom: 8 }} onClick={() => onUncomplete(selected.id, selected.pts)}>↩ ↩ Undo this</button>
                   </div>
                 ) : (
-                  <button className="btn btn-primary" style={{ width: "100%" }} onClick={() => { onComplete(selected.id, selected.pts); }}>Mark Complete ✓</button>
+                  <button className="btn btn-primary" style={{ width: "100%" }} onClick={() => { onDone(selected.id, selected.pts); }}>Add Evidence ✓</button>
                 )}
               </div>
             </div>
@@ -6891,7 +6791,7 @@ function ProjectLab({ student, completed, content, onComplete, onUncomplete, boa
     <div>
       <div className="page-header">
         <h1 className="page-title">⬟ Project Lab</h1>
-        <p className="page-sub">{projects.length} projects · {completed.filter(id => projects.find(p => p.id === id)).length} completed</p>
+        <p className="page-sub">{projects.length} projects · {completed.filter(id => projects.find(p => p.id === id)).length} done</p>
       </div>
       <div className="page-content">
         <div className="filter-row">
@@ -6932,7 +6832,7 @@ function ProjectLab({ student, completed, content, onComplete, onUncomplete, boa
 
 // ─── STUDENT: FACTIONS ────────────────────────────────────────────────────────
 
-function GigDetail({ gig, completed, grabbed, onGrab, onComplete, onUncomplete, onBack, backLabel, boards, saveToBoard, submissions, setSubmission, portfolioFeatured, setPortfolioFeatured }) {
+function GigDetail({ gig, completed, grabbed, onGrab, onDone, onUncomplete, onBack, backLabel, boards, saveToBoard, submissions, setSubmission, portfolioFeatured, setPortfolioFeatured }) {
   const [checksDone, setChecksDone] = useState({});
   const faction = FACTIONS.find(f => f.id === gig.faction);
   const isDone = completed.includes(gig.id);
@@ -6947,7 +6847,7 @@ function GigDetail({ gig, completed, grabbed, onGrab, onComplete, onUncomplete, 
   const tags = parseTags(gig.tags);
 
   const colorRgb = { amber: "232,160,32", sage: "122,170,122", sky: "96,144,184", clay: "200,112,96", lavender: "144,128,192" };
-  const factionRgb = faction ? (colorRgb[faction.color] || "232,160,32") : "232,160,32";
+  const GuildRgb = Guild ? (colorRgb[faction.color] || "232,160,32") : "232,160,32";
 
   const difficultyStars = (d) => {
     if (d === "Beginner") return "★☆☆";
@@ -6963,10 +6863,10 @@ function GigDetail({ gig, completed, grabbed, onGrab, onComplete, onUncomplete, 
       </div>
       <div className="page-content" style={{ maxWidth: 680, paddingTop: 0 }}>
 
-        {/* Faction + tag badges */}
+        {/* Guild + tag badges */}
         <div className="flex-center gap-10 mb-12" style={{ flexWrap: "wrap" }}>
-          {faction && (
-            <div style={{ display: "flex", alignItems: "center", gap: 7, padding: "4px 12px", borderRadius: 20, background: `rgba(${factionRgb},.15)`, border: `1px solid rgba(${factionRgb},.35)` }}>
+          {Guild && (
+            <div style={{ display: "flex", alignItems: "center", gap: 7, padding: "4px 12px", borderRadius: 20, background: `rgba(${GuildRgb},.15)`, border: `1px solid rgba(${GuildRgb},.35)` }}>
               <span style={{ fontSize: 14 }}>{faction.icon}</span>
               <span style={{ fontSize: 12, fontWeight: 700, color: `var(--${faction.color})` }}>{faction.name}</span>
             </div>
@@ -7074,20 +6974,20 @@ function GigDetail({ gig, completed, grabbed, onGrab, onComplete, onUncomplete, 
                   onChange={e => setPortfolioFeatured(p => ({ ...p, [gig.id]: e.target.checked }))} />
                 <span style={{ fontSize: 13, color: "var(--cream-dim)" }}>Feature in Portfolio</span>
               </label>
-              <button className="btn btn-ghost btn-sm" style={{ width: "100%" }} onClick={() => onUncomplete(gig.id, gig.pts || 0)}>↩ Mark as Incomplete</button>
+              <button className="btn btn-ghost btn-sm" style={{ width: "100%" }} onClick={() => onUncomplete(gig.id, gig.pts || 0)}>↩ ↩ Undo this</button>
             </div>
           ) : !isGrabbed ? (
             <button onClick={onGrab}
               style={{ width: "100%", padding: "16px", background: "var(--amber)", color: "#0c0c16", border: "none", borderRadius: "var(--r)", fontWeight: 900, fontSize: 15, letterSpacing: 1, textTransform: "uppercase", cursor: "pointer", fontFamily: "var(--font-body)" }}>
-              Grab This Gig →
+              Take This Gig →
             </button>
           ) : (
             <div>
               <div style={{ padding: "12px 14px", background: "var(--sage-dim)", border: "1px solid rgba(0,229,168,0.35)", borderRadius: "var(--r)", marginBottom: 12, fontSize: 13, color: "var(--sage)" }}>
                 ✓ You've grabbed this gig — complete your deliverables and mark it done below.
               </div>
-              <button className="btn btn-sage" style={{ width: "100%" }} onClick={onComplete}>
-                Mark Gig Complete ✓
+              <button className="btn btn-sage" style={{ width: "100%" }} onClick={onDone}>
+                Mark Gig Done ✓
               </button>
             </div>
           )}
@@ -7119,8 +7019,8 @@ function GigDetail({ gig, completed, grabbed, onGrab, onComplete, onUncomplete, 
   );
 }
 
-function FactionsView({ completed, content, studentFaction, setStudentFaction, grabbed, setGrabbed, onComplete, onUncomplete, boards, saveToBoard, submissions, setSubmission, portfolioFeatured, setPortfolioFeatured }) {
-  const [view, setView] = useState("factions");
+function GuildsView({ completed, content, studentFaction, setStudentFaction, grabbed, setGrabbed, onComplete, onUncomplete, boards, saveToBoard, submissions, setSubmission, portfolioFeatured, setPortfolioFeatured }) {
+  const [view, setView] = useState("home");
   const [selectedGig, setSelectedGig] = useState(null);
   const gigs = content.gigs;
 
@@ -7134,10 +7034,10 @@ function FactionsView({ completed, content, studentFaction, setStudentFaction, g
         completed={completed}
         grabbed={grabbed}
         onGrab={() => setGrabbed(p => ({ ...p, [selectedGig.id]: true }))}
-        onComplete={() => { onComplete(selectedGig.id, selectedGig.pts || 0); setSelectedGig(null); }}
+        onDone={() => { onComplete(selectedGig.id, selectedGig.pts || 0); setSelectedGig(null); }}
         onUncomplete={onUncomplete}
         onBack={() => setSelectedGig(null)}
-        backLabel={view === "factions" ? "Factions" : (FACTIONS.find(f => f.id === view)?.name || "Gigs")}
+        backLabel={view === "home" ? "Guilds" : (FACTIONS.find(f => f.id === view)?.name || "Gigs")}
         boards={boards}
         saveToBoard={saveToBoard}
         submissions={submissions}
@@ -7148,14 +7048,14 @@ function FactionsView({ completed, content, studentFaction, setStudentFaction, g
     );
   }
 
-  // ── Faction gig list ────────────────────────────────────────────────
-  if (view !== "factions") {
+  // ── Guild gig list ────────────────────────────────────────────────
+  if (view !== "home") {
     const faction = FACTIONS.find(f => f.id === view);
-    const factionGigs = gigs.filter(g => g.faction === view);
+    const GuildGigs = gigs.filter(g => g.faction === view);
     return (
       <div>
         <div className="page-header">
-          <button className="btn btn-ghost btn-sm mb-8" onClick={() => setView("factions")}>← All Factions</button>
+          <button className="btn btn-ghost btn-sm mb-8" onClick={() => setView("home")}>← All Guilds</button>
           <div className="flex-between">
             <div>
               <div style={{ fontSize: 32, marginBottom: 6 }}>{faction.icon}</div>
@@ -7164,18 +7064,18 @@ function FactionsView({ completed, content, studentFaction, setStudentFaction, g
             </div>
             <div style={{ textAlign: "right" }}>
               <div style={{ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 700, color: `var(--${faction.color})` }}>
-                {factionGigs.filter(g => completed.includes(g.id)).length} / {factionGigs.length}
+                {GuildGigs.filter(g => completed.includes(g.id)).length} / {GuildGigs.length}
               </div>
               <div style={{ fontSize: 12, color: "var(--muted)" }}>gigs completed</div>
             </div>
           </div>
         </div>
         <div className="page-content">
-          {factionGigs.length === 0 ? (
-            <EmptyState icon={faction.icon} title="No gigs yet" sub="Your teacher hasn't added gigs for this faction yet." />
+          {GuildGigs.length === 0 ? (
+            <EmptyState icon={faction.icon} title="No gigs in this Guild yet" sub="Your mentor hasn't added gigs for this Guild yet." />
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {factionGigs.map(gig => {
+              {GuildGigs.map(gig => {
                 const isDone = completed.includes(gig.id);
                 const tags = parseTags(gig.tags);
                 return (
@@ -7204,12 +7104,12 @@ function FactionsView({ completed, content, studentFaction, setStudentFaction, g
     );
   }
 
-  // ── Faction grid ────────────────────────────────────────────────────
+  // ── Guild grid ────────────────────────────────────────────────────
   return (
     <div>
       <div className="page-header">
-        <h1 className="page-title">⚡ Factions</h1>
-        <p className="page-sub">Pick your crew. Complete sandbox gigs to earn points and build your portfolio.</p>
+        <h1 className="page-title">⚡ Forge Guilds</h1>
+        <p className="page-sub">Pick your crew. Done sandbox gigs to earn points and build your portfolio.</p>
       </div>
       <div className="page-content">
         {studentFaction && (
@@ -7218,7 +7118,7 @@ function FactionsView({ completed, content, studentFaction, setStudentFaction, g
               <div className="flex-center gap-10">
                 <span style={{ fontSize: 28 }}>{FACTIONS.find(f => f.id === studentFaction)?.icon}</span>
                 <div>
-                  <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 2, color: "var(--muted)" }}>Your Faction</div>
+                  <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 2, color: "var(--muted)" }}>Your Guild</div>
                   <div style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, color: "var(--cream)" }}>{FACTIONS.find(f => f.id === studentFaction)?.name}</div>
                 </div>
               </div>
@@ -7228,24 +7128,24 @@ function FactionsView({ completed, content, studentFaction, setStudentFaction, g
         )}
         <div className="grid-2" style={{ gap: 16 }}>
           {FACTIONS.map(faction => {
-            const factionGigs = gigs.filter(g => g.faction === faction.id);
-            const doneCount = factionGigs.filter(g => completed.includes(g.id)).length;
-            const isMyFaction = studentFaction === faction.id;
+            const GuildGigs = gigs.filter(g => g.faction === faction.id);
+            const doneCount = GuildGigs.filter(g => completed.includes(g.id)).length;
+            const isMyGuild = studentFaction === faction.id;
             return (
               <div key={faction.id}
                 onClick={() => setView(faction.id)}
-                className={`faction-card ${isMyFaction ? "selected" : ""}`}
-                style={{ borderColor: isMyFaction ? `var(--${faction.color})` : "transparent", cursor: "pointer" }}
-                onMouseEnter={e => { if (!isMyFaction) e.currentTarget.style.borderColor = `var(--${faction.color})`; }}
-                onMouseLeave={e => { if (!isMyFaction) e.currentTarget.style.borderColor = "var(--border)"; }}>
+                className={`Guild-card ${isMyGuild ? "selected" : ""}`}
+                style={{ borderColor: isMyGuild ? `var(--${faction.color})` : "transparent", cursor: "pointer" }}
+                onMouseEnter={e => { if (!isMyGuild) e.currentTarget.style.borderColor = `var(--${faction.color})`; }}
+                onMouseLeave={e => { if (!isMyGuild) e.currentTarget.style.borderColor = "var(--border)"; }}>
                 <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `var(--${faction.color})`, opacity: 0.7 }} />
                 <div style={{ fontSize: 28, marginBottom: 8 }}>{faction.icon}</div>
                 <h3 style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, color: `var(--${faction.color})`, marginBottom: 4 }}>{faction.name}</h3>
                 <p style={{ fontSize: 12, color: "var(--muted)", lineHeight: 1.6, marginBottom: 14 }}>{faction.desc}</p>
                 <div className="flex-between">
-                  <span style={{ fontSize: 12, color: "var(--muted)" }}>{doneCount}/{factionGigs.length} gigs</span>
+                  <span style={{ fontSize: 12, color: "var(--muted)" }}>{doneCount}/{GuildGigs.length} gigs</span>
                   <div className="flex gap-6" onClick={e => e.stopPropagation()}>
-                    {!isMyFaction && (
+                    {!isMyGuild && (
                       <button className="btn btn-ghost btn-xs" onClick={(e) => { e.stopPropagation(); setStudentFaction(faction.id); }}>Join</button>
                     )}
                     <button className="btn btn-ghost btn-xs" onClick={() => setView(faction.id)}>View Gigs →</button>
@@ -7262,7 +7162,7 @@ function FactionsView({ completed, content, studentFaction, setStudentFaction, g
 
 // ─── STUDENT: RIPPLE MISSIONS ─────────────────────────────────────────────────
 
-function RippleMissions({ completed, content, onComplete, onUncomplete, boards, saveToBoard }) {
+function ContributionMissions({ completed, content, onDone, onUncomplete, boards, saveToBoard }) {
   const [selected, setSelected] = useState(null);
   const missions = content.ripple;
 
@@ -7292,7 +7192,7 @@ function RippleMissions({ completed, content, onComplete, onUncomplete, boards, 
               </div>
               {selected.steps && selected.steps.length > 0 && (
                 <div className="card">
-                  <h3 style={{ fontFamily: "var(--font-display)", fontSize: 17, fontWeight: 600, color: "var(--cream)", marginBottom: 12 }}>How to Complete It</h3>
+                  <h3 style={{ fontFamily: "var(--font-display)", fontSize: 17, fontWeight: 600, color: "var(--cream)", marginBottom: 12 }}>How to Done It</h3>
                   {selected.steps.map((step, i) => (
                     <div key={i} className="checklist-item">
                       <div style={{ width: 22, height: 22, borderRadius: 50, background: "var(--bg4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "var(--muted)", fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
@@ -7309,11 +7209,11 @@ function RippleMissions({ completed, content, onComplete, onUncomplete, boards, 
                     <span style={{ fontSize: 22 }}>✓</span>
                     <span style={{ fontWeight: 600 }}>Mission completed! +{selected.pts} points</span>
                   </div>
-                  <button className="btn btn-ghost btn-sm" style={{ width: "100%" }} onClick={() => onUncomplete(selected.id, selected.pts)}>↩ Mark as Incomplete</button>
+                  <button className="btn btn-ghost btn-sm" style={{ width: "100%" }} onClick={() => onUncomplete(selected.id, selected.pts)}>↩ ↩ Undo this</button>
                 </div>
               ) : (
-                <button className="btn btn-sage" style={{ width: "100%" }} onClick={() => { onComplete(selected.id, selected.pts); setSelected(null); }}>
-                  Mark Mission Complete ✓
+                <button className="btn btn-sage" style={{ width: "100%" }} onClick={() => { onDone(selected.id, selected.pts); setSelected(null); }}>
+                  Mark Mission Done ✓
                 </button>
               )}
             </div>
@@ -7329,12 +7229,12 @@ function RippleMissions({ completed, content, onComplete, onUncomplete, boards, 
   return (
     <div>
       <div className="page-header">
-        <h1 className="page-title">🌊 Ripple Missions</h1>
+        <h1 className="page-title">🌊 Contribution Lab</h1>
         <p className="page-sub">Philanthropic missions that create real impact. Your actions ripple outward.</p>
       </div>
       <div className="page-content">
         {missions.length === 0 ? (
-          <EmptyState icon="🌊" title="No missions yet" sub="Your teacher hasn't added ripple missions yet." />
+          <EmptyState icon="🌊" title="No missions yet" sub="Your teacher hasn't added contributions yet." />
         ) : (
           <div className="grid-2" style={{ gap: 14 }}>
             {missions.map(m => {
@@ -7364,7 +7264,7 @@ function RippleMissions({ completed, content, onComplete, onUncomplete, boards, 
 
 // ─── STUDENT: TEEN'S GUIDE ────────────────────────────────────────────────────
 
-function TeensGuide({ completed, content, onComplete, onUncomplete, boards, saveToBoard }) {
+function TeensGuide({ completed, content, onDone, onUncomplete, boards, saveToBoard }) {
   const [selected, setSelected] = useState(null);
   const entries = content.teensGuide;
 
@@ -7373,7 +7273,7 @@ function TeensGuide({ completed, content, onComplete, onUncomplete, boards, save
     return (
       <div>
         <div className="page-header">
-          <button className="btn btn-ghost btn-sm mb-8" onClick={() => setSelected(null)}>← Back to Teen's Guide</button>
+          <button className="btn btn-ghost btn-sm mb-8" onClick={() => setSelected(null)}>← Back to Foundations Guide</button>
           <div className="flex-between">
             <div>
               <div style={{ fontSize: 28, marginBottom: 6 }}>{selected.icon}</div>
@@ -7397,7 +7297,7 @@ function TeensGuide({ completed, content, onComplete, onUncomplete, boards, save
           )}
           <div style={{ maxWidth: 680, marginTop: 16 }}>
             {!isDone ? (
-              <button className="btn btn-sky" onClick={() => { onComplete(selected.id, selected.pts || 5); setSelected(null); }}>Mark as Read ✓</button>
+              <button className="btn btn-sky" onClick={() => { onDone(selected.id, selected.pts || 5); setSelected(null); }}>Mark as Read ✓</button>
             ) : (
               <div className="flex-center gap-10">
                 <div className="flex-center gap-8" style={{ color: "var(--sky)" }}>
@@ -7415,12 +7315,12 @@ function TeensGuide({ completed, content, onComplete, onUncomplete, boards, save
   return (
     <div>
       <div className="page-header">
-        <h1 className="page-title">📖 Teen's Guide</h1>
+        <h1 className="page-title">📖 Foundations Guide</h1>
         <p className="page-sub">Life skills, hard conversations, and things nobody else teaches you.</p>
       </div>
       <div className="page-content">
         {entries.length === 0 ? (
-          <EmptyState icon="📖" title="No entries yet" sub="Your teacher hasn't added Teen's Guide entries yet." />
+          <EmptyState icon="📖" title="No entries yet" sub="Your teacher hasn't added Foundations Guide entries yet." />
         ) : (
           <div className="grid-2" style={{ gap: 14 }}>
             {entries.map(entry => {
@@ -7449,7 +7349,7 @@ function TeensGuide({ completed, content, onComplete, onUncomplete, boards, save
 
 // ─── STUDENT: LIGHT ROOM ──────────────────────────────────────────────────────
 
-function LightRoom({ completed, content, onComplete, onUncomplete, boards, saveToBoard }) {
+function LightRoom({ completed, content, onDone, onUncomplete, boards, saveToBoard }) {
   const [selected, setSelected] = useState(null);
   const items = content.lightRoom;
 
@@ -7458,7 +7358,7 @@ function LightRoom({ completed, content, onComplete, onUncomplete, boards, saveT
     return (
       <div>
         <div className="page-header">
-          <button className="btn btn-ghost btn-sm mb-8" onClick={() => setSelected(null)}>← Back to Light Room</button>
+          <button className="btn btn-ghost btn-sm mb-8" onClick={() => setSelected(null)}>← Back to The Deep Room</button>
           <div className="flex-between">
             <div>
               <div style={{ fontSize: 28, marginBottom: 6 }}>{selected.icon}</div>
@@ -7483,7 +7383,7 @@ function LightRoom({ completed, content, onComplete, onUncomplete, boards, saveT
           )}
           <div style={{ maxWidth: 680, marginTop: 16 }}>
             {!isDone ? (
-              <button className="btn btn-lavender" onClick={() => { onComplete(selected.id, selected.pts || 5); setSelected(null); }}>Mark Complete ✓</button>
+              <button className="btn btn-lavender" onClick={() => { onDone(selected.id, selected.pts || 5); setSelected(null); }}>Add Evidence ✓</button>
             ) : (
               <div className="flex-center gap-10">
                 <div className="flex-center gap-8" style={{ color: "var(--lavender)" }}>
@@ -7501,12 +7401,12 @@ function LightRoom({ completed, content, onComplete, onUncomplete, boards, saveT
   return (
     <div>
       <div className="page-header">
-        <h1 className="page-title">💡 Light Room</h1>
+        <h1 className="page-title">💡 The Deep Room</h1>
         <p className="page-sub">Curated reading, watching, and reflection. For minds that want more.</p>
       </div>
       <div className="page-content">
         {items.length === 0 ? (
-          <EmptyState icon="💡" title="Coming soon" sub="Your teacher is curating Light Room content for you." />
+          <EmptyState icon="💡" title="Coming soon" sub="Your teacher is curating The Deep Room content for you." />
         ) : (
           <div className="grid-2" style={{ gap: 14 }}>
             {items.map(item => {
@@ -7537,7 +7437,7 @@ function LightRoom({ completed, content, onComplete, onUncomplete, boards, saveT
 
 // ─── STUDENT: DAILY DROPS ─────────────────────────────────────────────────────
 
-function DailyDrops({ completed, content, onComplete, onUncomplete, student, boards, saveToBoard, journalEntries, onSaveJournal }) {
+function DailyDrops({ completed, content, onDone, onUncomplete, student, boards, saveToBoard, journalEntries, onSaveJournal }) {
   const [selectedDate, setSelectedDate] = useState(null);
   const drops = content.dailyDrops;
   const today = todayStr();
@@ -7579,11 +7479,11 @@ function DailyDrops({ completed, content, onComplete, onUncomplete, student, boa
           <div className="flex-between">
             <div>
               <span style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 2, color: "var(--amber)", fontWeight: 700 }}>
-                {viewDrop.date === today ? "Today's Drop" : formatDisplayDate(viewDrop.date)}
+                {viewDrop.date === today ? "Today's Spark" : formatDisplayDate(viewDrop.date)}
               </span>
               <h1 className="page-title mt-4">{formatDisplayDate(viewDrop.date)}</h1>
             </div>
-            {isDone && <span className="tag tag-sage" style={{ fontSize: 12 }}>✓ Completed</span>}
+            {isDone && <span className="tag tag-sage" style={{ fontSize: 12 }}>✓ Doned</span>}
           </div>
         </div>
         <div className="page-content">
@@ -7715,15 +7615,15 @@ function DailyDrops({ completed, content, onComplete, onUncomplete, student, boa
             )}
 
             {!isDone && hasContent(viewDrop) && (
-              <button className="btn btn-primary" style={{ width: "100%" }} onClick={() => { onComplete(dropId, 5); }}>
-                Mark Today's Drop Complete ✓
+              <button className="btn btn-primary" style={{ width: "100%" }} onClick={() => { onDone(dropId, 5); }}>
+                Mark Today's Spark Done ✓
               </button>
             )}
             {isDone && (
               <div className="flex-center gap-10" style={{ justifyContent: "center", padding: "14px 0" }}>
                 <div className="flex-center gap-8" style={{ color: "var(--sage)" }}>
                   <span style={{ fontSize: 18 }}>✓</span>
-                  <span style={{ fontWeight: 600, fontSize: 15 }}>Drop complete — nice work.</span>
+                  <span style={{ fontWeight: 600, fontSize: 15 }}>Spark explored — nice work.</span>
                 </div>
                 <button className="btn btn-ghost btn-xs" onClick={() => onUncomplete(dropId, 5)}>↩ Undo</button>
               </div>
@@ -7737,18 +7637,18 @@ function DailyDrops({ completed, content, onComplete, onUncomplete, student, boa
   return (
     <div>
       <div className="page-header">
-        <h1 className="page-title">🌤️ Daily Drops</h1>
-        <p className="page-sub">Video, journal, career spotlight, and kindness challenge — fresh each day.</p>
+        <h1 className="page-title">✨ Sparks</h1>
+        <p className="page-sub">A question, a video, a spotlight, a challenge. Something worth exploring.</p>
       </div>
       <div className="page-content">
         {drops.length === 0 ? (
-          <EmptyState icon="🌤️" title="No drops yet" sub="Your teacher will add daily drops here — check back soon." />
+          <EmptyState icon="🌤️" title="No Sparks yet" sub="Your teacher will add Sparks here — check back soon — something interesting is on the way." />
         ) : (
           <>
-            {/* Today's Drop */}
+            {/* Today's Spark */}
             {todayDrop && hasContent(todayDrop) && (
               <div className="mb-24">
-                <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 2, color: "var(--amber)", fontWeight: 700, marginBottom: 10 }}>Today's Drop</div>
+                <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 2, color: "var(--amber)", fontWeight: 700, marginBottom: 10 }}>Today's Spark</div>
                 <div style={{ background: "var(--amber-dim)", border: "1px solid rgba(0,212,255,0.40)", borderRadius: "var(--r-lg)", padding: 24, cursor: "pointer" }} onClick={() => setSelectedDate(today)}>
                   <div className="flex-between mb-12">
                     <span style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, color: "var(--cream)" }}>{formatDisplayDate(today)}</span>
@@ -7756,7 +7656,7 @@ function DailyDrops({ completed, content, onComplete, onUncomplete, student, boa
                   </div>
                   <div className="flex gap-8 flex-wrap">
                     {todayDrop.video && <span className="tag tag-sky">📹 Video</span>}
-                    {todayDrop.journal && <span className="tag tag-amber">📓 Journal</span>}
+                    {todayDrop.journal && <span className="tag tag-amber">📓 Learning Log</span>}
                     {filterSpotlights(todayDrop).length > 0 && <span className="tag tag-lavender">💼 Career Spotlight</span>}
                     {todayDrop.kindnessChallenge && <span className="tag tag-sage">💛 Kindness Challenge</span>}
                   </div>
@@ -7766,12 +7666,12 @@ function DailyDrops({ completed, content, onComplete, onUncomplete, student, boa
             {(!todayDrop || !hasContent(todayDrop)) && (
               <div className="card mb-20" style={{ textAlign: "center", padding: 28 }}>
                 <div style={{ fontSize: 28, marginBottom: 8 }}>📭</div>
-                <div style={{ fontSize: 14, color: "var(--muted)" }}>No drop for today yet — check back later.</div>
+                <div style={{ fontSize: 14, color: "var(--muted)" }}>No Spark for today yet — check back later.</div>
               </div>
             )}
 
             {/* All drops list */}
-            <h3 style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 600, color: "var(--muted)", marginBottom: 12 }}>All Drops</h3>
+            <h3 style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 600, color: "var(--muted)", marginBottom: 12 }}>All Sparks</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {sortedDrops.map(drop => {
                 if (!hasContent(drop)) return null;
@@ -7814,7 +7714,7 @@ function Portfolio({ student, completed, content, onUncomplete, submissions, set
     ...content.skills.filter(s => completed.includes(s.id)).map(s => ({ ...s, type: "skill", label: "Skill" })),
     ...content.projects.filter(p => completed.includes(p.id)).map(p => ({ ...p, type: "project", label: "Project", name: p.title })),
     ...content.gigs.filter(g => completed.includes(g.id)).map(g => ({ ...g, type: "gig", label: "Gig", name: g.title })),
-    ...content.ripple.filter(r => completed.includes(r.id)).map(r => ({ ...r, type: "ripple", label: "Ripple", name: r.title })),
+    ...content.ripple.filter(r => completed.includes(r.id)).map(r => ({ ...r, type: "ripple", label: "Contribution", name: r.title })),
   ];
 
   const typeColors = { skill: "amber", project: "sky", gig: "sage", ripple: "clay" };
@@ -7948,7 +7848,7 @@ function Portfolio({ student, completed, content, onUncomplete, submissions, set
         <div className="flex-between">
           <div>
             <h1 className="page-title">🗂 Portfolio</h1>
-            <p className="page-sub">{allItems.length} completed items · {featuredCount} in portfolio</p>
+            <p className="page-sub">{allItems.length} things completed · {featuredCount} in your portfolio</p>
           </div>
           <div className="flex gap-10" style={{ alignItems: "center" }}>
             <div style={{ textAlign: "right" }}>
@@ -7966,11 +7866,11 @@ function Portfolio({ student, completed, content, onUncomplete, submissions, set
 
       <div className="page-content">
         {allItems.length === 0 ? (
-          <EmptyState icon="🗂" title="Your portfolio is empty" sub="Complete skills, projects, gigs, and missions — they'll automatically appear here." />
+          <EmptyState icon="🗂" title="Your portfolio is empty" sub="Done skills, projects, gigs, and missions — they'll automatically appear here." />
         ) : (
           <>
             <div className="filter-row">
-              {[{ id: "all", label: "All Completed" }, { id: "featured", label: "✦ In Portfolio" }, { id: "skill", label: "Skills" }, { id: "project", label: "Projects" }, { id: "gig", label: "Gigs" }, { id: "ripple", label: "Ripple" }].map(f => (
+              {[{ id: "all", label: "All Doned" }, { id: "featured", label: "✦ In Portfolio" }, { id: "skill", label: "Skills" }, { id: "project", label: "Projects" }, { id: "gig", label: "Gigs" }, { id: "ripple", label: "Contribution" }].map(f => (
                 <button key={f.id} className={"filter-btn " + (filter === f.id ? "active" : "")} onClick={() => setFilter(f.id)}>{f.label}</button>
               ))}
             </div>
@@ -8088,7 +7988,7 @@ function Portfolio({ student, completed, content, onUncomplete, submissions, set
             </div>
 
             {filtered.length === 0 && filter === "featured" && (
-              <EmptyState icon="📁" title="No submissions yet" sub="Complete a project or gig, then use the submission builder to document your work." />
+              <EmptyState icon="📁" title="No submissions yet" sub="Done a project or gig, then use the submission builder to document your work." />
             )}
           </>
         )}
@@ -8106,7 +8006,7 @@ function Transcript({ completed, content }) {
     <div>
       <div className="page-header">
         <h1 className="page-title">📋 Transcript</h1>
-        <p className="page-sub">Your official learning record — organized by subject area</p>
+        <p className="page-sub">A formal record — useful for transcripts and applications. Your portfolio tells the fuller story. — organized by subject area</p>
       </div>
       <div className="page-content">
         <div className="grid-4 mb-20">
@@ -8117,14 +8017,14 @@ function Transcript({ completed, content }) {
             }, 0);
             const totalTarget = content.areas.reduce((a,b)=>a+(b.target||0),0);
             const pct = Math.round((totalEarned / totalTarget) * 100);
-            const areasComplete = content.areas.filter(area => {
+            const areasDone = content.areas.filter(area => {
               const earned = skills.filter(s => s.area === area.id && completed.includes(s.id)).reduce((a, b) => a + (b.pts || 0), 0);
               return earned >= area.target;
             }).length;
             return [
               { num: totalEarned, label: "Total Points", color: "var(--amber)" },
               { num: pct + "%", label: "Completion", color: "var(--sky)" },
-              { num: areasComplete, label: "Areas Complete", color: "var(--sage)" },
+              { num: areasDone, label: "Areas Done", color: "var(--sage)" },
               { num: completed.filter(id => skills.find(s => s.id === id)).length, label: "Skills Mastered", color: "var(--lavender)" },
             ].map((s, i) => (
               <div key={i} className="stat-card">
@@ -8211,8 +8111,8 @@ function Roadmap({ roadmap, setRoadmap }) {
   return (
     <div>
       <div className="page-header">
-        <h1 className="page-title">🗺 4-Year Roadmap</h1>
-        <p className="page-sub">Your long-game plan. Click any text to edit it.</p>
+        <h1 className="page-title">🗺 The Four-Year Arc</h1>
+        <p className="page-sub">The big picture. Where you're headed, season by season. Click anything to edit.</p>
       </div>
       <div className="page-content">
         {roadmap.years.map((year, yi) => (
@@ -8315,7 +8215,7 @@ function MyProfile({ student, setStudent, content }) {
     const map = { skill: content.skills, project: content.projects, gig: content.gigs, ripple: content.ripple, lightroom: content.lightRoom, teensguide: content.teensGuide };
     return (map[type] || []).find(i => i.id === id) || null;
   };
-  const typeLabel = { skill: "Skill", project: "Project", gig: "Gig", ripple: "Ripple Mission", lightroom: "Light Room", teensguide: "Teen's Guide" };
+  const typeLabel = { skill: "Skill", project: "Project", gig: "Gig", ripple: "Contribution", lightroom: "The Deep Room", teensguide: "Foundations Guide" };
 
   const requiredUnanswered = questions.filter(q => q.required && !answers[q.id]).length;
 
@@ -8325,7 +8225,7 @@ function MyProfile({ student, setStudent, content }) {
         <div className="flex-between">
           <div>
             <h1 className="page-title">👤 My Profile</h1>
-            <p className="page-sub">Fill in your info at your own pace — your answers help Forge recommend the right things for you</p>
+            <p className="page-sub">Tell Forge who you are. The more honest you are, the better the recommendations.</p>
           </div>
           <button className="btn btn-primary" onClick={handleSave} disabled={requiredUnanswered > 0}>
             {saved ? "✓ Saved!" : "Save Profile"}
@@ -8508,13 +8408,13 @@ function StudentJournal({ journalEntries, content, onNavigate }) {
     return (
       <div>
         <div className="page-header">
-          <h1 className="page-title">📓 Journal</h1>
-          <p className="page-sub">Your writing from Daily Drops will appear here</p>
+          <h1 className="page-title">📓 Learning Log</h1>
+          <p className="page-sub">Your thinking, captured. A record of what you noticed and figured out. will appear here</p>
         </div>
         <div className="page-content">
-          <EmptyState icon="📓" title="No journal entries yet"
-            sub="When you write in a Daily Drop's journal prompt, it'll be saved and collected here."
-            action={<button className="btn btn-ghost btn-sm" onClick={() => onNavigate("drops")}>Go to Daily Drops →</button>} />
+          <EmptyState icon="📓" title="Your Learning Log is empty"
+            sub="When you reflect on a Spark's journal prompt, it'll be saved and collected here."
+            action={<button className="btn btn-ghost btn-sm" onClick={() => onNavigate("drops")}>Go to Sparks →</button>} />
         </div>
       </div>
     );
@@ -8525,8 +8425,8 @@ function StudentJournal({ journalEntries, content, onNavigate }) {
       <div className="page-header">
         <div className="flex-between">
           <div>
-            <h1 className="page-title">📓 Journal</h1>
-            <p className="page-sub">{entries.length} entr{entries.length !== 1 ? "ies" : "y"} · Your writing from Daily Drops</p>
+            <h1 className="page-title">📓 Learning Log</h1>
+            <p className="page-sub">{entries.length} entr{entries.length !== 1 ? "ies" : "y"} · Your thinking, captured. A record of what you noticed and figured out.</p>
           </div>
           <button className="btn btn-ghost btn-sm" onClick={() => onNavigate("drops")}>+ New Drop →</button>
         </div>
@@ -8586,7 +8486,7 @@ function StudentJournal({ journalEntries, content, onNavigate }) {
                     </div>
                     <div style={{ marginTop: 16, paddingTop: 12, borderTop: "1px solid var(--border)", display: "flex", justifyContent: "flex-end" }}>
                       <button className="btn btn-ghost btn-sm" onClick={() => onNavigate("drops")}>
-                        Open in Daily Drops →
+                        Open in Sparks →
                       </button>
                     </div>
                   </div>
@@ -8621,9 +8521,11 @@ function StudentApp({ student, setStudent, content, messages, setMessages, onSwi
   const [habitLogs, setHabitLogs] = useState(student.habitLogs || {});
   const [taskLogs, setTaskLogs] = useState(student.taskLogs || {});
   const [goals, setGoals] = useState(student.goals || []);
+  const [savedToast, setSavedToast] = useState(false);
 
   // Auto-save all student state to Firebase whenever it changes
   const saveRef = useRef(null);
+  const toastRef = useRef(null);
   useEffect(() => {
     if (saveRef.current) clearTimeout(saveRef.current);
     saveRef.current = setTimeout(() => {
@@ -8633,6 +8535,10 @@ function StudentApp({ student, setStudent, content, messages, setMessages, onSwi
         grabbedGigs, boards, submissions, portfolioFeatured,
         journalEntries, habitLogs, taskLogs, goals,
       }));
+      // Show "Saved!" toast
+      setSavedToast(true);
+      if (toastRef.current) clearTimeout(toastRef.current);
+      toastRef.current = setTimeout(() => setSavedToast(false), 2000);
     }, 800);
     return () => clearTimeout(saveRef.current);
   }, [completed, points, completionDates, weekPlan, dailyPlan, roadmap, studentFaction,
@@ -8681,26 +8587,26 @@ function StudentApp({ student, setStudent, content, messages, setMessages, onSwi
   };
 
   const NAV = [
-    { id: "dashboard", label: "Dashboard", icon: "⬡" },
-    { id: "planner", label: "Weekly Planner", icon: "📅" },
+    { id: "dashboard", label: "Home Base", icon: "⬡" },
+    { id: "planner", label: "Rhythm Planner", icon: "📅" },
     null,
-    { id: "skills", label: "Skill Explorer", icon: "◈" },
+    { id: "skills", label: "Skill Library", icon: "◈" },
     { id: "projects", label: "Project Lab", icon: "⬟" },
-    { id: "factions", label: "Factions & Gigs", icon: "⚡" },
-    { id: "ripple", label: "Ripple Missions", icon: "🌊" },
+    { id: "Guilds", label: "Forge Guilds", icon: "⚡" },
+    { id: "ripple", label: "Contribution Lab", icon: "🌊" },
     null,
-    { id: "teensguide", label: "Teen's Guide", icon: "📖" },
-    { id: "lightroom", label: "Light Room", icon: "💡" },
-    { id: "drops", label: "Daily Drops", icon: "🌤️" },
-    { id: "journal", label: "Journal", icon: "📓" },
-    { id: "habits", label: "Habits & Chores", icon: "✅" },
-    { id: "tasks", label: "Tasks", icon: "📋" },
-    { id: "goals", label: "Goals", icon: "🎯" },
+    { id: "teensguide", label: "Foundations Guide", icon: "📖" },
+    { id: "lightroom", label: "The Deep Room", icon: "💡" },
+    { id: "drops", label: "Sparks", icon: "✨" },
+    { id: "journal", label: "Learning Log", icon: "📓" },
+    { id: "habits", label: "Rhythms", icon: "🔁" },
+    { id: "tasks", label: "Today's Focus", icon: "🎯" },
+    { id: "goals", label: "Horizons", icon: "🌅" },
     { id: "messages", label: "Messages", icon: "✉️" },
     null,
     { id: "portfolio", label: "Portfolio", icon: "🗂" },
     { id: "transcript", label: "Transcript", icon: "📋" },
-    { id: "roadmap", label: "Roadmap", icon: "🗺" },
+    { id: "roadmap", label: "Four-Year Arc", icon: "🗺" },
     { id: "profile", label: "My Profile", icon: "👤" },
   ];
 
@@ -8714,8 +8620,8 @@ function StudentApp({ student, setStudent, content, messages, setMessages, onSwi
       case "planner": return <WeeklyPlanner content={content} completed={completed} weekPlan={weekPlan} setWeekPlan={setWeekPlan} onComplete={complete} onUncomplete={uncomplete} dailyPlan={dailyPlan} setDailyPlan={setDailyPlan} />;
       case "skills": return <SkillExplorer student={student} completed={completed} content={content} onComplete={complete} onUncomplete={uncomplete} onSubmitApproval={submitApproval} boards={boards} saveToBoard={saveToBoard} submissions={submissions} setSubmission={setSubmission} />;
       case "projects": return <ProjectLab student={student} completed={completed} content={content} onComplete={complete} onUncomplete={uncomplete} boards={boards} saveToBoard={saveToBoard} submissions={submissions} setSubmission={setSubmission} portfolioFeatured={portfolioFeatured} setPortfolioFeatured={setPortfolioFeatured} />;
-      case "factions": return <FactionsView completed={completed} content={content} studentFaction={studentFaction} setStudentFaction={setStudentFaction} grabbed={grabbedGigs} setGrabbed={setGrabbedGigs} onComplete={complete} onUncomplete={uncomplete} boards={boards} saveToBoard={saveToBoard} submissions={submissions} setSubmission={setSubmission} portfolioFeatured={portfolioFeatured} setPortfolioFeatured={setPortfolioFeatured} />;
-      case "ripple": return <RippleMissions completed={completed} content={content} onComplete={complete} onUncomplete={uncomplete} boards={boards} saveToBoard={saveToBoard} />;
+      case "factions": return <GuildsView completed={completed} content={content} studentFaction={studentFaction} setStudentFaction={setStudentFaction} grabbed={grabbedGigs} setGrabbed={setGrabbedGigs} onComplete={complete} onUncomplete={uncomplete} boards={boards} saveToBoard={saveToBoard} submissions={submissions} setSubmission={setSubmission} portfolioFeatured={portfolioFeatured} setPortfolioFeatured={setPortfolioFeatured} />;
+      case "ripple": return <ContributionMissions completed={completed} content={content} onComplete={complete} onUncomplete={uncomplete} boards={boards} saveToBoard={saveToBoard} />;
       case "teensguide": return <TeensGuide completed={completed} content={content} onComplete={complete} onUncomplete={uncomplete} boards={boards} saveToBoard={saveToBoard} />;
       case "lightroom": return <LightRoom completed={completed} content={content} onComplete={complete} onUncomplete={uncomplete} boards={boards} saveToBoard={saveToBoard} />;
       case "drops": return <DailyDrops completed={completed} content={content} onComplete={complete} onUncomplete={uncomplete} student={student} boards={boards} saveToBoard={saveToBoard} journalEntries={journalEntries} onSaveJournal={saveJournalEntry} />;
@@ -8732,6 +8638,7 @@ function StudentApp({ student, setStudent, content, messages, setMessages, onSwi
 
   return (
     <div className="app-wrap">
+      {savedToast && <div className="saved-toast">✓ Saved!</div>}
       <CheckInPopup
         checkIns={content.checkIns || []}
         content={content}
@@ -8742,7 +8649,7 @@ function StudentApp({ student, setStudent, content, messages, setMessages, onSwi
       <nav className="sidebar">
         <div className="sidebar-logo">
           <div className="logo-title">Forge</div>
-          <div className="logo-badge" style={{ background: "var(--sky)", color: "#0c0c16" }}>Student</div>
+          <div className="logo-badge" style={{ background: "var(--sky)", color: "#0c0c16" }}>Studio</div>
           <div className="logo-role">{student.name}</div>
         </div>
         {NAV.map((item, i) => {
@@ -8755,10 +8662,11 @@ function StudentApp({ student, setStudent, content, messages, setMessages, onSwi
           );
         })}
         <div className="sidebar-footer">
-          <div className="pts-label">Total Points</div>
+          <div className="pts-label">Momentum Points</div>
           <div className="pts-count">{points}</div>
-          <div className="pts-bar"><div className="pts-fill" style={{ width: `${pct}%` }} /></div>
-          <button className="btn btn-ghost btn-sm mt-12" style={{ width: "100%", fontSize: 11 }} onClick={onSwitchRole}>Teacher Mode →</button>
+          <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 4, lineHeight: 1.5 }}>You've logged {completed.length} thing{completed.length !== 1 ? "s" : ""} so far</div>
+          <div className="pts-bar" style={{ marginTop: 8 }}><div className="pts-fill" style={{ width: `${pct}%` }} /></div>
+          <button className="btn btn-ghost btn-sm mt-12" style={{ width: "100%", fontSize: 11 }} onClick={onSwitchRole}>Mentor Mode →</button>
         </div>
       </nav>
       <main className="main">{renderView()}</main>
@@ -8773,17 +8681,18 @@ function RoleSelector({ onSelect }) {
     <div className="role-selector">
       <div style={{ textAlign: "center", maxWidth: 640, width: "100%" }}>
         <div style={{ fontFamily: "var(--font-display)", fontSize: 48, fontWeight: 900, color: "var(--amber)", letterSpacing: -2, marginBottom: 8 }}>Forge</div>
-        <div style={{ fontSize: 14, color: "var(--muted)", marginBottom: 48 }}>Who are you today?</div>
+        <div style={{ fontSize: 16, color: "var(--muted)", marginBottom: 8, lineHeight: 1.75 }}>A life-building studio.</div>
+        <div style={{ fontSize: 14, color: "var(--muted)", marginBottom: 48, opacity: 0.7 }}>Who's using Forge today?</div>
         <div style={{ display: "flex", gap: 20, justifyContent: "center", flexWrap: "wrap" }}>
           <div className="role-card" onClick={() => onSelect("teacher")}>
             <div style={{ fontSize: 44, marginBottom: 14 }}>🧭</div>
-            <div style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, color: "var(--cream)", marginBottom: 8 }}>Teacher</div>
-            <div style={{ fontSize: 13, color: "var(--muted)", lineHeight: 1.6 }}>Manage content, students, approvals, and platform settings</div>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, color: "var(--cream)", marginBottom: 8 }}>Mentor</div>
+            <div style={{ fontSize: 14, color: "var(--muted)", lineHeight: 1.75 }}>Manage content, students, and platform settings</div>
           </div>
           <div className="role-card" onClick={() => onSelect("student")}>
             <div style={{ fontSize: 44, marginBottom: 14 }}>🔥</div>
             <div style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, color: "var(--cream)", marginBottom: 8 }}>Student</div>
-            <div style={{ fontSize: 13, color: "var(--muted)", lineHeight: 1.6 }}>Explore skills, complete projects, and build your portfolio</div>
+            <div style={{ fontSize: 14, color: "var(--muted)", lineHeight: 1.75 }}>Build skills, explore projects, and document who you're becoming</div>
           </div>
         </div>
       </div>
