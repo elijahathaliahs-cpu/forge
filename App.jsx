@@ -5675,7 +5675,7 @@ function Onboarding({ onDone }) {
 
 // ─── DASHBOARD WORK ITEM ─────────────────────────────────────────────────────
 
-function DashboardWorkItem({ item, meta, isDone, onDone, onUncomplete, content }) {
+function DashboardWorkItem({ item, meta, isDone, onComplete, onUncomplete, content }) {
   const [expanded, setExpanded] = useState(false);
 
   const accentColor = meta.color || "var(--amber)";
@@ -5715,7 +5715,7 @@ function DashboardWorkItem({ item, meta, isDone, onDone, onUncomplete, content }
               <button className="btn btn-ghost btn-xs" onClick={() => { onUncomplete(item.id, item.pts || 0); setExpanded(false); }}>↩ Undo</button>
             </div>
           ) : (
-            <button className="btn btn-sage btn-sm" onClick={() => { onDone(item.id, item.pts || 0); setExpanded(false); }}>
+            <button className="btn btn-sage btn-sm" onClick={() => { onComplete(item.id, item.pts || 0); setExpanded(false); }}>
               Add Evidence ✓ {item.pts ? `+${item.pts} pts` : ""}
             </button>
           )}
@@ -5748,7 +5748,7 @@ function DashboardWorkItem({ item, meta, isDone, onDone, onUncomplete, content }
 
 // ─── STUDENT: DASHBOARD ───────────────────────────────────────────────────────
 
-function StudentDashboard({ student, completed, points, content, weekPlan, grabbedGigs, onNavigate, boards, setBoards, saveToBoard, onDone, onUncomplete, journalEntries, habitDefs, habitLogs, setHabitLogs, goals, messages, taskDefs, taskLogs, setTaskLogs, dailyPlan, completionDates, checkInAnswers }) {
+function StudentDashboard({ student, completed, points, content, weekPlan, grabbedGigs, onNavigate, boards, setBoards, saveToBoard, onComplete, onUncomplete, journalEntries, habitDefs, habitLogs, setHabitLogs, goals, messages, taskDefs, taskLogs, setTaskLogs, dailyPlan, completionDates, checkInAnswers }) {
   const pct = Math.round((points / Math.max(1, content.areas.reduce((a,b)=>a+(b.target||0),0))) * 100);
   const todayDrop = content.dailyDrops.find(d => d.date === todayStr()) || null;
   const myInterests = student.interests || [];
@@ -5894,7 +5894,7 @@ function StudentDashboard({ student, completed, points, content, weekPlan, grabb
         <div className="grid-2" style={{ gap: 20, alignItems: "start" }}>
           <div>
             {/* Tasks / Today's Focus widget */}
-            <TasksWidget taskDefs={taskDefs || []} taskLogs={taskLogs} setTaskLogs={setTaskLogs} student={student} onDone={onDone} onNavigate={onNavigate} />
+            <TasksWidget taskDefs={taskDefs || []} taskLogs={taskLogs} setTaskLogs={setTaskLogs} student={student} onDone={onComplete} onNavigate={onNavigate} />
 
             {/* Today's Spark */}
             {todayDrop && (todayDrop.video || todayDrop.journal || todayDrop.kindnessChallenge || todayDrop.careerSpotlights?.length > 0) && (
@@ -6000,7 +6000,7 @@ function StudentDashboard({ student, completed, points, content, weekPlan, grabb
             {(() => {
               const entries = Object.entries(journalEntries || {})
                 .filter(([, e]) => e?.text?.trim())
-                .sort((a, b) => (b[1].dropDate || "").localeCompare(a[1].dropDate || ""))
+                .sort((a, b) => ((b[1].dropDate || b[1].date || "")).localeCompare((a[1].dropDate || a[1].date || "")))
                 .slice(0, 2);
               if (!entries.length) return null;
               return (
@@ -6014,10 +6014,10 @@ function StudentDashboard({ student, completed, points, content, weekPlan, grabb
                   </div>
                   {entries.map(([id, entry]) => (
                     <div key={id} onClick={() => onNavigate("journal")}
-                      style={{ padding: "10px 0", borderBottom: "1px solid var(--border)", cursor: "pointer" }}
-                      onMouseEnter={e => e.currentTarget.style.opacity = "0.8"}
-                      onMouseLeave={e => e.currentTarget.style.opacity = "1"}>
-                      <div style={{ fontSize: 12, color: "var(--amber)", fontWeight: 600, marginBottom: 4 }}>{entry.title || "Log Entry"} {entry.dropDate ? `· ${formatDisplayDate(entry.dropDate)}` : ""}</div>
+                      style={{ padding: "10px 0", borderBottom: "1px solid var(--border)", cursor: "pointer" }}>
+                      <div style={{ fontSize: 12, color: id.startsWith("daily_") ? "var(--sage)" : "var(--amber)", fontWeight: 600, marginBottom: 4 }}>
+                        {id.startsWith("daily_") ? "📝 Daily Log" : "✨ Spark"} {entry.title ? `· ${entry.title}` : ""} {(entry.dropDate || entry.date) ? `· ${formatDisplayDate(entry.dropDate || entry.date)}` : ""}
+                      </div>
                       <p style={{ fontSize: 14, color: "var(--cream-dim)", lineHeight: 1.65, margin: 0 }}>{entry.text.length > 110 ? entry.text.substring(0, 110) + "…" : entry.text}</p>
                     </div>
                   ))}
@@ -6060,7 +6060,7 @@ function StudentDashboard({ student, completed, points, content, weekPlan, grabb
 }
 
 
-function WeeklyPlanner({ content, completed, weekPlan, setWeekPlan, dailyPlan, setDailyPlan, onDone, onUncomplete }) {
+function WeeklyPlanner({ content, completed, weekPlan, setWeekPlan, dailyPlan, setDailyPlan, onComplete, onUncomplete }) {
   const DAYS = ["Mon","Tue","Wed","Thu","Fri"];
   const DAY_LABELS = { Mon: "Monday", Tue: "Tuesday", Wed: "Wednesday", Thu: "Thursday", Fri: "Friday" };
   const DAY_NUM = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
@@ -6181,7 +6181,7 @@ function WeeklyPlanner({ content, completed, weekPlan, setWeekPlan, dailyPlan, s
                 <button className="btn btn-ghost btn-sm" onClick={() => { onUncomplete(item.id, item.pts || 0); setViewItem(null); }}>↩ Undo</button>
               </div>
             ) : (
-              <button className="btn btn-sage" onClick={() => { onDone(item.id, item.pts || 0); setViewItem(null); }}>
+              <button className="btn btn-sage" onClick={() => { onComplete(item.id, item.pts || 0); setViewItem(null); }}>
                 Add Evidence ✓ {item.pts ? `+${item.pts} pts` : ""}
               </button>
             )}
@@ -6424,7 +6424,7 @@ function WeeklyPlanner({ content, completed, weekPlan, setWeekPlan, dailyPlan, s
 
 // ─── STUDENT: SKILL EXPLORER ──────────────────────────────────────────────────
 
-function SkillExplorer({ student, setStudent, completed, content, onDone, onUncomplete, onSubmitApproval, boards, saveToBoard, submissions, setSubmission }) {
+function SkillExplorer({ student, setStudent, completed, content, onComplete, onUncomplete, onSubmitApproval, boards, saveToBoard, submissions, setSubmission }) {
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState(null);
@@ -6450,8 +6450,8 @@ function SkillExplorer({ student, setStudent, completed, content, onDone, onUnco
   };
 
   const filtered = skills.filter(s => {
-    const matchArea = filter === "all" || filter === "interest" && s.interests?.some(i => myInterests.includes(i)) || s.area === filter;
-    const matchSearch = (s.name + s.desc).toLowerCase().includes(search.toLowerCase());
+    const matchArea = filter === "all" || (filter === "interest" && s.interests?.some(i => myInterests.includes(i))) || s.area === filter;
+    const matchSearch = ((s.name || "") + (s.desc || "")).toLowerCase().includes(search.toLowerCase());
     return matchArea && matchSearch;
   });
 
@@ -6557,7 +6557,7 @@ function SkillExplorer({ student, setStudent, completed, content, onDone, onUnco
           </div>
         </div>
         <Modal open={showApproval} onClose={() => setShowApproval(false)} title="Submit Mastery Check"
-          footer={<><button className="btn btn-ghost" onClick={() => setShowApproval(false)}>Cancel</button><button className="btn btn-primary" onClick={() => { onSubmitApproval({ skillId: selected.id, skillName: selected.name, pts: selected.pts, notes: approvalNotes }); setShowApproval(false); onDone(selected.id, selected.pts); }}>Submit →</button></>}>
+          footer={<><button className="btn btn-ghost" onClick={() => setShowApproval(false)}>Cancel</button><button className="btn btn-primary" onClick={() => { onSubmitApproval({ skillId: selected.id, skillName: selected.name, pts: selected.pts, notes: approvalNotes }); setShowApproval(false); onComplete(selected.id, selected.pts); }}>Submit →</button></>}>
           <p style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.7, marginBottom: 16 }}>Tell your teacher what you did to master this skill. Include evidence — what you made, wrote, built, or documented.</p>
           <textarea className="input textarea" style={{ minHeight: 100 }} value={approvalNotes} onChange={e => setApprovalNotes(e.target.value)} placeholder="Describe your evidence for mastery. What did you create or accomplish? How do you know you've mastered this?" />
         </Modal>
@@ -7103,7 +7103,7 @@ function SubmissionBuilder({ submission, onChange, itemTitle }) {
 
 // ─── STUDENT: PROJECT LAB ─────────────────────────────────────────────────────
 
-function ProjectLab({ student, completed, content, onDone, onUncomplete, boards, saveToBoard, submissions, setSubmission, portfolioFeatured, setPortfolioFeatured }) {
+function ProjectLab({ student, completed, content, onComplete, onUncomplete, boards, saveToBoard, submissions, setSubmission, portfolioFeatured, setPortfolioFeatured }) {
   const [filter, setFilter] = useState("all");
   const [selected, setSelected] = useState(null);
 
@@ -7161,10 +7161,10 @@ function ProjectLab({ student, completed, content, onDone, onUncomplete, boards,
                         onChange={e => setPortfolioFeatured(p => ({ ...p, [selected.id]: e.target.checked }))} />
                       <span style={{ fontSize: 13, color: "var(--cream-dim)" }}>Feature in Portfolio</span>
                     </label>
-                    <button className="btn btn-ghost btn-sm" style={{ width: "100%", marginBottom: 8 }} onClick={() => onUncomplete(selected.id, selected.pts)}>↩ ↩ Undo this</button>
+                    <button className="btn btn-ghost btn-sm" style={{ width: "100%", marginBottom: 8 }} onClick={() => onUncomplete(selected.id, selected.pts)}>↩ Undo this</button>
                   </div>
                 ) : (
-                  <button className="btn btn-primary" style={{ width: "100%" }} onClick={() => { onDone(selected.id, selected.pts); }}>Add Evidence ✓</button>
+                  <button className="btn btn-primary" style={{ width: "100%" }} onClick={() => { onComplete(selected.id, selected.pts); }}>Add Evidence ✓</button>
                 )}
               </div>
             </div>
@@ -7381,7 +7381,7 @@ function GigDetail({ gig, completed, grabbed, onGrab, onDone, onUncomplete, onBa
                   onChange={e => setPortfolioFeatured(p => ({ ...p, [gig.id]: e.target.checked }))} />
                 <span style={{ fontSize: 13, color: "var(--cream-dim)" }}>Feature in Portfolio</span>
               </label>
-              <button className="btn btn-ghost btn-sm" style={{ width: "100%" }} onClick={() => onUncomplete(gig.id, gig.pts || 0)}>↩ ↩ Undo this</button>
+              <button className="btn btn-ghost btn-sm" style={{ width: "100%" }} onClick={() => onUncomplete(gig.id, gig.pts || 0)}>↩ Undo this</button>
             </div>
           ) : !isGrabbed ? (
             <button onClick={onGrab}
@@ -7542,7 +7542,7 @@ function GuildsView({ completed, content, studentFaction, setStudentFaction, gra
               <div key={faction.id}
                 onClick={() => setView(faction.id)}
                 className={`Guild-card ${isMyGuild ? "selected" : ""}`}
-                style={{ borderColor: isMyGuild ? `var(--${faction.color})` : "transparent", cursor: "pointer" }}
+                style={{ borderColor: isMyGuild ? `var(--${faction.color})` : "var(--border)", cursor: "pointer" }}
                 onMouseEnter={e => { if (!isMyGuild) e.currentTarget.style.borderColor = `var(--${faction.color})`; }}
                 onMouseLeave={e => { if (!isMyGuild) e.currentTarget.style.borderColor = "var(--border)"; }}>
                 <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `var(--${faction.color})`, opacity: 0.7 }} />
@@ -7569,7 +7569,7 @@ function GuildsView({ completed, content, studentFaction, setStudentFaction, gra
 
 // ─── STUDENT: RIPPLE MISSIONS ─────────────────────────────────────────────────
 
-function ContributionMissions({ completed, content, onDone, onUncomplete, boards, saveToBoard }) {
+function ContributionMissions({ completed, content, onComplete, onUncomplete, boards, saveToBoard }) {
   const [selected, setSelected] = useState(null);
   const missions = content.ripple;
 
@@ -7616,10 +7616,10 @@ function ContributionMissions({ completed, content, onDone, onUncomplete, boards
                     <span style={{ fontSize: 22 }}>✓</span>
                     <span style={{ fontWeight: 600 }}>Mission completed! +{selected.pts} points</span>
                   </div>
-                  <button className="btn btn-ghost btn-sm" style={{ width: "100%" }} onClick={() => onUncomplete(selected.id, selected.pts)}>↩ ↩ Undo this</button>
+                  <button className="btn btn-ghost btn-sm" style={{ width: "100%" }} onClick={() => onUncomplete(selected.id, selected.pts)}>↩ Undo this</button>
                 </div>
               ) : (
-                <button className="btn btn-sage" style={{ width: "100%" }} onClick={() => { onDone(selected.id, selected.pts); setSelected(null); }}>
+                <button className="btn btn-sage" style={{ width: "100%" }} onClick={() => { onComplete(selected.id, selected.pts); setSelected(null); }}>
                   Mark Mission Done ✓
                 </button>
               )}
@@ -7671,7 +7671,7 @@ function ContributionMissions({ completed, content, onDone, onUncomplete, boards
 
 // ─── STUDENT: TEEN'S GUIDE ────────────────────────────────────────────────────
 
-function TeensGuide({ completed, content, onDone, onUncomplete, boards, saveToBoard }) {
+function TeensGuide({ completed, content, onComplete, onUncomplete, boards, saveToBoard }) {
   const [selected, setSelected] = useState(null);
   const entries = content.teensGuide;
 
@@ -7704,7 +7704,7 @@ function TeensGuide({ completed, content, onDone, onUncomplete, boards, saveToBo
           )}
           <div style={{ maxWidth: 680, marginTop: 16 }}>
             {!isDone ? (
-              <button className="btn btn-sky" onClick={() => { onDone(selected.id, selected.pts || 5); setSelected(null); }}>Mark as Read ✓</button>
+              <button className="btn btn-sky" onClick={() => { onComplete(selected.id, selected.pts || 5); setSelected(null); }}>Mark as Read ✓</button>
             ) : (
               <div className="flex-center gap-10">
                 <div className="flex-center gap-8" style={{ color: "var(--sky)" }}>
@@ -7756,7 +7756,7 @@ function TeensGuide({ completed, content, onDone, onUncomplete, boards, saveToBo
 
 // ─── STUDENT: LIGHT ROOM ──────────────────────────────────────────────────────
 
-function LightRoom({ completed, content, onDone, onUncomplete, boards, saveToBoard }) {
+function LightRoom({ completed, content, onComplete, onUncomplete, boards, saveToBoard }) {
   const [selected, setSelected] = useState(null);
   const items = content.lightRoom;
 
@@ -7790,7 +7790,7 @@ function LightRoom({ completed, content, onDone, onUncomplete, boards, saveToBoa
           )}
           <div style={{ maxWidth: 680, marginTop: 16 }}>
             {!isDone ? (
-              <button className="btn btn-lavender" onClick={() => { onDone(selected.id, selected.pts || 5); setSelected(null); }}>Add Evidence ✓</button>
+              <button className="btn btn-lavender" onClick={() => { onComplete(selected.id, selected.pts || 5); setSelected(null); }}>Add Evidence ✓</button>
             ) : (
               <div className="flex-center gap-10">
                 <div className="flex-center gap-8" style={{ color: "var(--lavender)" }}>
@@ -7844,7 +7844,7 @@ function LightRoom({ completed, content, onDone, onUncomplete, boards, saveToBoa
 
 // ─── STUDENT: DAILY DROPS ─────────────────────────────────────────────────────
 
-function DailyDrops({ completed, content, onDone, onUncomplete, student, boards, saveToBoard, journalEntries, onSaveJournal }) {
+function DailyDrops({ completed, content, onComplete, onUncomplete, student, boards, saveToBoard, journalEntries, onSaveJournal }) {
   const [selectedDate, setSelectedDate] = useState(null);
   const drops = content.dailyDrops;
   const today = todayStr();
@@ -8022,7 +8022,7 @@ function DailyDrops({ completed, content, onDone, onUncomplete, student, boards,
             )}
 
             {!isDone && hasContent(viewDrop) && (
-              <button className="btn btn-primary" style={{ width: "100%" }} onClick={() => { onDone(dropId, 5); }}>
+              <button className="btn btn-primary" style={{ width: "100%" }} onClick={() => { onComplete(dropId, 5); }}>
                 Mark Today's Spark Done ✓
               </button>
             )}
@@ -8847,33 +8847,46 @@ function MyProfile({ student, setStudent, content }) {
 
 // ─── STUDENT: JOURNAL ────────────────────────────────────────────────────────
 
-function StudentJournal({ journalEntries, content, onNavigate }) {
+function StudentJournal({ journalEntries, onSaveJournal, content, onNavigate }) {
   const [expandedId, setExpandedId] = useState(null);
-  const [editingId, setEditingId] = useState(null);
+  const [newEntry, setNewEntry] = useState("");
+  const [newEntryTitle, setNewEntryTitle] = useState("");
+  const [savingNew, setSavingNew] = useState(false);
+  const [savedNew, setSavedNew] = useState(false);
 
-  const entries = Object.entries(journalEntries || {})
-    .filter(([, e]) => e?.text?.trim() || e?.prompt)
+  // Spark-linked entries (from Drops journal prompts)
+  const sparkEntries = Object.entries(journalEntries || {})
+    .filter(([key, e]) => !key.startsWith("daily_") && (e?.text?.trim() || e?.prompt))
     .map(([dropId, entry]) => {
       const drop = content.dailyDrops.find(d => d.id === dropId);
-      return { dropId, ...entry, drop };
-    })
-    .sort((a, b) => (b.dropDate || "").localeCompare(a.dropDate || ""));
+      return { dropId, ...entry, drop, isDaily: false };
+    });
 
-  if (entries.length === 0) {
-    return (
-      <div>
-        <div className="page-header">
-          <h1 className="page-title">📓 Learning Log</h1>
-          <p className="page-sub">Your thinking, captured. A record of what you noticed and figured out. will appear here</p>
-        </div>
-        <div className="page-content">
-          <EmptyState icon="📓" title="Your Learning Log is empty"
-            sub="When you reflect on a Spark's journal prompt, it'll be saved and collected here."
-            action={<button className="btn btn-ghost btn-sm" onClick={() => onNavigate("drops")}>Go to Sparks →</button>} />
-        </div>
-      </div>
-    );
-  }
+  // Standalone daily entries
+  const dailyEntries = Object.entries(journalEntries || {})
+    .filter(([key, e]) => key.startsWith("daily_") && e?.text?.trim())
+    .map(([id, entry]) => ({ dropId: id, ...entry, isDaily: true }));
+
+  const allEntries = [...sparkEntries, ...dailyEntries]
+    .sort((a, b) => (b.dropDate || b.date || "").localeCompare(a.dropDate || a.date || ""));
+
+  const saveNewEntry = () => {
+    if (!newEntry.trim()) return;
+    setSavingNew(true);
+    const id = "daily_" + Date.now();
+    onSaveJournal(id, {
+      text: newEntry.trim(),
+      title: newEntryTitle.trim() || "Daily Log",
+      date: todayStr(),
+      dropDate: todayStr(),
+      isDaily: true,
+    });
+    setNewEntry("");
+    setNewEntryTitle("");
+    setSavingNew(false);
+    setSavedNew(true);
+    setTimeout(() => setSavedNew(false), 2000);
+  };
 
   return (
     <div>
@@ -8881,75 +8894,124 @@ function StudentJournal({ journalEntries, content, onNavigate }) {
         <div className="flex-between">
           <div>
             <h1 className="page-title">📓 Learning Log</h1>
-            <p className="page-sub">{entries.length} entr{entries.length !== 1 ? "ies" : "y"} · Your thinking, captured. A record of what you noticed and figured out.</p>
+            <p className="page-sub">{allEntries.length} entr{allEntries.length !== 1 ? "ies" : "y"} · Your thinking, captured as you go</p>
           </div>
-          <button className="btn btn-ghost btn-sm" onClick={() => onNavigate("drops")}>+ New Drop →</button>
         </div>
       </div>
 
-      <div className="page-content" style={{ maxWidth: 720 }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {entries.map(({ dropId, text, prompt, title, dropDate }) => {
-            const isExpanded = expandedId === dropId;
-            const wordCount = text ? text.trim().split(/\s+/).filter(Boolean).length : 0;
-            return (
-              <div key={dropId} style={{
-                background: "var(--bg2)",
-                border: "1px solid var(--border)",
-                borderLeft: "3px solid var(--amber)",
-                borderRadius: "var(--r-lg)",
-                overflow: "hidden",
-                transition: "border-color 0.15s",
-              }}>
-                {/* Entry header — always visible */}
-                <div onClick={() => setExpandedId(isExpanded ? null : dropId)}
-                  style={{ padding: "16px 20px", cursor: "pointer", display: "flex", alignItems: "flex-start", gap: 14 }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div className="flex-center gap-10 mb-4">
-                      <span style={{ fontSize: 11, fontWeight: 700, color: "var(--amber)", textTransform: "uppercase", letterSpacing: 1.5 }}>
-                        {title || "Journal"}
-                      </span>
-                      {dropDate && (
-                        <span style={{ fontSize: 11, color: "var(--muted)" }}>{formatDisplayDate(dropDate)}</span>
-                      )}
-                      <span style={{ fontSize: 10, color: "var(--muted)", marginLeft: "auto" }}>
-                        {wordCount} word{wordCount !== 1 ? "s" : ""}
-                      </span>
+      <div className="page-content" style={{ maxWidth: 740 }}>
+
+        {/* ── Write a new entry ── */}
+        <div className="card mb-24" style={{ borderColor: "rgba(0,212,255,0.25)" }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--amber)", marginBottom: 14 }}>
+            📝 Write Today's Entry
+          </div>
+          <div className="form-row">
+            <input
+              className="input"
+              placeholder="Title — optional (e.g. 'What I figured out today')"
+              value={newEntryTitle}
+              onChange={e => setNewEntryTitle(e.target.value)}
+              style={{ fontSize: 15, marginBottom: 10 }}
+            />
+          </div>
+          <div className="form-row">
+            <textarea
+              className="input textarea"
+              placeholder="What did you do today? What did you figure out or notice? What surprised you? What do you want to do tomorrow?&#10;&#10;Two sentences minimum — no maximum. Just write what's real."
+              value={newEntry}
+              onChange={e => setNewEntry(e.target.value)}
+              style={{ minHeight: 130, fontSize: 15, lineHeight: 1.75, resize: "vertical" }}
+            />
+          </div>
+          <div className="flex-between" style={{ alignItems: "center" }}>
+            <span style={{ fontSize: 13, color: "var(--muted)" }}>
+              {newEntry.trim() ? `${newEntry.trim().split(/\s+/).filter(Boolean).length} words` : ""}
+            </span>
+            <button
+              className="btn btn-primary"
+              onClick={saveNewEntry}
+              disabled={!newEntry.trim() || savingNew}
+            >
+              {savedNew ? "✓ Saved!" : "Save entry →"}
+            </button>
+          </div>
+        </div>
+
+        {/* ── Past entries ── */}
+        {allEntries.length === 0 ? (
+          <div style={{ padding: "32px", textAlign: "center", color: "var(--muted)", fontSize: 15, lineHeight: 1.75 }}>
+            Your first entry is just above. Write something — anything real counts.
+          </div>
+        ) : (
+          <>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--muted)", marginBottom: 14 }}>
+              Past entries
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {allEntries.map(({ dropId, text, prompt, title, dropDate, date, isDaily }) => {
+                const isExpanded = expandedId === dropId;
+                const displayDate = dropDate || date || "";
+                const wordCount = text ? text.trim().split(/\s+/).filter(Boolean).length : 0;
+                const accentColor = isDaily ? "var(--sage)" : "var(--amber)";
+                return (
+                  <div key={dropId} style={{
+                    background: "var(--bg2)",
+                    border: "1px solid var(--border)",
+                    borderLeft: `3px solid ${accentColor}`,
+                    borderRadius: "var(--r-lg)",
+                    overflow: "hidden",
+                  }}>
+                    <div onClick={() => setExpandedId(isExpanded ? null : dropId)}
+                      style={{ padding: "16px 20px", cursor: "pointer", display: "flex", alignItems: "flex-start", gap: 14 }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div className="flex-center gap-10 mb-6">
+                          <span style={{ fontSize: 11, fontWeight: 700, color: accentColor, textTransform: "uppercase", letterSpacing: 1.5 }}>
+                            {isDaily ? "📝 Daily Log" : "✨ Spark Reflection"}
+                          </span>
+                          <span style={{ fontSize: 13, color: "var(--muted)" }}>{title || ""}</span>
+                          {displayDate && (
+                            <span style={{ fontSize: 12, color: "var(--muted)", marginLeft: "auto" }}>{formatDisplayDate(displayDate)}</span>
+                          )}
+                          <span style={{ fontSize: 11, color: "var(--muted)" }}>{wordCount}w</span>
+                        </div>
+                        {prompt && !isDaily && (
+                          <div style={{ fontSize: 13, color: "var(--muted)", fontStyle: "italic", lineHeight: 1.6, marginBottom: isExpanded ? 0 : 6 }}>
+                            {prompt.length > 100 && !isExpanded ? prompt.substring(0, 100) + "…" : prompt}
+                          </div>
+                        )}
+                        {!isExpanded && text && (
+                          <p style={{ fontSize: 14, color: "var(--cream-dim)", lineHeight: 1.75, margin: "6px 0 0" }}>
+                            {text.length > 180 ? text.substring(0, 180) + "…" : text}
+                          </p>
+                        )}
+                      </div>
+                      <span style={{ color: "var(--muted)", fontSize: 12, flexShrink: 0, marginTop: 2 }}>{isExpanded ? "▲" : "▼"}</span>
                     </div>
-                    {prompt && (
-                      <div style={{ fontSize: 12, color: "var(--muted)", fontStyle: "italic", lineHeight: 1.5, marginBottom: isExpanded ? 0 : 6 }}>
-                        {prompt.length > 100 && !isExpanded ? prompt.substring(0, 100) + "…" : prompt}
+
+                    {isExpanded && (
+                      <div style={{ borderTop: "1px solid var(--border)", padding: "16px 20px", background: "var(--bg3)" }}>
+                        {prompt && !isDaily && (
+                          <div style={{ fontSize: 13, color: "var(--muted)", fontStyle: "italic", lineHeight: 1.65, marginBottom: 14, padding: "10px 14px", background: "var(--bg2)", borderRadius: "var(--r)", borderLeft: `2px solid ${accentColor}` }}>
+                            {prompt}
+                          </div>
+                        )}
+                        <div style={{ fontSize: 15, color: "var(--cream-dim)", lineHeight: 1.85, whiteSpace: "pre-wrap" }}>
+                          {text}
+                        </div>
+                        {isDaily && (
+                          <div style={{ marginTop: 16, paddingTop: 12, borderTop: "1px solid var(--border)", display: "flex", justifyContent: "flex-end" }}>
+                            <span style={{ fontSize: 12, color: "var(--muted)" }}>Daily log entry · {formatDisplayDate(displayDate)}</span>
+                          </div>
+                        )}
                       </div>
                     )}
-                    {!isExpanded && text && (
-                      <p style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.65, margin: "8px 0 0" }}>
-                        {text.length > 160 ? text.substring(0, 160) + "…" : text}
-                      </p>
-                    )}
                   </div>
-                  <span style={{ color: "var(--muted)", fontSize: 12, flexShrink: 0, marginTop: 2 }}>{isExpanded ? "▲" : "▼"}</span>
-                </div>
-
-                {/* Expanded full entry */}
-                {isExpanded && (
-                  <div style={{ borderTop: "1px solid var(--border)", padding: "16px 20px", background: "rgba(232,160,32,0.03)" }}>
-                    <div style={{ fontSize: 12, color: "var(--muted)", fontStyle: "italic", lineHeight: 1.6, marginBottom: 12, padding: "10px 14px", background: "var(--bg3)", borderRadius: "var(--r)", borderLeft: "2px solid var(--amber)" }}>
-                      {prompt}
-                    </div>
-                    <div style={{ fontSize: 14, color: "var(--cream-dim)", lineHeight: 1.85, whiteSpace: "pre-wrap" }}>
-                      {text}
-                    </div>
-                    <div style={{ marginTop: 16, paddingTop: 12, borderTop: "1px solid var(--border)", display: "flex", justifyContent: "flex-end" }}>
-                      <button className="btn btn-ghost btn-sm" onClick={() => onNavigate("drops")}>
-                        Open in Sparks →
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+                );
+              })}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
@@ -9103,7 +9165,7 @@ function StudentApp({ student, setStudent, content, messages, setMessages, onSwi
       case "goals": return <StudentGoalsPage goals={goals} setGoals={setGoals} />;
       case "messages": return <StudentMessagesPage messages={messages} setMessages={setMessages} studentId={student.id} />;
       case "planner": return <WeeklyPlanner content={content} completed={completed} weekPlan={weekPlan} setWeekPlan={setWeekPlan} onComplete={complete} onUncomplete={uncomplete} dailyPlan={dailyPlan} setDailyPlan={setDailyPlan} />;
-      case "skills": return <SkillExplorer student={student} setStudent={handleSetStudent} completed={completed} content={content} onComplete={complete} onUncomplete={uncomplete} onSubmitApproval={submitApproval} boards={boards} saveToBoard={saveToBoard} submissions={submissions} setSubmission={setSubmission} />;
+      case "skills": return <SkillExplorer student={student} setStudent={setStudent} completed={completed} content={content} onComplete={complete} onUncomplete={uncomplete} onSubmitApproval={submitApproval} boards={boards} saveToBoard={saveToBoard} submissions={submissions} setSubmission={setSubmission} />;
       case "projects": return <ProjectLab student={student} completed={completed} content={content} onComplete={complete} onUncomplete={uncomplete} boards={boards} saveToBoard={saveToBoard} submissions={submissions} setSubmission={setSubmission} portfolioFeatured={portfolioFeatured} setPortfolioFeatured={setPortfolioFeatured} />;
       case "factions": return <GuildsView completed={completed} content={content} studentFaction={studentFaction} setStudentFaction={setStudentFaction} grabbed={grabbedGigs} setGrabbed={setGrabbedGigs} onComplete={complete} onUncomplete={uncomplete} boards={boards} saveToBoard={saveToBoard} submissions={submissions} setSubmission={setSubmission} portfolioFeatured={portfolioFeatured} setPortfolioFeatured={setPortfolioFeatured} />;
       case "ripple": return <ContributionMissions completed={completed} content={content} onComplete={complete} onUncomplete={uncomplete} boards={boards} saveToBoard={saveToBoard} />;
@@ -9111,7 +9173,7 @@ function StudentApp({ student, setStudent, content, messages, setMessages, onSwi
       case "lightroom": return <LightRoom completed={completed} content={content} onComplete={complete} onUncomplete={uncomplete} boards={boards} saveToBoard={saveToBoard} />;
       case "drops": return <DailyDrops completed={completed} content={content} onComplete={complete} onUncomplete={uncomplete} student={student} boards={boards} saveToBoard={saveToBoard} journalEntries={journalEntries} onSaveJournal={saveJournalEntry} />;
       case "portfolio": return <Portfolio student={student} completed={completed} content={content} onUncomplete={uncomplete} submissions={submissions} setSubmission={setSubmission} portfolioFeatured={portfolioFeatured} setPortfolioFeatured={setPortfolioFeatured} />;
-      case "journal": return <StudentJournal journalEntries={journalEntries} content={content} onNavigate={setView} />;
+      case "journal": return <StudentJournal journalEntries={journalEntries} onSaveJournal={saveJournalEntry} content={content} onNavigate={setView} />;
       case "transcript": return <Transcript completed={completed} content={content} />;
       case "roadmap": return <Roadmap roadmap={roadmap} setRoadmap={setRoadmap} />;
       case "profile": return <MyProfile student={student} setStudent={setStudent} content={content} />;
@@ -9395,7 +9457,7 @@ export default function App() {
     return (
       <><GlobalStyles />
         <StudentApp
-          student={student} setStudent={handleSetStudent}
+          student={student} setStudent={setStudent}
           content={content}
           messages={messages} setMessages={setMessages}
           onSwitchRole={() => { setStudentLocal(null); setRole(null); }}
