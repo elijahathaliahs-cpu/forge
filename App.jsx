@@ -5774,7 +5774,7 @@ function StudentDashboard({ student, completed, points, content, weekPlan, grabb
 
   // One suggested action
   const getSuggestedAction = () => {
-    if (activeGigs.length > 0) return { label: "Continue your active gig", nav: "Guilds", icon: "⚡" };
+    if (activeGigs.length > 0) return { label: "Continue your active gig", nav: "factions", icon: "⚡" };
     const todayItems = dailyPlan?.[todayKey] || [];
     const unfinishedToday = todayItems.find(e => !completed.includes(e.id));
     if (unfinishedToday) return { label: `Work on: ${unfinishedToday.name || unfinishedToday.title}`, nav: "planner", icon: "📅" };
@@ -9139,7 +9139,7 @@ function StudentApp({ student, setStudent, content, messages, setMessages, onSwi
     null,
     { id: "skills", label: "Skill Library", icon: "◈" },
     { id: "projects", label: "Project Lab", icon: "⬟" },
-    { id: "Guilds", label: "Forge Guilds", icon: "⚡" },
+    { id: "factions", label: "Forge Guilds", icon: "⚡" },
     { id: "ripple", label: "Contribution Lab", icon: "🌊" },
     null,
     { id: "teensguide", label: "Foundations Guide", icon: "📖" },
@@ -9457,7 +9457,7 @@ export default function App() {
     return (
       <><GlobalStyles />
         <StudentApp
-          student={student} setStudent={setStudent}
+          student={student} setStudent={handleSetStudent}
           content={content}
           messages={messages} setMessages={setMessages}
           onSwitchRole={() => { setStudentLocal(null); setRole(null); }}
