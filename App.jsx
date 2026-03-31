@@ -401,6 +401,121 @@ const SKILLS = [
 ];
 
 
+const CAREERS_DEFAULT = [
+  {
+    id: "car1",
+    title: "Tattoo Artist",
+    icon: "🖋️",
+    path: "trade",
+    pathLabel: "Apprenticeship Trade",
+    clusters: ["character_design", "japanese_storytelling", "material_making", "digital_art"],
+    description: "An apprenticeship trade that pulls directly from character design, understanding of line and form, and the psychology of what people want to carry on their body forever. Japanese tattooing (irezumi) is its own deep tradition. No college — apprentice under a shop, build a portfolio, get licensed.",
+    tuesday: "Sketching a client's custom sleeve concept — a fox spirit in a Japanese woodblock style — then doing a consultation call to walk through the design intent and placement before the first session.",
+    personality: "Patient, detail-obsessed, able to read people and understand what they actually want vs what they say they want. Comfortable with intimacy and trust. Thrives on creative problem-solving within constraints.",
+    path_details: "Apprentice under a working tattoo artist (typically 1-2 years). Build a flash portfolio. Get state licensed. Independent or shop-based from there.",
+    skills_connected: [],
+    targetStudent: "all",
+  },
+  {
+    id: "car2",
+    title: "Manga / Webtoon Artist",
+    icon: "📖",
+    path: "portfolio",
+    pathLabel: "Portfolio-Based / Self-Published",
+    clusters: ["character_design", "japanese_storytelling", "digital_art"],
+    description: "Creates ongoing serialized visual stories — indie or through publishers like Tapas, Webtoon, or Japanese doujin channels. Pulls from Japanese storytelling, character design, and psychology of how readers bond with characters. Can be freelance or self-published from day one.",
+    tuesday: "Inking chapter 7 panels, making a note to rework a character's expression so the emotional beat lands harder, then posting the finished chapter and replying to reader comments about the plot theory they got exactly right.",
+    personality: "Loves serialized storytelling, feels the pull of a long arc, comfortable with repetition and iteration. Strong sense of pacing and visual rhythm. Thrives with audience connection and feedback.",
+    path_details: "Build a series and start publishing on Webtoon, Tapas, or Pixiv. Build readership. Move toward monetization through Patreon, merch, or publisher deals as audience grows.",
+    skills_connected: [],
+    targetStudent: "all",
+  },
+  {
+    id: "car3",
+    title: "Prop + Costume Fabricator",
+    icon: "🪖",
+    path: "portfolio",
+    pathLabel: "Portfolio-Based / Community-Trained",
+    clusters: ["character_design", "material_making", "japanese_storytelling"],
+    description: "Builds physical objects for film, theater, cosplay, or game conventions — armor, creature suits, wearable character pieces. Lives at the intersection of material making, character design, and storytelling. Learned through community, YouTube, and doing. No degree needed, strong portfolio essential.",
+    tuesday: "Sanding and painting the second layer of a samurai-inspired helmet commission, testing whether the weathering technique gives it the aged-lacquer look, music on, totally in flow.",
+    personality: "Loves the physical — texture, weight, finish. Problem-solver who finds satisfaction in figuring out how to make something look real with improbable materials. Comfortable with long, patient processes.",
+    path_details: "Start making things and documenting the process. Build an online portfolio. Take commissions. Move toward film/TV prop work or convention circuit as portfolio grows.",
+    skills_connected: [],
+    targetStudent: "all",
+  },
+  {
+    id: "car4",
+    title: "Character Designer",
+    icon: "✏️",
+    path: "certification",
+    pathLabel: "Portfolio + Selective Certification",
+    clusters: ["character_design", "digital_art", "japanese_storytelling"],
+    description: "Designs the visual identity of characters for games, animation, webtoons, and branding. Psychology of human behavior feeds directly into making characters that feel real and legible. Many working character designers are self-taught or trade-school trained.",
+    tuesday: "Iterating on a villain's silhouette for an indie game client — trying to make her feel powerful but sympathetic — then sending three variations with notes explaining the psychology behind each choice.",
+    personality: "Observant of people — how they hold themselves, what they wear, what it signals. Thinks in archetypes and subversions. Comfortable with iteration and client feedback without taking it personally.",
+    path_details: "Build a strong portfolio across multiple styles. Get on platforms like ArtStation and Twitter/Instagram. Freelance for indie games, webtoon studios, or small animation houses. Grow from there.",
+    skills_connected: [],
+    targetStudent: "all",
+  },
+  {
+    id: "car5",
+    title: "Public Aquarist / Aquarium Technician",
+    icon: "🌊",
+    path: "certification",
+    pathLabel: "Certification + Experience",
+    clusters: ["marine_biology", "deep_ocean", "entomology"],
+    description: "Maintains living marine exhibits at aquariums, zoos, or research stations — water chemistry, ecosystem balance, species care. A hands-on science trade that doesn't require a biology degree, just certification and experience. Deeply connected to ocean interest without academic gatekeeping.",
+    tuesday: "Testing salinity and oxygen levels in the deep-water tank, adjusting the lighting spectrum to mimic the bioluminescent zone, then prepping to lead a school group tour of the cephalopod exhibit.",
+    personality: "Methodical and observant. Comfortable with routine monitoring that most people would find boring but you find meditative. Genuinely fascinated by living systems and the edge cases that break your expectations.",
+    path_details: "Get SCUBA certified. Volunteer or intern at local aquarium. Study for PADI Divemaster or Aquarist certification. Apply for technician roles — most aquariums train from within.",
+    skills_connected: [],
+    targetStudent: "all",
+  },
+  {
+    id: "car6",
+    title: "Game Environment Artist",
+    icon: "🎮",
+    path: "portfolio",
+    pathLabel: "Portfolio-Based",
+    clusters: ["game_worldbuilding", "liminal_spaces", "color_visual_systems"],
+    description: "Builds the spaces players move through — the abandoned stations, the deep-sea labs, the in-between places that feel wrong in exactly the right way. Liminal space interest and color/visual systems knowledge are rare in someone this age. Portfolio gets the job, not a diploma.",
+    tuesday: "Sculpting a flooded underground corridor in Blender, adjusting the greenish water-filtered light so it feels like somewhere abandoned for decades — running it by the lead artist before moving to texture work.",
+    personality: "Feels the atmosphere of spaces deeply. Can walk into a place and immediately understand what makes it feel the way it does. Comfortable with detail work and technical problem-solving in service of mood.",
+    path_details: "Build environments in Blender/UE5, document them, post on ArtStation and Twitter. Apply for junior environment artist roles at indie studios. Most hiring is portfolio-first.",
+    skills_connected: [],
+    targetStudent: "all",
+  },
+  {
+    id: "car7",
+    title: "Lighting Designer",
+    icon: "💡",
+    path: "trade",
+    pathLabel: "Apprenticeship / Union Path",
+    clusters: ["color_visual_systems", "liminal_spaces", "game_worldbuilding"],
+    description: "Controls how light shapes mood, space, and story in live performance or on set. Directly applies color and visual systems interest plus instinct for liminal, atmospheric space. Learned through apprenticeship, community theater, and union programs — not college.",
+    tuesday: "Programming the cue stack for opening night — adjusting how the cold blue wash fades into amber during act two's turning point, making sure the transition happens slowly enough that the audience doesn't notice it but still feels it.",
+    personality: "Understands that the best lighting is invisible — it creates feeling without calling attention to itself. Patient, technically minded, and emotionally intelligent about how light affects human psychology.",
+    path_details: "Start at community theater. Learn the board. Join IATSE (the entertainment workers union) as an apprentice. Work up through regional theater, touring shows, or film/TV set work.",
+    skills_connected: [],
+    targetStudent: "all",
+  },
+  {
+    id: "car8",
+    title: "Pest Management Technician",
+    icon: "🐛",
+    path: "certification",
+    pathLabel: "Licensed Trade",
+    clusters: ["entomology", "marine_biology"],
+    description: "A licensed trade that takes insect biology seriously — integrated pest management, species ID, ecosystem impact. Some technicians specialize in research partnerships with universities or agricultural operations. Short certification path, steady demand, and a legit applied entomology career without a science degree.",
+    tuesday: "Doing a site assessment on a property with a carpenter ant infestation — identifying the colony trail, checking moisture sources, writing up a treatment plan that uses the least intervention necessary to protect the ecosystem.",
+    personality: "Systematic thinker who sees the whole ecological picture. Genuinely fascinated by insect behavior — the colony logic, the chemical communication, the evolutionary elegance. Can communicate complex things clearly to anxious homeowners.",
+    path_details: "Study for your state pesticide applicator license. Work under a licensed technician. Build toward commercial or specialty work — research partnerships, agricultural consulting, or urban ecology focus.",
+    skills_connected: [],
+    targetStudent: "all",
+  },
+];
+
 const PROJECTS = [
   { id: "p1", title: "Start Your Own Micro-Business", color: "amber", interests: ["business", "tech", "social", "art"], skills: ["ls1", "m1", "s8"], pts: 40, duration: "2-4 months", desc: "Identify a real problem, validate a product or service, and get your first customer.", output: "Business plan, revenue records, reflection write-up", steps: ["Identify 3 possible business ideas", "Interview 10 potential customers", "Build a minimum viable product", "Get your first 5 paying customers", "Track revenue and costs for 30 days", "Write a retrospective"] },
   { id: "p2", title: "Build & Publish a Website", color: "sky", interests: ["tech", "art", "business", "social"], skills: ["t2", "a6", "s8"], pts: 30, duration: "4-8 weeks", desc: "Design and build a complete website about something you care about. Make it live.", output: "Live website URL, case study", steps: ["Define your audience and purpose", "Write all the content first", "Design the visual style and layout", "Build it with HTML/CSS/JS", "Deploy it live", "Get feedback and iterate"] },
@@ -434,41 +549,41 @@ const FACTIONS = [
 
 const SANDBOX_GIGS_DEFAULT = [
   // The Forge
-  { id: "g1", Guild: "f1", title: "Design and Build a Shelf From Scrap Materials", pts: 15, difficulty: "Beginner", time: "4-6 hrs", deliverable: "Photos of finished shelf + materials list", area: "tech" },
-  { id: "g2", Guild: "f1", title: "Repair Something That's Broken in Your Home", pts: 10, difficulty: "Beginner", time: "2-4 hrs", deliverable: "Before/after photos + one-page reflection", area: "life" },
-  { id: "g3", Guild: "f1", title: "Create a Tool or Jig That Solves a Specific Problem", pts: 20, difficulty: "Intermediate", time: "6-8 hrs", deliverable: "Documentation + demo video", area: "tech" },
-  { id: "g4", Guild: "f1", title: "Build a Birdhouse or Pollinator Box From Scratch", pts: 15, difficulty: "Beginner", time: "4-6 hrs", deliverable: "Finished product + build journal", area: "science" },
-  { id: "g5", Guild: "f1", title: "Design a Piece of Furniture and Build a Scale Model", pts: 25, difficulty: "Advanced", time: "8-12 hrs", deliverable: "Design drawings + scale model + reflection", area: "arts" },
+  { id: "g1", faction: "f1", title: "Design and Build a Shelf From Scrap Materials", pts: 15, difficulty: "Beginner", time: "4-6 hrs", deliverable: "Photos of finished shelf + materials list", area: "tech" },
+  { id: "g2", faction: "f1", title: "Repair Something That's Broken in Your Home", pts: 10, difficulty: "Beginner", time: "2-4 hrs", deliverable: "Before/after photos + one-page reflection", area: "life" },
+  { id: "g3", faction: "f1", title: "Create a Tool or Jig That Solves a Specific Problem", pts: 20, difficulty: "Intermediate", time: "6-8 hrs", deliverable: "Documentation + demo video", area: "tech" },
+  { id: "g4", faction: "f1", title: "Build a Birdhouse or Pollinator Box From Scratch", pts: 15, difficulty: "Beginner", time: "4-6 hrs", deliverable: "Finished product + build journal", area: "science" },
+  { id: "g5", faction: "f1", title: "Design a Piece of Furniture and Build a Scale Model", pts: 25, difficulty: "Advanced", time: "8-12 hrs", deliverable: "Design drawings + scale model + reflection", area: "arts" },
   // The Signal
-  { id: "g6", Guild: "f2", title: "Interview Someone Doing Work You Admire", pts: 15, difficulty: "Beginner", time: "3-5 hrs", deliverable: "Interview transcript or recording + 300-word summary", area: "comm" },
-  { id: "g7", Guild: "f2", title: "Write and Publish a 500-Word Essay on Something You Disagree With", pts: 10, difficulty: "Beginner", time: "2-3 hrs", deliverable: "Published essay (blog, newsletter, or social post)", area: "comm" },
-  { id: "g8", Guild: "f2", title: "Create a 3-Episode Podcast Mini-Series", pts: 30, difficulty: "Advanced", time: "12-15 hrs", deliverable: "3 published episodes with show notes", area: "comm" },
-  { id: "g9", Guild: "f2", title: "Produce a 2-3 Minute Explainer Video", pts: 20, difficulty: "Intermediate", time: "6-10 hrs", deliverable: "Finished video published anywhere online", area: "comm" },
-  { id: "g10", Guild: "f2", title: "Document Your Town: A 10-Photo Essay", pts: 15, difficulty: "Beginner", time: "4-6 hrs", deliverable: "10 edited photos + caption for each", area: "arts" },
+  { id: "g6", faction: "f2", title: "Interview Someone Doing Work You Admire", pts: 15, difficulty: "Beginner", time: "3-5 hrs", deliverable: "Interview transcript or recording + 300-word summary", area: "comm" },
+  { id: "g7", faction: "f2", title: "Write and Publish a 500-Word Essay on Something You Disagree With", pts: 10, difficulty: "Beginner", time: "2-3 hrs", deliverable: "Published essay (blog, newsletter, or social post)", area: "comm" },
+  { id: "g8", faction: "f2", title: "Create a 3-Episode Podcast Mini-Series", pts: 30, difficulty: "Advanced", time: "12-15 hrs", deliverable: "3 published episodes with show notes", area: "comm" },
+  { id: "g9", faction: "f2", title: "Produce a 2-3 Minute Explainer Video", pts: 20, difficulty: "Intermediate", time: "6-10 hrs", deliverable: "Finished video published anywhere online", area: "comm" },
+  { id: "g10", faction: "f2", title: "Document Your Town: A 10-Photo Essay", pts: 15, difficulty: "Beginner", time: "4-6 hrs", deliverable: "10 edited photos + caption for each", area: "arts" },
   // The Root
-  { id: "g11", Guild: "f3", title: "Start and Maintain a Compost System for 30 Days", pts: 15, difficulty: "Beginner", time: "Ongoing", deliverable: "Log + before/after photos + reflection", area: "science" },
-  { id: "g12", Guild: "f3", title: "Identify 20 Plants, Insects, or Birds in Your Area", pts: 20, difficulty: "Beginner", time: "6-10 hrs", deliverable: "Documented field notes with photos", area: "science" },
-  { id: "g13", Guild: "f3", title: "Cook a Full Week of Meals Using Only Whole Ingredients", pts: 20, difficulty: "Intermediate", time: "Ongoing", deliverable: "Meal log + notes on what you learned", area: "life" },
-  { id: "g14", Guild: "f3", title: "Grow Something From Seed to Harvest", pts: 25, difficulty: "Intermediate", time: "Ongoing", deliverable: "Growth journal with photos + harvest record", area: "science" },
-  { id: "g15", Guild: "f3", title: "Research and Map Your Local Watershed", pts: 20, difficulty: "Intermediate", time: "5-8 hrs", deliverable: "Annotated map + 500-word write-up", area: "science" },
+  { id: "g11", faction: "f3", title: "Start and Maintain a Compost System for 30 Days", pts: 15, difficulty: "Beginner", time: "Ongoing", deliverable: "Log + before/after photos + reflection", area: "science" },
+  { id: "g12", faction: "f3", title: "Identify 20 Plants, Insects, or Birds in Your Area", pts: 20, difficulty: "Beginner", time: "6-10 hrs", deliverable: "Documented field notes with photos", area: "science" },
+  { id: "g13", faction: "f3", title: "Cook a Full Week of Meals Using Only Whole Ingredients", pts: 20, difficulty: "Intermediate", time: "Ongoing", deliverable: "Meal log + notes on what you learned", area: "life" },
+  { id: "g14", faction: "f3", title: "Grow Something From Seed to Harvest", pts: 25, difficulty: "Intermediate", time: "Ongoing", deliverable: "Growth journal with photos + harvest record", area: "science" },
+  { id: "g15", faction: "f3", title: "Research and Map Your Local Watershed", pts: 20, difficulty: "Intermediate", time: "5-8 hrs", deliverable: "Annotated map + 500-word write-up", area: "science" },
   // The Circuit
-  { id: "g16", Guild: "f4", title: "Build a Calculator App Without Tutorials", pts: 15, difficulty: "Beginner", time: "4-6 hrs", deliverable: "Working app + code on GitHub", area: "tech" },
-  { id: "g17", Guild: "f4", title: "Automate Something Annoying in Your Life", pts: 20, difficulty: "Intermediate", time: "5-8 hrs", deliverable: "Working script or automation + documentation", area: "tech" },
-  { id: "g18", Guild: "f4", title: "Build a Simple Game With a Physics Engine", pts: 25, difficulty: "Intermediate", time: "8-12 hrs", deliverable: "Playable game + reflection on what you learned", area: "tech" },
-  { id: "g19", Guild: "f4", title: "Set Up a Raspberry Pi for a Specific Purpose", pts: 20, difficulty: "Intermediate", time: "5-8 hrs", deliverable: "Working device + setup guide", area: "tech" },
-  { id: "g20", Guild: "f4", title: "Analyze a Dataset and Create 3 Visualizations", pts: 20, difficulty: "Beginner", time: "4-6 hrs", deliverable: "3 charts + a 300-word interpretation", area: "math" },
+  { id: "g16", faction: "f4", title: "Build a Calculator App Without Tutorials", pts: 15, difficulty: "Beginner", time: "4-6 hrs", deliverable: "Working app + code on GitHub", area: "tech" },
+  { id: "g17", faction: "f4", title: "Automate Something Annoying in Your Life", pts: 20, difficulty: "Intermediate", time: "5-8 hrs", deliverable: "Working script or automation + documentation", area: "tech" },
+  { id: "g18", faction: "f4", title: "Build a Simple Game With a Physics Engine", pts: 25, difficulty: "Intermediate", time: "8-12 hrs", deliverable: "Playable game + reflection on what you learned", area: "tech" },
+  { id: "g19", faction: "f4", title: "Set Up a Raspberry Pi for a Specific Purpose", pts: 20, difficulty: "Intermediate", time: "5-8 hrs", deliverable: "Working device + setup guide", area: "tech" },
+  { id: "g20", faction: "f4", title: "Analyze a Dataset and Create 3 Visualizations", pts: 20, difficulty: "Beginner", time: "4-6 hrs", deliverable: "3 charts + a 300-word interpretation", area: "math" },
   // The Commons
-  { id: "g21", Guild: "f5", title: "Organize a Neighborhood Cleanup or Beautification Project", pts: 20, difficulty: "Intermediate", time: "8-12 hrs", deliverable: "Before/after photos + participant count + reflection", area: "life" },
-  { id: "g22", Guild: "f5", title: "Facilitate a Community Discussion on a Local Issue", pts: 20, difficulty: "Intermediate", time: "6-8 hrs", deliverable: "Discussion notes + summary of perspectives + reflection", area: "comm" },
-  { id: "g23", Guild: "f5", title: "Start or Participate in a Buy-Nothing or Mutual Aid Group", pts: 15, difficulty: "Beginner", time: "Ongoing", deliverable: "Log of exchanges + 300-word reflection", area: "life" },
-  { id: "g24", Guild: "f5", title: "Research and Present a Solution to a Local Problem", pts: 25, difficulty: "Advanced", time: "10-14 hrs", deliverable: "Written proposal + presentation to at least 5 people", area: "comm" },
-  { id: "g25", Guild: "f5", title: "Mentor or Tutor Someone Younger in a Skill You Have", pts: 20, difficulty: "Beginner", time: "5-8 hrs", deliverable: "4+ session log + reflection on teaching", area: "life" },
+  { id: "g21", faction: "f5", title: "Organize a Neighborhood Cleanup or Beautification Project", pts: 20, difficulty: "Intermediate", time: "8-12 hrs", deliverable: "Before/after photos + participant count + reflection", area: "life" },
+  { id: "g22", faction: "f5", title: "Facilitate a Community Discussion on a Local Issue", pts: 20, difficulty: "Intermediate", time: "6-8 hrs", deliverable: "Discussion notes + summary of perspectives + reflection", area: "comm" },
+  { id: "g23", faction: "f5", title: "Start or Participate in a Buy-Nothing or Mutual Aid Group", pts: 15, difficulty: "Beginner", time: "Ongoing", deliverable: "Log of exchanges + 300-word reflection", area: "life" },
+  { id: "g24", faction: "f5", title: "Research and Present a Solution to a Local Problem", pts: 25, difficulty: "Advanced", time: "10-14 hrs", deliverable: "Written proposal + presentation to at least 5 people", area: "comm" },
+  { id: "g25", faction: "f5", title: "Mentor or Tutor Someone Younger in a Skill You Have", pts: 20, difficulty: "Beginner", time: "5-8 hrs", deliverable: "4+ session log + reflection on teaching", area: "life" },
   // The Studio
-  { id: "g26", Guild: "f6", title: "Create a Series of 5 Pieces Around a Single Theme", pts: 20, difficulty: "Beginner", time: "6-10 hrs", deliverable: "5 finished pieces + artist statement (100 words)", area: "arts" },
-  { id: "g27", Guild: "f6", title: "Design and Print a Zine on a Topic You Care About", pts: 15, difficulty: "Beginner", time: "5-8 hrs", deliverable: "Printed or PDF zine + distribution to 10+ people", area: "arts" },
-  { id: "g28", Guild: "f6", title: "Compose and Record an Original Instrumental Track", pts: 20, difficulty: "Intermediate", time: "5-8 hrs", deliverable: "Finished track (any format) + production notes", area: "arts" },
-  { id: "g29", Guild: "f6", title: "Design a Done Brand Identity From Scratch", pts: 25, difficulty: "Intermediate", time: "8-12 hrs", deliverable: "Logo, palette, typography, and usage guide", area: "arts" },
-  { id: "g30", Guild: "f6", title: "Perform Something Live (Music, Comedy, Poetry, Theater)", pts: 25, difficulty: "Intermediate", time: "10-15 hrs", deliverable: "Video of performance + reflection", area: "arts" },
+  { id: "g26", faction: "f6", title: "Create a Series of 5 Pieces Around a Single Theme", pts: 20, difficulty: "Beginner", time: "6-10 hrs", deliverable: "5 finished pieces + artist statement (100 words)", area: "arts" },
+  { id: "g27", faction: "f6", title: "Design and Print a Zine on a Topic You Care About", pts: 15, difficulty: "Beginner", time: "5-8 hrs", deliverable: "Printed or PDF zine + distribution to 10+ people", area: "arts" },
+  { id: "g28", faction: "f6", title: "Compose and Record an Original Instrumental Track", pts: 20, difficulty: "Intermediate", time: "5-8 hrs", deliverable: "Finished track (any format) + production notes", area: "arts" },
+  { id: "g29", faction: "f6", title: "Design a Done Brand Identity From Scratch", pts: 25, difficulty: "Intermediate", time: "8-12 hrs", deliverable: "Logo, palette, typography, and usage guide", area: "arts" },
+  { id: "g30", faction: "f6", title: "Perform Something Live (Music, Comedy, Poetry, Theater)", pts: 25, difficulty: "Intermediate", time: "10-15 hrs", deliverable: "Video of performance + reflection", area: "arts" },
 ];
 
 const RIPPLE_MISSIONS_DEFAULT = [
@@ -5422,10 +5537,11 @@ function TeacherApp({ content, setContent, studentAccounts, setStudentAccounts, 
   ];
 
   const PROJECT_FIELDS = [
-    { key: "title", label: "Project Title", placeholder: "e.g. Build & Publish a Website" },
-    { key: "desc", label: "Description", type: "textarea", placeholder: "What will students do?" },
+    { key: "title", label: "Project Title", placeholder: "e.g. Create an Animal World" },
+    { key: "openPrompt", label: "The Open Prompt ✦", type: "textarea", placeholder: "The creative constraint — what to make, with any medium they choose. e.g. 'Create a world inhabited entirely by animals. You choose what it looks like, how you build it, and what story it tells.'" },
+    { key: "desc", label: "Description", type: "textarea", placeholder: "What's the spirit of this project? What should students discover doing it?" },
     { key: "color", label: "Accent Color", type: "select", options: ["amber","sage","clay","sky","lavender"].map(c => ({ value: c, label: c })) },
-    { key: "duration", label: "Duration", placeholder: "e.g. 4-8 weeks" },
+    { key: "duration", label: "Time Range", placeholder: "e.g. 2-6 weeks" },
     { key: "pts", label: "Points", type: "number", placeholder: "30" },
   ];
 
@@ -5494,6 +5610,7 @@ function TeacherApp({ content, setContent, studentAccounts, setStudentAccounts, 
       { id: "tasks", label: "Today's Focus", icon: "🎯" },
       { id: "checkins", label: "Mentor Touch-Points", icon: "💬" },
       { id: "categories", label: "Transcript Categories", icon: "📋" },
+      { id: "careers", label: "Career Map", icon: "🧭" },
     ]},
     { section: "students", items: [
       { id: "accounts", label: "Student Accounts", icon: "🔑" },
@@ -5519,6 +5636,7 @@ function TeacherApp({ content, setContent, studentAccounts, setStudentAccounts, 
       case "tasks": return <TeacherTaskManager taskDefs={content.taskDefs || []} setTaskDefs={setContentKey("taskDefs")} studentAccounts={studentAccounts} />;
       case "checkins": return <CheckInManager checkIns={content.checkIns || []} setCheckIns={setContentKey("checkIns")} content={content} />;
       case "categories": return <TeacherCategories areas={content.areas} setAreas={setContentKey("areas")} skills={content.skills} />;
+      case "careers": return <TeacherCareers careers={content.careers || []} setCareers={setContentKey("careers")} />;
       case "habits": return <TeacherHabitsManager habitDefs={content.habitDefs || []} setHabitDefs={setContentKey("habitDefs")} studentAccounts={studentAccounts} />;
       case "messages": return <TeacherMessaging messages={messages} setMessages={setMessages} studentAccounts={studentAccounts} content={content} />;
       case "accounts": return <TeacherStudentAccounts accounts={studentAccounts} setAccounts={setStudentAccounts} />;
@@ -6519,7 +6637,7 @@ function SkillExplorer({ student, setStudent, completed, content, onComplete, on
                 )}
               </div>
               {selected.interests?.length > 0 && (
-                <div className="card">
+                <div className="card mb-16">
                   <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 2, color: "var(--muted)", marginBottom: 10 }}>Related Interest Areas</div>
                   <div className="pill-row">
                     {selected.interests.map(id => {
@@ -6529,6 +6647,32 @@ function SkillExplorer({ student, setStudent, completed, content, onComplete, on
                   </div>
                 </div>
               )}
+              {/* Connected Careers */}
+              {(() => {
+                const careers = content.careers || [];
+                const interestToCluster = { art: ["character_design","digital_art","color_visual_systems"], film: ["color_visual_systems","liminal_spaces"], writing: ["writing","japanese_storytelling"], gaming: ["game_worldbuilding","color_visual_systems"], science: ["marine_biology","entomology","science"], animals: ["marine_biology","entomology","nature"], nature: ["marine_biology","entomology","nature","deep_ocean"], making: ["material_making","character_design"], people: ["psychology","community"], tech: ["tech","game_worldbuilding"], space: ["deep_ocean","liminal_spaces"], philosophy: ["psychology","writing"], fashion: ["character_design","material_making"], music: ["music"], social: ["community","writing"], health: ["psychology","nature"] };
+                const skillClusters = (selected.interests || []).flatMap(id => interestToCluster[id] || []);
+                const connected = careers.filter(c => (c.clusters || []).some(cl => skillClusters.includes(cl)));
+                if (connected.length === 0) return null;
+                return (
+                  <div className="card">
+                    <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 2, color: "var(--muted)", marginBottom: 12 }}>🧭 Careers that use this skill</div>
+                    {connected.slice(0, 3).map(career => {
+                      const pathInfo = PATH_COLORS[career.path] || PATH_COLORS.portfolio;
+                      return (
+                        <div key={career.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 0", borderBottom: "1px solid var(--border)" }}>
+                          <span style={{ fontSize: 20, flexShrink: 0 }}>{career.icon}</span>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: 13, fontWeight: 600, color: "var(--cream)" }}>{career.title}</div>
+                            <div style={{ fontSize: 11, color: pathInfo.color }}>{pathInfo.label}</div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    {connected.length > 3 && <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 8 }}>+{connected.length - 3} more in the Career Map</div>}
+                  </div>
+                );
+              })()}
             </div>
           </div>
           {selected.blocks?.length > 0 && (
@@ -7131,22 +7275,38 @@ function ProjectLab({ student, completed, content, onComplete, onUncomplete, boa
           </div>
         </div>
         <div className="page-content">
+          {/* Open Prompt — the heart of the project */}
+          {selected.openPrompt && (
+            <div className="card mb-20" style={{ borderColor: `var(--${selected.color || "amber"})`, background: "var(--bg3)" }}>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: `var(--${selected.color || "amber"})`, marginBottom: 10 }}>
+                ✦ The Prompt — make it yours
+              </div>
+              <p style={{ fontSize: 18, color: "var(--cream)", lineHeight: 1.85, margin: 0, fontFamily: "var(--font-display)" }}>{selected.openPrompt}</p>
+              <p style={{ fontSize: 14, color: "var(--muted)", lineHeight: 1.65, marginTop: 12, marginBottom: 0 }}>
+                Any medium. Any format. You choose how to make it real.
+              </p>
+            </div>
+          )}
           <div className="grid-2" style={{ gap: 24 }}>
             <div>
-              <div className="card mb-16">
-                <h3 style={{ fontFamily: "var(--font-display)", fontSize: 17, fontWeight: 600, color: "var(--cream)", marginBottom: 10 }}>About This Project</h3>
-                <p style={{ fontSize: 14, color: "var(--cream-dim)", lineHeight: 1.7 }}>{selected.desc}</p>
-                {selected.output && <div style={{ marginTop: 12, padding: "10px 12px", background: "var(--bg3)", borderRadius: "var(--r)", fontSize: 12, color: "var(--muted)" }}><strong style={{ color: "var(--cream-dim)" }}>Output: </strong>{selected.output}</div>}
-              </div>
-              <div className="card">
-                <h3 style={{ fontFamily: "var(--font-display)", fontSize: 17, fontWeight: 600, color: "var(--cream)", marginBottom: 12 }}>Steps</h3>
-                {(selected.steps || []).map((step, i) => (
-                  <div key={i} className="checklist-item">
-                    <div style={{ width: 22, height: 22, borderRadius: 50, background: "var(--bg4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "var(--muted)", fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
-                    <span style={{ fontSize: 13, color: "var(--cream-dim)", lineHeight: 1.5 }}>{step}</span>
-                  </div>
-                ))}
-              </div>
+              {selected.desc && (
+                <div className="card mb-16">
+                  <h3 style={{ fontFamily: "var(--font-display)", fontSize: 17, fontWeight: 600, color: "var(--cream)", marginBottom: 10 }}>About This Project</h3>
+                  <p style={{ fontSize: 16, color: "var(--cream-dim)", lineHeight: 1.75 }}>{selected.desc}</p>
+                  {selected.output && <div style={{ marginTop: 12, padding: "10px 12px", background: "var(--bg3)", borderRadius: "var(--r)", fontSize: 13, color: "var(--muted)" }}><strong style={{ color: "var(--cream-dim)" }}>Output: </strong>{selected.output}</div>}
+                </div>
+              )}
+              {(selected.steps || []).length > 0 && (
+                <div className="card">
+                  <h3 style={{ fontFamily: "var(--font-display)", fontSize: 17, fontWeight: 600, color: "var(--cream)", marginBottom: 12 }}>Starting points</h3>
+                  {(selected.steps || []).map((step, i) => (
+                    <div key={i} className="checklist-item">
+                      <div style={{ width: 22, height: 22, borderRadius: 50, background: "var(--bg4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "var(--muted)", fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
+                      <span style={{ fontSize: 14, color: "var(--cream-dim)", lineHeight: 1.65 }}>{step}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <div>
               <div className="card">
@@ -7211,14 +7371,17 @@ function ProjectLab({ student, completed, content, onComplete, onUncomplete, boa
             const isDone = completed.includes(proj.id);
             return (
               <div key={proj.id} className={`proj-card color-${proj.color} ${isDone ? "done" : ""}`} onClick={() => setSelected(proj)}>
-                <div className="pill-row mb-4">
-                  {(proj.interests || []).slice(0, 3).map(id => {
-                    const int = INTERESTS.find(i => i.id === id);
-                    return int ? <span key={id} className="tag tag-muted">{int.icon} {int.label}</span> : null;
-                  })}
-                </div>
                 <div className="proj-title">{proj.title}</div>
-                <div className="proj-desc">{proj.desc?.substring(0, 110)}…</div>
+                {proj.openPrompt ? (
+                  <div style={{ fontSize: 14, color: "var(--cream-dim)", lineHeight: 1.65, marginBottom: 10, fontStyle: "italic" }}>
+                    "{proj.openPrompt.substring(0, 100)}{proj.openPrompt.length > 100 ? "…" : ""}"
+                  </div>
+                ) : (
+                  <div className="proj-desc">{(proj.desc || "").substring(0, 110)}{(proj.desc || "").length > 110 ? "…" : ""}</div>
+                )}
+                <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 10, lineHeight: 1.5 }}>
+                  Any medium — you choose how to make it.
+                </div>
                 <div className="flex gap-8" style={{ alignItems: "center" }}>
                   <span className="pts-badge">⭐ {proj.pts} pts</span>
                   {proj.duration && <span className="duration-badge">🕐 {proj.duration}</span>}
@@ -8845,6 +9008,391 @@ function MyProfile({ student, setStudent, content }) {
   );
 }
 
+// ─── CAREER MAP ───────────────────────────────────────────────────────────────
+
+const CLUSTER_LABELS = {
+  character_design: { label: "Character Design", icon: "✏️", color: "lavender" },
+  japanese_storytelling: { label: "Japanese Storytelling", icon: "🌸", color: "clay" },
+  material_making: { label: "Material Making", icon: "🔨", color: "amber" },
+  digital_art: { label: "Digital Art", icon: "🎨", color: "lavender" },
+  marine_biology: { label: "Marine Biology", icon: "🌊", color: "sage" },
+  deep_ocean: { label: "Deep Ocean", icon: "🔭", color: "sky" },
+  entomology: { label: "Entomology", icon: "🐛", color: "sage" },
+  game_worldbuilding: { label: "Game Worldbuilding", icon: "🎮", color: "sky" },
+  liminal_spaces: { label: "Liminal Spaces", icon: "🚪", color: "muted" },
+  color_visual_systems: { label: "Color & Visual Systems", icon: "🎨", color: "amber" },
+  psychology: { label: "Psychology", icon: "🧠", color: "lavender" },
+  nature: { label: "Nature & Ecology", icon: "🌿", color: "sage" },
+  writing: { label: "Writing & Storytelling", icon: "📝", color: "amber" },
+  music: { label: "Music", icon: "🎵", color: "lavender" },
+  science: { label: "Science", icon: "🔬", color: "sage" },
+  tech: { label: "Technology", icon: "💻", color: "sky" },
+  business: { label: "Business", icon: "🚀", color: "amber" },
+  movement: { label: "Movement & Body", icon: "⚡", color: "clay" },
+  food: { label: "Food & Cooking", icon: "🍳", color: "clay" },
+  community: { label: "Community & Service", icon: "🤝", color: "clay" },
+};
+
+const PATH_COLORS = {
+  trade: { color: "var(--amber)", label: "Trade / Apprenticeship" },
+  portfolio: { color: "var(--sky)", label: "Portfolio-Based" },
+  certification: { color: "var(--sage)", label: "Certification Path" },
+  degree: { color: "var(--lavender)", label: "Degree Optional" },
+};
+
+function CareerMap({ careers, content, student }) {
+  const [selected, setSelected] = useState(null);
+  const [filterCluster, setFilterCluster] = useState("all");
+  const [filterPath, setFilterPath] = useState("all");
+  const [search, setSearch] = useState("");
+  const myInterests = student.interests || [];
+
+  const allCareers = careers || [];
+
+  const filtered = allCareers.filter(c => {
+    const matchCluster = filterCluster === "all" || (c.clusters || []).includes(filterCluster);
+    const matchPath = filterPath === "all" || c.path === filterPath;
+    const matchSearch = !search || (c.title + (c.description || "")).toLowerCase().includes(search.toLowerCase());
+    return matchCluster && matchPath && matchSearch;
+  });
+
+  // Which careers connect to my interests?
+  const myInterestClusters = myInterests.map(id => {
+    const map = { animals: ["marine_biology","entomology","nature"], science: ["marine_biology","entomology","science"], art: ["character_design","digital_art","color_visual_systems"], gaming: ["game_worldbuilding","color_visual_systems"], nature: ["marine_biology","entomology","nature","deep_ocean"], film: ["color_visual_systems","liminal_spaces"], writing: ["writing","japanese_storytelling"], music: ["music"], tech: ["tech","game_worldbuilding"], people: ["psychology","community"], making: ["material_making","character_design"], space: ["deep_ocean","liminal_spaces"], philosophy: ["psychology","writing"] };
+    return map[id] || [];
+  }).flat();
+
+  const isRelated = (c) => (c.clusters || []).some(cl => myInterestClusters.includes(cl));
+
+  if (selected) {
+    const career = allCareers.find(c => c.id === selected);
+    if (!career) { setSelected(null); return null; }
+    const pathInfo = PATH_COLORS[career.path] || PATH_COLORS.portfolio;
+    const clusterInfo = (career.clusters || []).map(cl => CLUSTER_LABELS[cl]).filter(Boolean);
+    return (
+      <div>
+        <div className="page-header">
+          <button className="btn btn-ghost btn-sm mb-8" onClick={() => setSelected(null)}>← Career Map</button>
+          <div className="flex-between">
+            <div>
+              <div className="flex-center gap-10 mb-6">
+                <span style={{ fontSize: 32 }}>{career.icon}</span>
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: pathInfo.color, textTransform: "uppercase", letterSpacing: 1.5 }}>{pathInfo.label}</div>
+                  <h1 className="page-title" style={{ marginTop: 2 }}>{career.title}</h1>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="flex gap-6 flex-wrap" style={{ marginTop: 8 }}>
+            {clusterInfo.map(cl => (
+              <span key={cl.label} className={`tag tag-${cl.color}`} style={{ fontSize: 11 }}>{cl.icon} {cl.label}</span>
+            ))}
+          </div>
+        </div>
+
+        <div className="page-content" style={{ maxWidth: 760 }}>
+          {/* Tuesday at 2pm — the most important card */}
+          <div className="card mb-20" style={{ borderColor: pathInfo.color, background: `${pathInfo.color}0a` }}>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--muted)", marginBottom: 10 }}>
+              ⏱ Tuesday at 2pm — what this life actually looks like
+            </div>
+            <p style={{ fontSize: 17, color: "var(--cream)", lineHeight: 1.85, margin: 0, fontFamily: "var(--font-display)", fontStyle: "italic" }}>
+              "{career.tuesday}"
+            </p>
+          </div>
+
+          <div className="grid-2" style={{ gap: 20 }}>
+            <div>
+              <div className="card mb-16">
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--muted)", marginBottom: 10 }}>What this is</div>
+                <p style={{ fontSize: 16, color: "var(--cream-dim)", lineHeight: 1.75, margin: 0 }}>{career.description}</p>
+              </div>
+              {career.personality && (
+                <div className="card mb-16">
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--muted)", marginBottom: 10 }}>Who thrives here</div>
+                  <p style={{ fontSize: 16, color: "var(--cream-dim)", lineHeight: 1.75, margin: 0 }}>{career.personality}</p>
+                </div>
+              )}
+            </div>
+            <div>
+              {career.path_details && (
+                <div className="card mb-16" style={{ borderColor: `${pathInfo.color}44` }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--muted)", marginBottom: 10 }}>How you actually get here</div>
+                  <p style={{ fontSize: 16, color: "var(--cream-dim)", lineHeight: 1.75, margin: 0 }}>{career.path_details}</p>
+                </div>
+              )}
+              {/* Skills in Forge that connect */}
+              {(() => {
+                const relatedSkills = (content.skills || []).filter(s =>
+                  (career.clusters || []).some(cl => {
+                    const clusterToInterests = { character_design: ["art","film","fashion"], digital_art: ["art","tech","gaming"], japanese_storytelling: ["writing","art","history"], material_making: ["making","art","tech"], marine_biology: ["science","animals","nature"], deep_ocean: ["science","space","nature"], entomology: ["science","animals","nature"], game_worldbuilding: ["gaming","tech","writing"], liminal_spaces: ["art","philosophy","film"], color_visual_systems: ["art","tech","gaming"], psychology: ["people","philosophy","health"] };
+                    const interests = clusterToInterests[cl] || [];
+                    return (s.interests || []).some(i => interests.includes(i));
+                  })
+                ).slice(0, 4);
+                if (relatedSkills.length === 0) return null;
+                return (
+                  <div className="card">
+                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--muted)", marginBottom: 12 }}>Skills in Forge that build toward this</div>
+                    {relatedSkills.map(skill => (
+                      <div key={skill.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0", borderBottom: "1px solid var(--border)" }}>
+                        <span style={{ fontSize: 18 }}>{skill.icon}</span>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: 14, fontWeight: 600, color: "var(--cream)" }}>{skill.name}</div>
+                          <div style={{ fontSize: 12, color: "var(--muted)" }}>{skill.desc?.substring(0, 60)}…</div>
+                        </div>
+                        <span className="pts-badge" style={{ fontSize: 10 }}>{skill.pts}pts</span>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="page-header">
+        <h1 className="page-title">🧭 Career Map</h1>
+        <p className="page-sub">Real paths that real people take. Browse freely — follow what pulls you.</p>
+      </div>
+      <div className="page-content">
+        {/* Search and filters */}
+        <div className="flex gap-10 mb-16 flex-wrap">
+          <div className="search-bar" style={{ flex: 1, marginBottom: 0, minWidth: 200 }}>
+            <span style={{ color: "var(--muted)" }}>🔍</span>
+            <input placeholder="Search careers…" value={search} onChange={e => setSearch(e.target.value)} />
+          </div>
+          <select className="input" style={{ width: "auto", minWidth: 160 }} value={filterPath} onChange={e => setFilterPath(e.target.value)}>
+            <option value="all">All paths</option>
+            <option value="trade">Trade / Apprenticeship</option>
+            <option value="portfolio">Portfolio-Based</option>
+            <option value="certification">Certification</option>
+            <option value="degree">Degree Optional</option>
+          </select>
+        </div>
+
+        {/* For You section */}
+        {myInterests.length > 0 && (() => {
+          const forYou = allCareers.filter(isRelated);
+          if (forYou.length === 0) return null;
+          return (
+            <div className="mb-24">
+              <div style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, color: "var(--cream)", marginBottom: 6 }}>✦ Connected to your interests</div>
+              <p style={{ fontSize: 14, color: "var(--muted)", lineHeight: 1.65, marginBottom: 14 }}>Based on what you've told us you care about — these paths build from the same roots.</p>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 14 }}>
+                {forYou.map(career => <CareerCard key={career.id} career={career} onSelect={() => setSelected(career.id)} highlighted />)}
+              </div>
+              <div style={{ height: 1, background: "var(--border)", margin: "24px 0" }} />
+            </div>
+          );
+        })()}
+
+        {/* All careers */}
+        <div style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 600, color: "var(--muted)", marginBottom: 14 }}>
+          {filterCluster === "all" && filterPath === "all" && !search ? "All paths" : `${filtered.length} result${filtered.length !== 1 ? "s" : ""}`}
+        </div>
+        {filtered.length === 0 ? (
+          <EmptyState icon="🧭" title="No careers match this filter" sub="Try a different search or clear the filters." />
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 14 }}>
+            {filtered.map(career => <CareerCard key={career.id} career={career} onSelect={() => setSelected(career.id)} />)}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function CareerCard({ career, onSelect, highlighted }) {
+  const pathInfo = PATH_COLORS[career.path] || PATH_COLORS.portfolio;
+  const clusterInfo = ((career.clusters || []).slice(0, 3)).map(cl => CLUSTER_LABELS[cl]).filter(Boolean);
+  return (
+    <div onClick={onSelect} style={{
+      background: "var(--bg2)", border: `1px solid ${highlighted ? `${pathInfo.color}44` : "var(--border)"}`,
+      borderRadius: "var(--r-lg)", padding: "18px 20px", cursor: "pointer",
+      transition: "all 0.15s", position: "relative", overflow: "hidden",
+    }}
+    onMouseEnter={e => { e.currentTarget.style.borderColor = pathInfo.color; e.currentTarget.style.transform = "translateY(-2px)"; }}
+    onMouseLeave={e => { e.currentTarget.style.borderColor = highlighted ? `${pathInfo.color}44` : "var(--border)"; e.currentTarget.style.transform = "translateY(0)"; }}>
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: pathInfo.color }} />
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 10, marginTop: 4 }}>
+        <span style={{ fontSize: 28 }}>{career.icon}</span>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: pathInfo.color, textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 2 }}>{pathInfo.label}</div>
+          <div style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, color: "var(--cream)", lineHeight: 1.2 }}>{career.title}</div>
+        </div>
+      </div>
+      <p style={{ fontSize: 14, color: "var(--muted)", lineHeight: 1.65, margin: "0 0 12px" }}>
+        {career.description?.substring(0, 110)}{(career.description?.length || 0) > 110 ? "…" : ""}
+      </p>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+        {clusterInfo.map(cl => (
+          <span key={cl.label} style={{ fontSize: 10, padding: "2px 8px", borderRadius: 20, background: "var(--bg3)", color: "var(--muted)", border: "1px solid var(--border)" }}>{cl.icon} {cl.label}</span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── TEACHER: CAREER MANAGER ──────────────────────────────────────────────────
+
+function TeacherCareers({ careers, setCareers }) {
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [form, setForm] = useState({});
+  const [clustersText, setClustersText] = useState("");
+
+  const allClusters = Object.entries(CLUSTER_LABELS).map(([id, info]) => ({ id, ...info }));
+
+  const blank = () => ({ title: "", icon: "🧭", path: "portfolio", description: "", tuesday: "", personality: "", path_details: "", targetStudent: "all" });
+
+  const openNew = () => { setEditingId(null); setForm(blank()); setClustersText(""); setShowForm(true); };
+  const openEdit = (c) => { setEditingId(c.id); setForm({ ...c }); setClustersText((c.clusters || []).join(", ")); setShowForm(true); };
+
+  const save = () => {
+    if (!form.title?.trim()) return;
+    const item = {
+      ...form,
+      id: editingId || ("car_" + Date.now()),
+      clusters: clustersText.split(",").map(s => s.trim()).filter(Boolean),
+      skills_connected: form.skills_connected || [],
+    };
+    setCareers(prev => editingId ? prev.map(c => c.id === editingId ? item : c) : [...prev, item]);
+    setShowForm(false);
+  };
+
+  const del = (id) => { if (window.confirm("Delete this career entry?")) setCareers(prev => prev.filter(c => c.id !== id)); };
+
+  const setF = (k, v) => setForm(p => ({ ...p, [k]: v }));
+
+  return (
+    <div>
+      <div className="page-header">
+        <div className="flex-between">
+          <div>
+            <h1 className="page-title">🧭 Career Map</h1>
+            <p className="page-sub">{(careers || []).length} career entr{(careers || []).length !== 1 ? "ies" : "y"} · Students browse these freely to explore paths</p>
+          </div>
+          <button className="btn btn-primary" onClick={openNew}>+ Add Career</button>
+        </div>
+      </div>
+
+      <div className="page-content">
+        {(careers || []).length === 0 ? (
+          <EmptyState icon="🧭" title="No career entries yet"
+            sub="Add paths that connect to your students' interests. Be specific — 'Tuesday at 2pm' is the most important field." />
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {(careers || []).map(career => {
+              const pathInfo = PATH_COLORS[career.path] || PATH_COLORS.portfolio;
+              const clusterInfo = ((career.clusters || []).slice(0, 4)).map(cl => CLUSTER_LABELS[cl]).filter(Boolean);
+              return (
+                <div key={career.id} style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: "var(--r-lg)", padding: "16px 20px", display: "flex", alignItems: "flex-start", gap: 14 }}
+                  onMouseEnter={e => e.currentTarget.style.borderColor = pathInfo.color}
+                  onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}>
+                  <span style={{ fontSize: 28, flexShrink: 0 }}>{career.icon}</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: pathInfo.color, textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 2 }}>{pathInfo.label}</div>
+                    <div style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, color: "var(--cream)", marginBottom: 4 }}>{career.title}</div>
+                    {career.tuesday && <p style={{ fontSize: 13, color: "var(--muted)", lineHeight: 1.6, marginBottom: 8, fontStyle: "italic" }}>"{career.tuesday.substring(0, 100)}…"</p>}
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                      {clusterInfo.map(cl => <span key={cl.label} className={`tag tag-${cl.color}`} style={{ fontSize: 10 }}>{cl.icon} {cl.label}</span>)}
+                    </div>
+                  </div>
+                  <div className="flex gap-8" style={{ flexShrink: 0 }}>
+                    <button className="btn btn-ghost btn-sm" onClick={() => openEdit(career)}>Edit</button>
+                    <button className="btn btn-clay btn-sm" onClick={() => del(career.id)}>✕</button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      <Modal open={showForm} onClose={() => setShowForm(false)}
+        title={editingId ? "Edit Career Entry" : "New Career Entry"}
+        size="modal-lg"
+        footer={<><button className="btn btn-ghost" onClick={() => setShowForm(false)}>Cancel</button><button className="btn btn-primary" onClick={save} disabled={!form.title?.trim()}>Save Career</button></>}>
+
+        <div className="grid-2" style={{ gap: 14 }}>
+          <div className="form-row">
+            <label className="label">Career Title</label>
+            <input className="input" value={form.title || ""} onChange={e => setF("title", e.target.value)} placeholder="e.g. Game Environment Artist" />
+          </div>
+          <div className="form-row">
+            <label className="label">Icon (emoji)</label>
+            <input className="input" value={form.icon || ""} onChange={e => setF("icon", e.target.value)} placeholder="🎮" />
+          </div>
+        </div>
+
+        <div className="form-row">
+          <label className="label">Path Type</label>
+          <div className="flex gap-6 flex-wrap">
+            {Object.entries(PATH_COLORS).map(([key, info]) => (
+              <button key={key} className={`filter-btn ${form.path === key ? "active" : ""}`}
+                style={form.path === key ? { color: info.color, borderColor: info.color } : {}}
+                onClick={() => setF("path", key)}>{info.label}</button>
+            ))}
+          </div>
+        </div>
+
+        <div className="form-row">
+          <label className="label">Tuesday at 2pm ✦ — what this life actually looks like</label>
+          <textarea className="input textarea" style={{ minHeight: 80 }} value={form.tuesday || ""}
+            onChange={e => setF("tuesday", e.target.value)}
+            placeholder="Write a specific, vivid scene from the middle of a working day. This is the most important field." />
+        </div>
+
+        <div className="form-row">
+          <label className="label">Description</label>
+          <textarea className="input textarea" style={{ minHeight: 80 }} value={form.description || ""}
+            onChange={e => setF("description", e.target.value)} placeholder="What is this career? What does it draw from?" />
+        </div>
+
+        <div className="form-row">
+          <label className="label">Who thrives here</label>
+          <textarea className="input textarea" style={{ minHeight: 70 }} value={form.personality || ""}
+            onChange={e => setF("personality", e.target.value)} placeholder="What kind of person? What personality, working style, what lights them up?" />
+        </div>
+
+        <div className="form-row">
+          <label className="label">How you actually get here</label>
+          <textarea className="input textarea" style={{ minHeight: 70 }} value={form.path_details || ""}
+            onChange={e => setF("path_details", e.target.value)} placeholder="The real path — apprenticeship, portfolio, certification, etc." />
+        </div>
+
+        <div className="form-row">
+          <label className="label">Interest Clusters (comma-separated)</label>
+          <input className="input" value={clustersText}
+            onChange={e => setClustersText(e.target.value)}
+            placeholder="e.g. character_design, digital_art, japanese_storytelling" />
+          <div style={{ marginTop: 8, display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {allClusters.map(cl => {
+              const active = clustersText.split(",").map(s => s.trim()).includes(cl.id);
+              return (
+                <button key={cl.id} onClick={() => {
+                  const current = clustersText.split(",").map(s => s.trim()).filter(Boolean);
+                  const updated = active ? current.filter(c => c !== cl.id) : [...current, cl.id];
+                  setClustersText(updated.join(", "));
+                }} style={{ padding: "4px 10px", borderRadius: 20, fontSize: 11, cursor: "pointer", fontFamily: "var(--font-body)", border: `1px solid ${active ? "var(--amber)" : "var(--border)"}`, background: active ? "var(--amber-dim)" : "var(--bg3)", color: active ? "var(--amber)" : "var(--muted)" }}>
+                  {cl.icon} {cl.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </Modal>
+    </div>
+  );
+}
+
 // ─── STUDENT: JOURNAL ────────────────────────────────────────────────────────
 
 function StudentJournal({ journalEntries, onSaveJournal, content, onNavigate }) {
@@ -9153,6 +9701,7 @@ function StudentApp({ student, setStudent, content, messages, setMessages, onSwi
     null,
     { id: "portfolio", label: "Portfolio", icon: "🗂" },
     { id: "transcript", label: "Transcript", icon: "📋" },
+    { id: "careermap", label: "Career Map", icon: "🧭" },
     { id: "roadmap", label: "Four-Year Arc", icon: "🗺" },
     { id: "profile", label: "My Profile", icon: "👤" },
   ];
@@ -9175,6 +9724,7 @@ function StudentApp({ student, setStudent, content, messages, setMessages, onSwi
       case "portfolio": return <Portfolio student={student} completed={completed} content={content} onUncomplete={uncomplete} submissions={submissions} setSubmission={setSubmission} portfolioFeatured={portfolioFeatured} setPortfolioFeatured={setPortfolioFeatured} />;
       case "journal": return <StudentJournal journalEntries={journalEntries} onSaveJournal={saveJournalEntry} content={content} onNavigate={setView} />;
       case "transcript": return <Transcript completed={completed} content={content} />;
+      case "careermap": return <CareerMap careers={content.careers || []} content={content} student={student} />;
       case "roadmap": return <Roadmap roadmap={roadmap} setRoadmap={setRoadmap} />;
       case "profile": return <MyProfile student={student} setStudent={setStudent} content={content} />;
       default: return null;
@@ -9294,6 +9844,7 @@ function buildDefaultPlatformDoc() {
       teensGuide: TEENS_GUIDE_DEFAULT, lightRoom: LIGHT_ROOM_DEFAULT,
       dailyDrops: DAILY_DROPS_DEFAULT, checkIns: CHECK_INS_DEFAULT,
       profileQuestions: PROFILE_QUESTIONS_DEFAULT, habitDefs: [], taskDefs: [],
+      careers: CAREERS_DEFAULT,
     },
     studentAccounts: DEFAULT_STUDENT_ACCOUNTS,
     teacherPassword: "forge2026",
@@ -9334,7 +9885,7 @@ export default function App() {
             } catch { return acct; }
           })
         );
-        setContentLocal(d.content || buildDefaultPlatformDoc().content);
+        setContentLocal(d.content ? { ...buildDefaultPlatformDoc().content, ...d.content, careers: d.content.careers || CAREERS_DEFAULT } : buildDefaultPlatformDoc().content);
         setAcctsLocal(enriched);
         setTpwLocal(d.teacherPassword || "forge2026");
         setMsgsLocal(d.messages || {});
