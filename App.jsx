@@ -9681,31 +9681,6 @@ function StudentApp({ student, setStudent, content, messages, setMessages, onSwi
     }]);
   };
 
-  const NAV = [
-    { id: "dashboard", label: "Home Base", icon: "⬡" },
-    { id: "planner", label: "Rhythm Planner", icon: "📅" },
-    null,
-    { id: "skills", label: "Skill Library", icon: "◈" },
-    { id: "projects", label: "Project Lab", icon: "⬟" },
-    { id: "factions", label: "Forge Guilds", icon: "⚡" },
-    { id: "ripple", label: "Contribution Lab", icon: "🌊" },
-    null,
-    { id: "teensguide", label: "Foundations Guide", icon: "📖" },
-    { id: "lightroom", label: "The Deep Room", icon: "💡" },
-    { id: "drops", label: "Sparks", icon: "✨" },
-    { id: "journal", label: "Learning Log", icon: "📓" },
-    { id: "habits", label: "Rhythms", icon: "🔁" },
-    { id: "tasks", label: "Today's Focus", icon: "🎯" },
-    { id: "goals", label: "Horizons", icon: "🌅" },
-    { id: "messages", label: "Messages", icon: "✉️" },
-    null,
-    { id: "portfolio", label: "Portfolio", icon: "🗂" },
-    { id: "transcript", label: "Transcript", icon: "📋" },
-    { id: "careermap", label: "Career Map", icon: "🧭" },
-    { id: "roadmap", label: "Four-Year Arc", icon: "🗺" },
-    { id: "profile", label: "My Profile", icon: "👤" },
-  ];
-
   const renderView = () => {
     switch (view) {
       case "dashboard": return <StudentDashboard student={student} completed={completed} points={points} content={content} weekPlan={weekPlan} grabbedGigs={grabbedGigs} onNavigate={setView} boards={boards} setBoards={setBoards} saveToBoard={saveToBoard} onComplete={complete} onUncomplete={uncomplete} journalEntries={journalEntries} habitDefs={content.habitDefs || []} habitLogs={habitLogs} setHabitLogs={setHabitLogs} goals={goals} messages={messages} taskDefs={content.taskDefs || []} taskLogs={taskLogs} setTaskLogs={setTaskLogs} dailyPlan={dailyPlan} completionDates={completionDates} checkInAnswers={checkInAnswers} />;
@@ -9731,7 +9706,66 @@ function StudentApp({ student, setStudent, content, messages, setMessages, onSwi
     }
   };
 
-  const pct = Math.round((points / content.areas.reduce((a,b)=>a+(b.target||0),0)) * 100);
+  const NAV_GROUPS = [
+    {
+      id: "today", label: "Today", icon: "☀️",
+      items: [
+        { id: "dashboard",  label: "Home Base",       icon: "⬡" },
+        { id: "planner",    label: "Rhythm Planner",  icon: "📅" },
+        { id: "tasks",      label: "Today's Focus",   icon: "🎯" },
+        { id: "drops",      label: "Sparks",          icon: "✨" },
+      ],
+    },
+    {
+      id: "work", label: "My Work", icon: "🔨",
+      items: [
+        { id: "skills",     label: "Skill Library",   icon: "◈" },
+        { id: "projects",   label: "Project Lab",     icon: "⬟" },
+        { id: "factions",   label: "Forge Guilds",    icon: "⚡" },
+        { id: "ripple",     label: "Contribution Lab",icon: "🌊" },
+        { id: "journal",    label: "Learning Log",    icon: "📓" },
+      ],
+    },
+    {
+      id: "explore", label: "Explore", icon: "🔭",
+      items: [
+        { id: "teensguide", label: "Foundations Guide", icon: "📖" },
+        { id: "lightroom",  label: "The Deep Room",     icon: "💡" },
+        { id: "goals",      label: "Horizons",          icon: "🌅" },
+        { id: "careermap",  label: "Career Map",        icon: "🧭" },
+      ],
+    },
+    {
+      id: "record", label: "My Record", icon: "🗂",
+      items: [
+        { id: "portfolio",  label: "Portfolio",        icon: "🗂" },
+        { id: "transcript", label: "Transcript",       icon: "📋" },
+        { id: "roadmap",    label: "Four-Year Arc",    icon: "🗺" },
+      ],
+    },
+    {
+      id: "me", label: "Me", icon: "👤",
+      items: [
+        { id: "habits",     label: "Rhythms",          icon: "🔁" },
+        { id: "messages",   label: "Messages",         icon: "✉️" },
+        { id: "profile",    label: "My Profile",       icon: "👤" },
+      ],
+    },
+  ];
+
+  // Which group is active?
+  const activeGroup = NAV_GROUPS.find(g => g.items.some(i => i.id === view))?.id || "today";
+  const [openGroups, setOpenGroups] = React.useState(() => ({ [activeGroup]: true }));
+
+  const toggleGroup = (id) => setOpenGroups(prev => ({ ...prev, [id]: !prev[id] }));
+
+  // Auto-open group when navigating to it
+  React.useEffect(() => {
+    const grp = NAV_GROUPS.find(g => g.items.some(i => i.id === view))?.id;
+    if (grp) setOpenGroups(prev => ({ ...prev, [grp]: true }));
+  }, [view]);
+
+  const pct = Math.round((points / Math.max(1, content.areas.reduce((a,b)=>a+(b.target||0),0))) * 100);
 
   return (
     <div className="app-wrap">
@@ -9751,15 +9785,44 @@ function StudentApp({ student, setStudent, content, messages, setMessages, onSwi
           <div className="logo-badge" style={{ background: "var(--sky)", color: "#0c0c16" }}>Studio</div>
           <div className="logo-role">{student.name}</div>
         </div>
-        {NAV.map((item, i) => {
-          if (!item) return <div key={i} className="divider" style={{ margin: "6px 20px" }} />;
-          return (
-            <div key={item.id} className={`nav-item ${view === item.id ? "active" : ""}`} onClick={() => setView(item.id)}>
-              <span className="nav-icon">{item.icon}</span>
-              {item.label}
-            </div>
-          );
-        })}
+
+        <div style={{ flex: 1, overflowY: "auto" }}>
+          {NAV_GROUPS.map(group => {
+            const isOpen = openGroups[group.id];
+            const groupActive = group.items.some(i => i.id === view);
+            return (
+              <div key={group.id}>
+                {/* Group header */}
+                <div
+                  onClick={() => toggleGroup(group.id)}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 8,
+                    padding: "10px 20px 6px",
+                    cursor: "pointer",
+                    userSelect: "none",
+                  }}>
+                  <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: groupActive ? "var(--amber)" : "var(--muted)", flex: 1 }}>
+                    {group.label}
+                  </span>
+                  <span style={{ fontSize: 10, color: "var(--muted)", opacity: 0.6 }}>{isOpen ? "▲" : "▼"}</span>
+                </div>
+
+                {/* Group items */}
+                {isOpen && group.items.map(item => (
+                  <div
+                    key={item.id}
+                    className={`nav-item ${view === item.id ? "active" : ""}`}
+                    onClick={() => setView(item.id)}
+                    style={{ paddingLeft: 28 }}>
+                    <span className="nav-icon">{item.icon}</span>
+                    {item.label}
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+        </div>
+
         <div className="sidebar-footer">
           <div className="pts-label">Momentum Points</div>
           <div className="pts-count">{points}</div>
