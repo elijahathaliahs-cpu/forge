@@ -8918,7 +8918,7 @@ function StudentJournal({ journalEntries, onSaveJournal, content, onNavigate }) 
           <div className="form-row">
             <textarea
               className="input textarea"
-              placeholder="What did you do today? What did you figure out or notice? What surprised you? What do you want to do tomorrow?&#10;&#10;Two sentences minimum — no maximum. Just write what's real."
+              placeholder="What did you do today? What did you figure out? What surprised you? What do you want to do tomorrow? Two sentences minimum — no maximum. Just write what's real."
               value={newEntry}
               onChange={e => setNewEntry(e.target.value)}
               style={{ minHeight: 130, fontSize: 15, lineHeight: 1.75, resize: "vertical" }}
